@@ -8,7 +8,9 @@ import { StockService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ITEM_CATEGORIES, ItemCategory, PagedList, StockListRow } from '@org/shared-models';
 import { ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectSelectedId } from '@org/ui';
+import { AuthService } from '@org/auth';
 import { ItemStockComponent } from './item-stock';
+import { StockImportComponent } from './stock-import';
 
 const PAGE_SIZE = 20;
 const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -16,12 +18,12 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
 /**
  * The stock list (stock spec R9, R10, R16): one row per stock-managed item with its Main, Damaged and Sample quantities and a
  * warning mark at zero or below; searchable, filtered by category, "zero or below only" and "show inactive", sortable by name or
- * code, paged. An item's stock opens in the panel beside the list (platform U10).
+ * code, paged. An item's stock opens in the panel beside the list (platform U10). The Owner also gets the Excel opening import (R17).
  */
 @Component({
   selector: 'app-stock-list',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, ItemStockComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, ItemStockComponent, StockImportComponent],
   templateUrl: './stock-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,6 +32,9 @@ export class StockListComponent {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** R17: only the Owner imports openings. */
+  readonly canEdit = inject(AuthService).hasAppRole('OWNER');
 
   readonly selectedId = injectSelectedId();
   readonly hasPanel = computed(() => this.selectedId() !== null);
@@ -49,6 +54,8 @@ export class StockListComponent {
   readonly loading = signal(false);
   readonly loadError = signal('');
   readonly skeletonRows = [1, 2, 3];
+
+  readonly importOpen = signal(false);
 
   constructor() {
     this.search.valueChanges

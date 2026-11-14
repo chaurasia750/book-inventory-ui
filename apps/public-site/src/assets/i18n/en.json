@@ -219,7 +219,18 @@
       "document_already_posted": "The stock of this document was already posted.",
       "document_not_posted": "This document has no stock posted.",
       "document_already_reversed": "The stock of this document was already reversed.",
-      "invalid_document": "The document type, id and number are required."
+      "invalid_document": "The document type, id and number are required.",
+      "import": {
+        "invalid_file": "Upload an Excel file (.xlsx) made from the template.",
+        "too_large": "The file is larger than 5 MB.",
+        "too_many_rows": "The file has more than 5000 rows.",
+        "empty": "The file has no rows to import.",
+        "rows_invalid": "Some rows are wrong; nothing was imported. Correct them and upload the file again.",
+        "item_required": "The item code or barcode is empty.",
+        "item_unknown": "No item has this code or barcode.",
+        "invalid_stock_type": "The stock type must be MAIN, DAMAGED or SAMPLE (empty means MAIN).",
+        "duplicate_row": "This item and stock type is already in an earlier row of the file."
+      }
     }
   },
   "iam": {
@@ -1101,6 +1112,31 @@
       "by": "By",
       "otherUser": "Super Admin",
       "empty": "No movement yet."
+    },
+    "import": {
+      "button": "Import opening stock",
+      "title": "Import opening stock from Excel",
+      "hint": "Fill the template: item code or barcode, stock type (MAIN, DAMAGED or SAMPLE; empty means MAIN) and quantity. Every row is imported, or none if any row is wrong.",
+      "template": "Download template",
+      "file": "Excel file (.xlsx, at most 5 MB, 5000 rows)",
+      "openingDate": "Opening date",
+      "submit": "Import",
+      "required": "Choose an .xlsx file and the opening date.",
+      "notXlsx": "Only .xlsx files can be imported.",
+      "tooLarge": "The file is larger than 5 MB.",
+      "done": "{{count}} openings were imported.",
+      "refused": "Nothing was imported. Correct these rows and upload the file again:",
+      "row": "Row",
+      "column": "Column",
+      "reason": "Reason",
+      "columns": {
+        "ItemCodeOrBarcode": "Item code or barcode",
+        "StockType": "Stock type",
+        "Quantity": "Quantity"
+      },
+      "close": "Close",
+      "again": "Upload another file",
+      "templateError": "The template could not be downloaded."
     }
   }
 }

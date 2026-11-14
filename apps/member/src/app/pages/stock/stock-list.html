@@ -4,6 +4,9 @@
       <h1 class="text-2xl font-bold text-primary-fg">{{ 'stock.title' | translate }}</h1>
       <p class="mt-0.5 text-sm text-gray-500">{{ 'stock.subtitle' | translate }}</p>
     </div>
+    @if (canEdit) {
+      <app-button variant="secondary" (clicked)="importOpen.set(true)">{{ 'stock.import.button' | translate }}</app-button>
+    }
   </div>
 
   <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'stock.title' | translate" [detailLabel]="'stock.panelLabel' | translate">
@@ -127,3 +130,7 @@
     </div>
   </app-list-detail>
 </div>
+
+@if (canEdit) {
+  <app-stock-import [open]="importOpen()" (closed)="importOpen.set(false)" (imported)="load()" />
+}
