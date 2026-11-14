@@ -1,0 +1,124 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'vendor.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'vendor.subtitle' | translate }}</p>
+    </div>
+    <app-button (clicked)="openAdd()">{{ 'vendor.add.button' | translate }}</app-button>
+  </div>
+
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'vendor.title' | translate" [detailLabel]="'vendor.panelLabel' | translate">
+    <div list>
+      <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
+        <input type="search" [formControl]="search" [placeholder]="'vendor.filters.search' | translate" [attr.aria-label]="'vendor.filters.search' | translate"
+          class="h-10 min-w-[12rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+        @if (!hasPanel()) {
+          <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'vendor.columns.status' | translate" [class]="select">
+            <option value="">{{ 'vendor.filters.allStatuses' | translate }}</option>
+            @for (s of statuses; track s) { <option [value]="s">{{ 'vendor.status.' + s | translate }}</option> }
+          </select>
+          <select (change)="setState($any($event.target).value)" [attr.aria-label]="'vendor.fields.state' | translate" [class]="select">
+            <option value="">{{ 'vendor.filters.allStates' | translate }}</option>
+            @for (s of states; track s) { <option [value]="s">{{ s }}</option> }
+          </select>
+        }
+      </div>
+
+      @if (loadError()) {
+        <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+          <span>{{ loadError() }}</span>
+          <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+        </div>
+      }
+
+      @if (hasPanel()) {
+        <ul class="m-0 list-none divide-y divide-neutral-100 p-0 dark:divide-charcoal-700">
+          @if (loading()) {
+            @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
+          } @else {
+            @for (vendor of result()?.items ?? []; track vendor.id) {
+              <li>
+                <button type="button" (click)="openView(vendor.id)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700"
+                  [class.bg-gold-50]="vendor.id === selectedId()" [attr.aria-current]="vendor.id === selectedId() ? 'true' : null">
+                  <span class="min-w-0 flex-1">
+                    <span class="block truncate text-sm font-medium text-primary-fg">{{ vendor.name }}</span>
+                    <span class="block font-mono text-xs text-gray-500">{{ vendor.code }}</span>
+                  </span>
+                  <span class="rounded-full px-2 py-0.5 text-[11px] font-medium" [class]="statusClass(vendor.status)">{{ 'vendor.status.' + vendor.status | translate }}</span>
+                </button>
+              </li>
+            } @empty {
+              @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'vendor.empty' | translate }}</li> }
+            }
+          }
+        </ul>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.code' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.name' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.contact' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.state' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.bank' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.status' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @if (loading()) {
+                @for (i of skeletonRows; track i) {
+                  <tr>
+                    <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="10rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                  </tr>
+                }
+              } @else {
+                @for (vendor of result()?.items ?? []; track vendor.id) {
+                  <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="openView(vendor.id)" (keydown.enter)="openView(vendor.id)" tabindex="0">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ vendor.code }}</td>
+                    <td class="px-4 py-3 font-medium text-primary-fg">{{ vendor.name }}</td>
+                    <td class="px-4 py-3 text-gray-600"><div>{{ vendor.contactPerson || '-' }}</div><div class="text-xs text-gray-500">{{ vendor.mobile || '' }}</div></td>
+                    <td class="px-4 py-3 text-gray-600">{{ vendor.state || '-' }}</td>
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ vendor.bankAccountMasked || '-' }}</td>
+                    <td class="px-4 py-3">
+                      <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(vendor.status)">{{ 'vendor.status.' + vendor.status | translate }}</span>
+                    </td>
+                  </tr>
+                } @empty {
+                  @if (!loadError()) {
+                    <tr><td colspan="6" class="py-10 text-center text-sm text-gray-400">{{ 'vendor.empty' | translate }}</td></tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+    </div>
+
+    <div detail>
+      @switch (panel().mode) {
+        @case ('new') {
+          <app-vendor-add (created)="openCreated($event)" (closed)="closePanel()" />
+        }
+        @case ('edit') {
+          @if (selectedId(); as id) {
+            <app-vendor-edit [id]="id" (saved)="afterEdit(id)" (closed)="openView(id)" />
+          }
+        }
+        @default {
+          @if (selectedId(); as id) {
+            <app-vendor-detail [id]="id" (closed)="closePanel()" (changed)="load()" (editRequested)="openEdit(id)" />
+          }
+        }
+      }
+    </div>
+  </app-list-detail>
+</div>

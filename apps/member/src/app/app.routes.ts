@@ -34,6 +34,17 @@ export const appRoutes: Route[] = [
         children: [{ path: ':id', children: [] }],
       },
       {
+        path: 'vendors',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('./pages/vendors/vendor-list').then((m) => m.VendorListComponent),
+        // The vendor, the form for a new one and the edit form open beside the list (platform U10); vendors are the Owner's only.
+        children: [
+          { path: 'new', children: [] },
+          { path: ':id/edit', children: [] },
+          { path: ':id', children: [] },
+        ],
+      },
+      {
         path: 'schools',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/schools/school-list').then((m) => m.SchoolListComponent),
