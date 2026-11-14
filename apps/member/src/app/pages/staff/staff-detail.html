@@ -1,7 +1,6 @@
-<div class="space-y-6">
-  <a routerLink="/staff" class="text-sm text-brand-600 hover:underline">{{ 'staff.back' | translate }}</a>
-
+<div class="flex flex-col gap-5">
   @if (loading()) {
+    <div class="flex justify-end"><app-close-button [label]="'staff.close' | translate" (clicked)="closed.emit()" /></div>
     <app-card>
       <div class="space-y-3">
         <app-skeleton-loader width="14rem" />
@@ -9,19 +8,21 @@
       </div>
     </app-card>
   } @else if (loadError()) {
+    <div class="flex justify-end"><app-close-button [label]="'staff.close' | translate" (clicked)="closed.emit()" /></div>
     <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
       <span>{{ loadError() }}</span>
       <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
     </div>
   } @else if (user(); as u) {
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="mr-auto flex flex-wrap items-center gap-3">
         <h1 class="text-2xl font-bold text-primary-fg">{{ u.fullName }}</h1>
         <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(u.status)">{{ 'users.status.' + u.status | translate }}</span>
         @if (u.isLocked) {
           <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">{{ 'users.locked' | translate }}</span>
         }
       </div>
+      <app-close-button [label]="'staff.close' | translate" (clicked)="closed.emit()" />
     </div>
 
     @if (actionError()) {
@@ -31,10 +32,10 @@
     <app-card>
       <h2 class="mb-3 text-base font-semibold">{{ 'staff.detail.profile' | translate }}</h2>
       <dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-        <div><dt class="text-xs text-gray-500">{{ 'staff.columns.userId' | translate }}</dt><dd>{{ u.userName }}</dd></div>
-        <div><dt class="text-xs text-gray-500">{{ 'staff.columns.lastLogin' | translate }}</dt><dd>{{ u.lastLoginAt ? (u.lastLoginAt | date: 'medium') : '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'staff.columns.userId' | translate }}</dt><dd>{{ u.userName }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'staff.columns.lastLogin' | translate }}</dt><dd>{{ u.lastLoginAt ? (u.lastLoginAt | date: 'medium') : '-' }}</dd></div>
         @if (u.status !== 'ACTIVE' && u.statusReason) {
-          <div class="sm:col-span-2"><dt class="text-xs text-gray-500">{{ 'staff.detail.reason' | translate }}</dt><dd>{{ u.statusReason }}</dd></div>
+          <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'staff.detail.reason' | translate }}</dt><dd>{{ u.statusReason }}</dd></div>
         }
       </dl>
       <div class="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4">

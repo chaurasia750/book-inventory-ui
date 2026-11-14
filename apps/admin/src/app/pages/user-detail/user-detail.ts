@@ -1,7 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin, Observable } from 'rxjs';
 import { IamLoginLogService, IamUsersService } from '@org/api-services';
@@ -17,7 +16,7 @@ import {
   UserStatusHistoryItem,
 } from '@org/shared-models';
 import { accountStatusBadgeClass, avatarColorClass, initials } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, ModalComponent, SkeletonLoaderComponent, ToastService } from '@org/ui';
+import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, ToastService } from '@org/ui';
 import { LoginLogTableComponent } from '../login-logs/login-log-table';
 
 type StatusAction = 'approve' | 'activate' | 'deactivate' | 'suspend' | 'reject';
@@ -78,27 +77,23 @@ const INPUT_CLASS =
   imports: [
     ReactiveFormsModule,
     DatePipe,
-    RouterLink,
     TranslatePipe,
     ButtonComponent,
     CardComponent,
+    CloseButtonComponent,
     ModalComponent,
     SkeletonLoaderComponent,
     LoginLogTableComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="space-y-6">
-      <a routerLink="/users" class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-brand-600">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-        {{ 'users.back' | translate }}
-      </a>
-
+    <div class="flex flex-col gap-5">
       @if (loadError()) {
         <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">{{ loadError() }}</p>
       }
 
       @if (!user() && !loadError()) {
+        <div class="flex justify-end"><app-close-button [label]="'users.close' | translate" (clicked)="closed.emit()" /></div>
         <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
           <div class="flex items-center gap-4">
             <app-skeleton-loader type="circle" width="4rem" />
@@ -115,6 +110,7 @@ const INPUT_CLASS =
             <p class="text-sm text-gray-500">{{ '@' }}{{ u.userName }} &middot; {{ 'users.role.' + u.role | translate }}</p>
           </div>
           <span class="rounded-full px-3 py-1 text-sm font-medium" [class]="statusClass(u.status)">{{ 'users.status.' + u.status | translate }}</span>
+          <app-close-button [label]="'users.close' | translate" (clicked)="closed.emit()" />
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -275,12 +271,15 @@ const INPUT_CLASS =
 export class UserDetailComponent {
   private readonly users = inject(IamUsersService);
   private readonly loginLogs = inject(IamLoginLogService);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
 
-  private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
+  /** The user open beside the list (platform U10); a new id loads that user. */
+  readonly id = input.required<string>();
+  /** The X: the list shows full width again. */
+  readonly closed = output<void>();
+  /** The user's name, role or status changed: the list reloads. */
+  readonly changed = output<void>();
 
   readonly user = signal<UserDetail | null>(null);
   readonly history = signal<UserStatusHistoryItem[]>([]);
@@ -323,7 +322,10 @@ export class UserDetailComponent {
   );
 
   constructor() {
-    this.reload();
+    effect(() => {
+      this.id();
+      untracked(() => this.reload());
+    });
   }
 
   avatarInitials(fullName: string): string {
@@ -364,6 +366,7 @@ export class UserDetailComponent {
         this.pending.set(null);
         this.toast.show(this.translate.instant(`users.done.${spec.key}`), 'success');
         this.reload();
+        this.changed.emit();
       },
       error: (error: unknown) => {
         this.working.set(false);
@@ -378,11 +381,12 @@ export class UserDetailComponent {
     const { fullName, email, mobile } = this.profileForm.getRawValue();
     this.savingProfile.set(true);
     this.profileError.set('');
-    this.users.update(this.id, { fullName: fullName.trim(), email: email.trim() || undefined, mobile: mobile.trim() || undefined }).subscribe({
+    this.users.update(this.id(), { fullName: fullName.trim(), email: email.trim() || undefined, mobile: mobile.trim() || undefined }).subscribe({
       next: () => {
         this.savingProfile.set(false);
         this.toast.show(this.translate.instant('users.done.profile'), 'success');
         this.reload();
+        this.changed.emit();
       },
       error: (error: unknown) => {
         this.savingProfile.set(false);
@@ -392,7 +396,7 @@ export class UserDetailComponent {
   }
 
   revoke(session: UserSessionItem): void {
-    this.users.revokeSession(this.id, session.id).subscribe({
+    this.users.revokeSession(this.id(), session.id).subscribe({
       next: () => {
         this.toast.show(this.translate.instant('users.done.revoke'), 'success');
         this.reload();
@@ -406,25 +410,25 @@ export class UserDetailComponent {
 
     switch (spec.key) {
       case 'change-role':
-        return this.users.changeRole(this.id, { role, reason: reason.trim() });
+        return this.users.changeRole(this.id(), { role, reason: reason.trim() });
       case 'approve':
       case 'activate':
       case 'deactivate':
       case 'suspend':
       case 'reject':
-        return this.users.changeStatus(this.id, spec.key, { reason: text, suspendedUntil: until ? new Date(until).toISOString() : undefined });
+        return this.users.changeStatus(this.id(), spec.key, { reason: text, suspendedUntil: until ? new Date(until).toISOString() : undefined });
       default:
-        return this.users.perform(this.id, spec.key);
+        return this.users.perform(this.id(), spec.key);
     }
   }
 
   private reload(): void {
     this.loadError.set('');
     forkJoin({
-      user: this.users.get(this.id),
-      history: this.users.statusHistory(this.id),
-      sessions: this.users.sessions(this.id),
-      logins: this.loginLogs.search({ userId: this.id, pageIndex: 1, pageSize: 10 }),
+      user: this.users.get(this.id()),
+      history: this.users.statusHistory(this.id()),
+      sessions: this.users.sessions(this.id()),
+      logins: this.loginLogs.search({ userId: this.id(), pageIndex: 1, pageSize: 10 }),
     }).subscribe({
       next: ({ user, history, sessions, logins }) => {
         this.logins.set(logins.items);
@@ -435,7 +439,7 @@ export class UserDetailComponent {
       },
       error: (error: unknown) => {
         this.loadError.set(messageForError(error, this.translate));
-        void this.router.navigate(['/users']);
+        this.closed.emit();
       },
     });
   }

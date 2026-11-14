@@ -1,7 +1,6 @@
-<div class="space-y-6">
-  <a routerLink="/companies" class="text-sm text-brand-600 hover:underline">{{ 'company.back' | translate }}</a>
-
+<div class="flex flex-col gap-5">
   @if (loading()) {
+    <div class="flex justify-end"><app-close-button [label]="'company.close' | translate" (clicked)="closed.emit()" /></div>
     <app-card>
       <div class="space-y-3">
         <app-skeleton-loader width="14rem" />
@@ -10,13 +9,14 @@
       </div>
     </app-card>
   } @else if (loadError()) {
+    <div class="flex justify-end"><app-close-button [label]="'company.close' | translate" (clicked)="closed.emit()" /></div>
     <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
       <span>{{ loadError() }}</span>
       <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
     </div>
   } @else if (company(); as c) {
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="mr-auto flex flex-wrap items-center gap-3">
         <h1 class="text-2xl font-bold text-primary-fg">{{ c.name }}</h1>
         <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(c.status)">{{ 'company.status.' + c.status | translate }}</span>
       </div>
@@ -28,6 +28,7 @@
           <app-button (clicked)="openStatus('activate')">{{ 'company.detail.activate' | translate }}</app-button>
         }
       </div>
+      <app-close-button [label]="'company.close' | translate" (clicked)="closed.emit()" />
     </div>
     @if (c.status === 'INACTIVE' && c.statusReason) {
       <p class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">{{ 'company.detail.statusReason' | translate }}: {{ c.statusReason }}</p>
@@ -36,13 +37,13 @@
     <app-card>
       <h2 class="mb-3 text-base font-semibold">{{ 'company.detail.profile' | translate }}</h2>
       <dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-        <div><dt class="text-xs text-gray-500">{{ 'company.fields.address' | translate }}</dt><dd>{{ c.address || '-' }}</dd></div>
-        <div><dt class="text-xs text-gray-500">{{ 'company.fields.state' | translate }}</dt><dd>{{ c.state || '-' }}</dd></div>
-        <div><dt class="text-xs text-gray-500">{{ 'company.fields.mobile' | translate }}</dt><dd>{{ c.mobile || '-' }}</dd></div>
-        <div><dt class="text-xs text-gray-500">{{ 'company.fields.email' | translate }}</dt><dd>{{ c.email || '-' }}</dd></div>
-        <div><dt class="text-xs text-gray-500">{{ 'company.fields.gstin' | translate }}</dt><dd>{{ c.gstin || '-' }}</dd></div>
-        <div><dt class="text-xs text-gray-500">{{ 'company.fields.pan' | translate }}</dt><dd>{{ c.pan || '-' }}</dd></div>
-        <div class="sm:col-span-2"><dt class="text-xs text-gray-500">{{ 'company.fields.tagline' | translate }}</dt><dd>{{ c.tagline || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'company.fields.address' | translate }}</dt><dd>{{ c.address || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'company.fields.state' | translate }}</dt><dd>{{ c.state || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'company.fields.mobile' | translate }}</dt><dd>{{ c.mobile || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'company.fields.email' | translate }}</dt><dd>{{ c.email || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'company.fields.gstin' | translate }}</dt><dd>{{ c.gstin || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'company.fields.pan' | translate }}</dt><dd>{{ c.pan || '-' }}</dd></div>
+        <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'company.fields.tagline' | translate }}</dt><dd>{{ c.tagline || '-' }}</dd></div>
       </dl>
     </app-card>
 

@@ -27,21 +27,15 @@ export const appRoutes: Route[] = [
         path: 'staff',
         canActivate: [appRoleGuard(['OWNER'])],
         loadComponent: () => import('./pages/staff/staff-list').then((m) => m.StaffListComponent),
-      },
-      {
-        path: 'staff/:id',
-        canActivate: [appRoleGuard(['OWNER'])],
-        loadComponent: () => import('./pages/staff/staff-detail').then((m) => m.StaffDetailComponent),
+        // The Staff account opens beside the list (platform U10); the id is the child route.
+        children: [{ path: ':id', children: [] }],
       },
       {
         path: 'schools',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/schools/school-list').then((m) => m.SchoolListComponent),
-      },
-      {
-        path: 'schools/:id',
-        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
-        loadComponent: () => import('./pages/schools/school-detail').then((m) => m.SchoolDetailComponent),
+        // The school opens beside the list (platform U10); the id is the child route.
+        children: [{ path: ':id', children: [] }],
       },
       {
         // The screen the forced-change guard and the header's user menu open (`/change-password`); the Settings tab shows the same page.

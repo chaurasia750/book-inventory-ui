@@ -25,21 +25,15 @@ export const appRoutes: Route[] = [
         canActivate: [appRoleGuard(['SUPER_ADMIN'])],
         loadComponent: () =>
           import('./pages/user-management/user-management').then((m) => m.UserManagementComponent),
+        // The user opens beside the list (platform U10); the id is the child route.
+        children: [{ path: ':id', children: [] }],
       },
       {
         path: 'companies',
         canActivate: [appRoleGuard(['SUPER_ADMIN'])],
         loadComponent: () => import('./pages/companies/company-list').then((m) => m.CompanyListComponent),
-      },
-      {
-        path: 'companies/:id',
-        canActivate: [appRoleGuard(['SUPER_ADMIN'])],
-        loadComponent: () => import('./pages/companies/company-detail').then((m) => m.CompanyDetailComponent),
-      },
-      {
-        path: `${stripPrefix(ADMIN_ROUTES.USERS)}/:id`,
-        canActivate: [appRoleGuard(['SUPER_ADMIN'])],
-        loadComponent: () => import('./pages/user-detail/user-detail').then((m) => m.UserDetailComponent),
+        // The company opens beside the list (platform U10); the id is the child route.
+        children: [{ path: ':id', children: [] }],
       },
       {
         path: stripPrefix(ADMIN_ROUTES.PROFILE),

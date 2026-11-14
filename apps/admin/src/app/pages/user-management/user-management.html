@@ -10,7 +10,8 @@
     </app-button>
   </div>
 
-  <app-card [padding]="false">
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'users.title' | translate" [detailLabel]="'users.detail' | translate">
+    <div list>
     <div class="flex flex-wrap items-center gap-3 border-b border-gray-100 p-4">
       <div class="relative min-w-[16rem] flex-1">
         <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -19,6 +20,7 @@
         <input type="search" [formControl]="search" [placeholder]="'users.filters.search' | translate"
           class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm transition-colors focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
       </div>
+      @if (!hasPanel()) {
       <select (change)="setRole($any($event.target).value)" class="h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
         <option value="">{{ 'users.filters.allRoles' | translate }}</option>
         @for (r of roles; track r) {
@@ -43,13 +45,37 @@
           <option value="LastLoginAt DESC">{{ 'users.filters.sortLastLogin' | translate }}</option>
         </select>
       </div>
+      }
     </div>
 
     @if (loadError()) {
       <p class="mx-4 mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">{{ loadError() }}</p>
     }
 
-    <div class="overflow-x-auto">
+    @if (hasPanel()) {
+      <ul class="m-0 list-none divide-y divide-neutral-100 p-0 dark:divide-charcoal-700">
+        @if (loading()) {
+          @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
+        } @else {
+          @for (user of result()?.items ?? []; track user.id) {
+            <li>
+              <button type="button" (click)="open(user)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700"
+                [class.bg-gold-50]="user.id === selectedId()" [attr.aria-current]="user.id === selectedId() ? 'true' : null">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold" [class]="avatarClass(user.fullName)">{{ avatarInitials(user.fullName) }}</span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate text-sm font-medium text-primary-fg">{{ user.fullName }}</span>
+                  <span class="block truncate text-xs text-gray-500">{{ '@' }}{{ user.userName }}</span>
+                </span>
+                <span class="rounded-full px-2 py-0.5 text-[11px] font-medium" [class]="statusClass(user.status)">{{ 'users.status.' + user.status | translate }}</span>
+              </button>
+            </li>
+          } @empty {
+            @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'users.empty' | translate }}</li> }
+          }
+        }
+      </ul>
+    } @else {
+      <div class="overflow-x-auto">
       <table class="w-full text-left text-sm">
         <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
           <tr>
@@ -106,9 +132,17 @@
         </tbody>
       </table>
     </div>
+    }
 
     <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
-  </app-card>
+  </div>
+
+    <div detail>
+      @if (selectedId(); as id) {
+        <app-user-detail [id]="id" (closed)="closePanel()" (changed)="reload()" />
+      }
+    </div>
+  </app-list-detail>
 </div>
 
 <app-modal [open]="createOpen()" [title]="'users.create.title' | translate" (closed)="createOpen.set(false)">

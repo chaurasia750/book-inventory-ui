@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,12 +11,15 @@ import { ACCOUNT_STATUSES, AccountStatus, CreatedCompanyStaff, PagedList, UserSu
 import { accountStatusBadgeClass } from '@org/shared-utils';
 import {
   ButtonComponent,
-  CardComponent,
+  ListDetailComponent,
+  injectSelectedId,
   CredentialsDialogComponent,
   ModalComponent,
   PaginationComponent,
   SkeletonLoaderComponent,
 } from '@org/ui';
+
+import { StaffDetailComponent } from './staff-detail';
 
 const PAGE_SIZE = 20;
 
@@ -36,7 +39,8 @@ const STAFF_FILTER_STATUSES = ACCOUNT_STATUSES.filter((s) => s === 'ACTIVE' || s
     DatePipe,
     TranslatePipe,
     ButtonComponent,
-    CardComponent,
+    ListDetailComponent,
+    StaffDetailComponent,
     ModalComponent,
     PaginationComponent,
     SkeletonLoaderComponent,
@@ -50,6 +54,10 @@ export class StaffListComponent {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Platform U10: the Staff account open beside the list (child route `:id`), or null. */
+  readonly selectedId = injectSelectedId();
+  readonly hasPanel = computed(() => this.selectedId() !== null);
 
   readonly statuses = STAFF_FILTER_STATUSES;
   readonly search = new FormControl('', { nonNullable: true });
@@ -96,6 +104,14 @@ export class StaffListComponent {
 
   open(user: UserSummary): void {
     void this.router.navigate(['/staff', user.id]);
+  }
+
+  closePanel(): void {
+    void this.router.navigate(['/staff']);
+  }
+
+  reload(): void {
+    this.load();
   }
 
   statusClass(status: AccountStatus): string {

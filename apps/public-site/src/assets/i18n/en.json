@@ -288,22 +288,7 @@
       "reason": "Reason",
       "until": "Suspended until"
     },
-    "detail": {
-      "actions": "Actions",
-      "status": "Status",
-      "profile": "Profile",
-      "history": "Status history",
-      "sessions": "Active sessions",
-      "reason": "Reason",
-      "changedAt": "Changed at",
-      "suspendedUntil": "Suspended until",
-      "lock": "Lock (failed attempts)",
-      "notLocked": "Not locked",
-      "lastLogin": "Last login",
-      "mustChange": "Must change password",
-      "save": "Save",
-      "logins": "Login log"
-    },
+    "detail": "User details",
     "history": {
       "when": "When",
       "change": "Change",
@@ -362,7 +347,8 @@
       "profile": "Profile saved.",
       "revoke": "Session ended."
     },
-    "retry": "Retry"
+    "retry": "Retry",
+    "close": "Close"
   },
   "account": {
     "unknown": "Unknown",
@@ -512,23 +498,7 @@
       "ACTIVE": "Active",
       "INACTIVE": "Inactive"
     },
-    "detail": {
-      "profile": "Company details",
-      "accounts": "Accounts",
-      "noAccounts": "No accounts.",
-      "history": "Status history",
-      "edit": "Edit",
-      "save": "Save",
-      "deactivate": "Deactivate",
-      "activate": "Reactivate",
-      "reason": "Reason",
-      "reasonHint": "5 to 500 characters. Every login of this company stops working at once.",
-      "note": "Note (optional)",
-      "confirmActivate": "Reactivate this company?",
-      "login": "User ID",
-      "role": "Role",
-      "statusReason": "Reason"
-    },
+    "detail": "Company details",
     "history": {
       "when": "When",
       "from": "From",
@@ -552,7 +522,8 @@
       "leave": "Leave company",
       "empty": "No active company",
       "loadError": "Could not load the companies."
-    }
+    },
+    "close": "Close"
   },
   "staff": {
     "title": "Staff",
@@ -579,15 +550,7 @@
       "status": "Status",
       "lastLogin": "Last login"
     },
-    "detail": {
-      "profile": "Details",
-      "sessions": "Active sessions",
-      "noSessions": "No active sessions.",
-      "reason": "Reason",
-      "reasonHint": "5 to 500 characters.",
-      "started": "Started",
-      "lastSeen": "Last seen"
-    },
+    "detail": "Staff details",
     "actions": {
       "deactivate": "Deactivate",
       "activate": "Reactivate",
@@ -606,12 +569,12 @@
       "copy": "Copy password",
       "copied": "Copied",
       "done": "Done"
-    }
+    },
+    "close": "Close"
   },
   "school": {
     "title": "Schools",
     "subtitle": "The schools your company sells to.",
-    "back": "Back to schools",
     "empty": "No schools match these filters.",
     "yes": "Yes",
     "no": "No",
@@ -690,6 +653,8 @@
       "discard": "Discard changes",
       "blank": "A class name cannot be empty.",
       "duplicate": "Two classes have the same name."
-    }
+    },
+    "close": "Close",
+    "detail": "School details"
   }
 }

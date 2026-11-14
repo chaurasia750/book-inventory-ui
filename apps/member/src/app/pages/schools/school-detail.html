@@ -1,7 +1,7 @@
-<div class="space-y-6">
-  <button type="button" class="text-sm text-brand-600 hover:underline" (click)="back()">&larr; {{ 'school.back' | translate }}</button>
+<div class="flex flex-col gap-5">
 
   @if (loading()) {
+    <div class="flex justify-end"><app-close-button [label]="'school.close' | translate" (clicked)="closed.emit()" /></div>
     <app-card>
       <div class="space-y-3">
         <app-skeleton-loader width="14rem" />
@@ -10,42 +10,42 @@
       </div>
     </app-card>
   } @else if (loadError()) {
+    <div class="flex justify-end"><app-close-button [label]="'school.close' | translate" (clicked)="closed.emit()" /></div>
     <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
       <span>{{ loadError() }}</span>
       <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
     </div>
   } @else if (school(); as s) {
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h1 class="text-2xl font-bold text-primary-fg">{{ s.name }}</h1>
-        <div class="mt-1 flex items-center gap-2 text-sm text-gray-500">
-          <span class="font-mono">{{ s.code }}</span>
-          <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(s.status)">{{ 'school.status.' + s.status | translate }}</span>
-        </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="mr-auto flex min-w-0 flex-wrap items-center gap-3">
+        <h1 class="font-mono text-xl font-semibold text-primary-fg">{{ s.code }}</h1>
+        <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(s.status)">{{ 'school.status.' + s.status | translate }}</span>
       </div>
       @if (canEdit) {
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
           <app-button variant="secondary" (clicked)="openEdit()">{{ 'school.edit.button' | translate }}</app-button>
           <app-button variant="secondary" (clicked)="openStatus()">
             {{ (s.status === 'ACTIVE' ? 'school.deactivate.button' : 'school.activate.button') | translate }}
           </app-button>
         </div>
       }
+      <app-close-button [label]="'school.close' | translate" (clicked)="closed.emit()" />
     </div>
 
     <app-card>
-      <dl class="grid gap-4 text-sm sm:grid-cols-2">
-        <div><dt class="text-gray-500">{{ 'school.fields.code' | translate }}</dt><dd class="font-mono">{{ s.code }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.state' | translate }}</dt><dd>{{ s.state }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.sessionType' | translate }}</dt><dd>{{ 'school.sessionType.' + s.sessionType | translate }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.saleType' | translate }}</dt><dd>{{ 'school.saleType.' + s.saleType | translate }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.openingBalance' | translate }}</dt><dd>{{ s.openingBalanceAmount | number: '1.2-2' }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.gstDefault' | translate }}</dt><dd>{{ (s.isGstDefault ? 'school.yes' : 'school.no') | translate }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.contactPerson' | translate }}</dt><dd>{{ s.contactPerson || '-' }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.mobile' | translate }}</dt><dd>{{ s.mobile || '-' }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.email' | translate }}</dt><dd>{{ s.email || '-' }}</dd></div>
-        <div><dt class="text-gray-500">{{ 'school.fields.gstin' | translate }}</dt><dd>{{ s.gstin || '-' }}</dd></div>
-        <div class="sm:col-span-2"><dt class="text-gray-500">{{ 'school.fields.address' | translate }}</dt><dd>{{ s.address || '-' }}</dd></div>
+      <dl class="grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.name' | translate }}</dt><dd class="mt-1 text-base font-semibold">{{ s.name }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.code' | translate }}</dt><dd class="mt-1 font-mono">{{ s.code }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.state' | translate }}</dt><dd class="mt-1">{{ s.state }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.sessionType' | translate }}</dt><dd class="mt-1">{{ 'school.sessionType.' + s.sessionType | translate }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.saleType' | translate }}</dt><dd class="mt-1">{{ 'school.saleType.' + s.saleType | translate }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.openingBalance' | translate }}</dt><dd class="mt-1">{{ s.openingBalanceAmount | number: '1.2-2' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.gstDefault' | translate }}</dt><dd class="mt-1">{{ (s.isGstDefault ? 'school.yes' : 'school.no') | translate }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.contactPerson' | translate }}</dt><dd class="mt-1">{{ s.contactPerson || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.mobile' | translate }}</dt><dd class="mt-1">{{ s.mobile || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.email' | translate }}</dt><dd class="mt-1">{{ s.email || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.gstin' | translate }}</dt><dd class="mt-1">{{ s.gstin || '-' }}</dd></div>
+        <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.address' | translate }}</dt><dd class="mt-1">{{ s.address || '-' }}</dd></div>
       </dl>
     </app-card>
 

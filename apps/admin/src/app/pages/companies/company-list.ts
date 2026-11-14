@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,12 +11,15 @@ import { COMPANY_STATUSES, CompanyStatus, CompanySummary, CreatedCompany, PagedL
 import { companyStatusBadgeClass } from '@org/shared-utils';
 import {
   ButtonComponent,
-  CardComponent,
+  ListDetailComponent,
+  injectSelectedId,
   CredentialsDialogComponent,
   ModalComponent,
   PaginationComponent,
   SkeletonLoaderComponent,
 } from '@org/ui';
+
+import { CompanyDetailComponent } from './company-detail';
 
 const PAGE_SIZE = 20;
 
@@ -33,7 +36,8 @@ const PAGE_SIZE = 20;
     DatePipe,
     TranslatePipe,
     ButtonComponent,
-    CardComponent,
+    ListDetailComponent,
+    CompanyDetailComponent,
     ModalComponent,
     PaginationComponent,
     SkeletonLoaderComponent,
@@ -47,6 +51,10 @@ export class CompanyListComponent {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Platform U10: the company open beside the list (child route `:id`), or null. */
+  readonly selectedId = injectSelectedId();
+  readonly hasPanel = computed(() => this.selectedId() !== null);
 
   readonly statuses = COMPANY_STATUSES;
   readonly search = new FormControl('', { nonNullable: true });
@@ -94,6 +102,14 @@ export class CompanyListComponent {
 
   open(company: CompanySummary): void {
     void this.router.navigate(['/companies', company.id]);
+  }
+
+  closePanel(): void {
+    void this.router.navigate(['/companies']);
+  }
+
+  reload(): void {
+    this.load();
   }
 
   statusClass(status: CompanyStatus): string {

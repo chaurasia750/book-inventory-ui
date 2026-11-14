@@ -1,13 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CompanyService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { CompanyDetail, CompanyFields, CompanyStatus } from '@org/shared-models';
 import { accountStatusBadgeClass, companyStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 
 type StatusDialog = 'deactivate' | 'activate';
 
@@ -21,11 +21,12 @@ type StatusDialog = 'deactivate' | 'activate';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     DatePipe,
+    RouterLink,
     TranslatePipe,
     ButtonComponent,
     CardComponent,
+    CloseButtonComponent,
     ModalComponent,
     SkeletonLoaderComponent,
   ],
@@ -33,11 +34,15 @@ type StatusDialog = 'deactivate' | 'activate';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CompanyDetailComponent {
-  private readonly route = inject(ActivatedRoute);
   private readonly companies = inject(CompanyService);
   private readonly translate = inject(TranslateService);
 
-  private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
+  /** The company open beside the list (platform U10); a new id loads that record. */
+  readonly id = input.required<string>();
+  /** The X: the list shows full width again. */
+  readonly closed = output<void>();
+  /** Something the list shows (name, status) changed: the list reloads. */
+  readonly changed = output<void>();
 
   readonly company = signal<CompanyDetail | null>(null);
   readonly loading = signal(true);
@@ -63,7 +68,10 @@ export class CompanyDetailComponent {
   readonly reasonControl = new FormControl('', { nonNullable: true, validators: [Validators.minLength(5), Validators.maxLength(500)] });
 
   constructor() {
-    this.load();
+    effect(() => {
+      this.id();
+      untracked(() => this.load());
+    });
   }
 
   statusClass(status: CompanyStatus): string {
@@ -77,7 +85,7 @@ export class CompanyDetailComponent {
   load(): void {
     this.loading.set(true);
     this.loadError.set('');
-    this.companies.get(this.id).subscribe({
+    this.companies.get(this.id()).subscribe({
       next: (company) => {
         this.loading.set(false);
         this.company.set(company);
@@ -123,11 +131,12 @@ export class CompanyDetailComponent {
     };
     this.saving.set(true);
     this.editError.set('');
-    this.companies.edit(this.id, request).subscribe({
+    this.companies.edit(this.id(), request).subscribe({
       next: () => {
         this.saving.set(false);
         this.editOpen.set(false);
         this.load();
+        this.changed.emit();
       },
       error: (error: unknown) => {
         this.saving.set(false);
@@ -153,12 +162,13 @@ export class CompanyDetailComponent {
     const text = this.reasonControl.value.trim();
     this.acting.set(true);
     this.actionError.set('');
-    const call = kind === 'deactivate' ? this.companies.deactivate(this.id, text) : this.companies.activate(this.id, text || undefined);
+    const call = kind === 'deactivate' ? this.companies.deactivate(this.id(), text) : this.companies.activate(this.id(), text || undefined);
     call.subscribe({
       next: () => {
         this.acting.set(false);
         this.dialog.set(null);
         this.load();
+        this.changed.emit();
       },
       error: (error: unknown) => {
         this.acting.set(false);

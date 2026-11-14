@@ -1,14 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
 import { StaffService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { AccountStatus, TemporaryPasswordResponse, UserDetail, UserSessionItem } from '@org/shared-models';
 import { accountStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, CredentialsDialogComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, CardComponent, CloseButtonComponent, CredentialsDialogComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 
 /**
  * One Staff account of the Owner's company (iam spec R66, R67): details, the sessions that are still usable, and the
@@ -20,11 +19,11 @@ import { ButtonComponent, CardComponent, CredentialsDialogComponent, ModalCompon
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     DatePipe,
     TranslatePipe,
     ButtonComponent,
     CardComponent,
+    CloseButtonComponent,
     ModalComponent,
     SkeletonLoaderComponent,
     CredentialsDialogComponent,
@@ -33,11 +32,15 @@ import { ButtonComponent, CardComponent, CredentialsDialogComponent, ModalCompon
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StaffDetailComponent {
-  private readonly route = inject(ActivatedRoute);
   private readonly staff = inject(StaffService);
   private readonly translate = inject(TranslateService);
 
-  private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
+  /** The Staff account open beside the list (platform U10); a new id loads that record. */
+  readonly id = input.required<string>();
+  /** The X: the list shows full width again. */
+  readonly closed = output<void>();
+  /** Something the list shows (name, status) changed: the list reloads. */
+  readonly changed = output<void>();
 
   readonly user = signal<UserDetail | null>(null);
   readonly sessions = signal<UserSessionItem[]>([]);
@@ -51,7 +54,10 @@ export class StaffDetailComponent {
   readonly reset = signal<TemporaryPasswordResponse | null>(null);
 
   constructor() {
-    this.load();
+    effect(() => {
+      this.id();
+      untracked(() => this.load());
+    });
   }
 
   statusClass(status: AccountStatus): string {
@@ -61,7 +67,7 @@ export class StaffDetailComponent {
   load(): void {
     this.loading.set(true);
     this.loadError.set('');
-    forkJoin({ user: this.staff.get(this.id), sessions: this.staff.sessions(this.id) }).subscribe({
+    forkJoin({ user: this.staff.get(this.id()), sessions: this.staff.sessions(this.id()) }).subscribe({
       next: ({ user, sessions }) => {
         this.loading.set(false);
         this.user.set(user);
@@ -86,26 +92,26 @@ export class StaffDetailComponent {
       return;
     }
 
-    this.run(this.staff.deactivate(this.id, { reason: this.reasonControl.value.trim() }), () => this.deactivateOpen.set(false));
+    this.run(this.staff.deactivate(this.id(), { reason: this.reasonControl.value.trim() }), () => this.deactivateOpen.set(false));
   }
 
   activate(): void {
-    this.run(this.staff.activate(this.id));
+    this.run(this.staff.activate(this.id()));
   }
 
   unlock(): void {
-    this.run(this.staff.unlock(this.id));
+    this.run(this.staff.unlock(this.id()));
   }
 
   forceLogout(): void {
-    this.run(this.staff.forceLogout(this.id));
+    this.run(this.staff.forceLogout(this.id()));
   }
 
   resetPassword(): void {
     if (this.acting()) return;
     this.acting.set(true);
     this.actionError.set('');
-    this.staff.resetPassword(this.id).subscribe({
+    this.staff.resetPassword(this.id()).subscribe({
       next: (response) => {
         this.acting.set(false);
         this.reset.set(response);
@@ -131,6 +137,7 @@ export class StaffDetailComponent {
         this.acting.set(false);
         onDone?.();
         this.load();
+        this.changed.emit();
       },
       error: (error: unknown) => {
         this.acting.set(false);

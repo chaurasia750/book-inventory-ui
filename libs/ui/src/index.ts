@@ -30,3 +30,6 @@ export * from './lib/date-picker/date-picker';
 export * from './lib/status-badge/status-badge';
 export * from './lib/reject-modal/reject-modal';
 export * from './lib/credentials-dialog/credentials-dialog';
+export * from './lib/list-detail/list-detail';
+export * from './lib/list-detail/close-button';
+export * from './lib/list-detail/selected-id';

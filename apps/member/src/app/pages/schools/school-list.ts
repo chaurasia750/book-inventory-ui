@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,7 +20,8 @@ import {
   SessionType,
 } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, ModalComponent, PaginationComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, ListDetailComponent, ModalComponent, PaginationComponent, SkeletonLoaderComponent, injectSelectedId } from '@org/ui';
+import { SchoolDetailComponent } from './school-detail';
 import { SchoolFormComponent } from './school-form';
 
 const PAGE_SIZE = 20;
@@ -38,11 +39,12 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
     ReactiveFormsModule,
     TranslatePipe,
     ButtonComponent,
-    CardComponent,
+    ListDetailComponent,
     ModalComponent,
     PaginationComponent,
     SkeletonLoaderComponent,
     SchoolFormComponent,
+    SchoolDetailComponent,
   ],
   templateUrl: './school-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,6 +57,10 @@ export class SchoolListComponent {
 
   /** R9: only the Owner adds schools; Staff read. */
   readonly canEdit = inject(AuthService).hasAppRole('OWNER');
+
+  /** Platform U10: the school open beside the list (child route `:id`), or null. */
+  readonly selectedId = injectSelectedId();
+  readonly hasPanel = computed(() => this.selectedId() !== null);
 
   readonly select = SELECT;
   readonly statuses = SCHOOL_STATUSES;
@@ -118,6 +124,10 @@ export class SchoolListComponent {
 
   open(school: SchoolSummary): void {
     void this.router.navigate(['/schools', school.id]);
+  }
+
+  closePanel(): void {
+    void this.router.navigate(['/schools']);
   }
 
   statusClass(status: SchoolStatus): string {

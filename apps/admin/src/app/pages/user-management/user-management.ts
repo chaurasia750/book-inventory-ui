@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,7 +18,8 @@ import {
   UserSummary,
 } from '@org/shared-models';
 import { avatarColorClass, accountStatusBadgeClass, initials } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, ModalComponent, PaginationComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, ListDetailComponent, ModalComponent, PaginationComponent, SkeletonLoaderComponent, injectSelectedId } from '@org/ui';
+import { UserDetailComponent } from '../user-detail/user-detail';
 
 const PAGE_SIZE = 20;
 
@@ -35,7 +36,8 @@ const PAGE_SIZE = 20;
     DatePipe,
     TranslatePipe,
     ButtonComponent,
-    CardComponent,
+    ListDetailComponent,
+    UserDetailComponent,
     ModalComponent,
     PaginationComponent,
     SkeletonLoaderComponent,
@@ -48,6 +50,10 @@ export class UserManagementComponent {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Platform U10: the user open beside the list (child route `:id`), or null. */
+  readonly selectedId = injectSelectedId();
+  readonly hasPanel = computed(() => this.selectedId() !== null);
 
   readonly roles: readonly AppRole[] = [...STAFF_ASSIGNABLE_ROLES, 'MEMBER', ...COMPANY_ROLES];
   readonly statuses = ACCOUNT_STATUSES;
@@ -119,6 +125,14 @@ export class UserManagementComponent {
 
   open(user: UserSummary): void {
     void this.router.navigate(['/users', user.id]);
+  }
+
+  closePanel(): void {
+    void this.router.navigate(['/users']);
+  }
+
+  reload(): void {
+    this.load();
   }
 
   avatarInitials(fullName: string): string {

@@ -1,13 +1,12 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
 import { SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { SchoolDetail, SchoolFields } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { SchoolFormComponent } from './school-form';
 
 /**
@@ -18,17 +17,19 @@ import { SchoolFormComponent } from './school-form';
 @Component({
   selector: 'app-school-detail',
   standalone: true,
-  imports: [DecimalPipe, TranslatePipe, ButtonComponent, CardComponent, ModalComponent, SkeletonLoaderComponent, SchoolFormComponent],
+  imports: [DecimalPipe, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, SchoolFormComponent],
   templateUrl: './school-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SchoolDetailComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  /** The route parameter `:id`. */
-  private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
+export class SchoolDetailComponent {
+  /** The school open beside the list (platform U10); a new id loads that school. */
+  readonly id = input.required<string>();
+  /** The X: the list shows full width again. */
+  readonly closed = output<void>();
+  /** The school's name, status or code-bearing data changed: the list beside it reloads. */
+  readonly changed = output<void>();
 
   private readonly schools = inject(SchoolService);
-  private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
 
   readonly canEdit = inject(AuthService).hasAppRole('OWNER');
@@ -53,14 +54,17 @@ export class SchoolDetailComponent implements OnInit {
 
   statusClass = schoolStatusBadgeClass;
 
-  ngOnInit(): void {
-    this.load();
+  constructor() {
+    effect(() => {
+      this.id();
+      untracked(() => this.load());
+    });
   }
 
   load(): void {
     this.loading.set(true);
     this.loadError.set('');
-    this.schools.get(this.id).subscribe({
+    this.schools.get(this.id()).subscribe({
       next: (school) => {
         this.loading.set(false);
         this.school.set(school);
@@ -73,10 +77,6 @@ export class SchoolDetailComponent implements OnInit {
     });
   }
 
-  back(): void {
-    void this.router.navigate(['/schools']);
-  }
-
   openEdit(): void {
     this.editError.set('');
     this.editOpen.set(true);
@@ -85,11 +85,12 @@ export class SchoolDetailComponent implements OnInit {
   edit(fields: SchoolFields): void {
     this.saving.set(true);
     this.editError.set('');
-    this.schools.edit(this.id, fields).subscribe({
+    this.schools.edit(this.id(), fields).subscribe({
       next: () => {
         this.saving.set(false);
         this.editOpen.set(false);
         this.load();
+        this.changed.emit();
       },
       error: (error: unknown) => {
         this.saving.set(false);
@@ -159,7 +160,7 @@ export class SchoolDetailComponent implements OnInit {
 
     this.classesSaving.set(true);
     this.classesError.set('');
-    this.schools.replaceClasses(this.id, names).subscribe({
+    this.schools.replaceClasses(this.id(), names).subscribe({
       next: () => {
         this.classesSaving.set(false);
         this.load();
@@ -184,12 +185,13 @@ export class SchoolDetailComponent implements OnInit {
 
     this.statusSaving.set(true);
     this.statusError.set('');
-    const call = school.status === 'ACTIVE' ? this.schools.deactivate(this.id) : this.schools.activate(this.id);
+    const call = school.status === 'ACTIVE' ? this.schools.deactivate(this.id()) : this.schools.activate(this.id());
     call.subscribe({
       next: () => {
         this.statusSaving.set(false);
         this.statusOpen.set(false);
         this.load();
+        this.changed.emit();
       },
       error: (error: unknown) => {
         this.statusSaving.set(false);
