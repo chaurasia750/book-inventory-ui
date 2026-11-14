@@ -15,7 +15,7 @@ import { APP_NAME } from '@org/constants';
   standalone: true,
   imports: [RouterOutlet, AppSidebarComponent, AppHeaderComponent, BackdropComponent, MemberFooterComponent],
   templateUrl: './app-layout.html',
-  styleUrl: './app-layout.scss',
+  host: { class: 'flex h-screen overflow-hidden' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppLayoutComponent {

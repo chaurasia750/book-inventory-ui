@@ -5,11 +5,11 @@
   [appSubtitle]="appSubtitle()"
   [homeRoute]="homeRoute()"
 />
-<div class="app-layout-main">
-  <app-header [title]="title()">
+<div class="flex min-w-0 flex-1 flex-col overflow-hidden bg-neutral-100 dark:bg-charcoal-900">
+  <app-header [title]="title()" [homeRoute]="homeRoute()">
     <ng-content select="[headerExtra]" />
   </app-header>
-  <main class="app-layout-content">
+  <main class="min-h-0 flex-1 overflow-y-auto px-3 pb-7 pt-3.5 sm:px-6 sm:pb-8 sm:pt-5">
     <router-outlet />
   </main>
   @if (showFooter()) {

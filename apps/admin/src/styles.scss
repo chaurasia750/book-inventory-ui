@@ -4,20 +4,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
+/* ── HAUT INFRA theme tokens ───────────────────────────────────────────
+   Deep Charcoal #171717 · Dark Graphite #242424 · Premium Gold #C9A227
+   Highlight Gold #E3C15A · Warm White #F5F3EE · Muted Gray #B8B8B8
+   Ivory #F7F5F0
+   ──────────────────────────────────────────────────────────────────── */
+
 :root {
-  --bg-body: #F0F2F5;
+  --bg-body: #F7F5F0;
   --bg-surface: #FFFFFF;
-  --bg-surface-hover: #EDF7E6;
+  --bg-surface-hover: #F1EEE5;
   --bg-surface-elevated: #FFFFFF;
-  --bg-sidebar: #074928;
-  --bg-header: rgba(255, 255, 255, 0.82);
-  --border: #E2E5E9;
-  --border-light: #EDEFF2;
-  --text-primary: #0F1115;
-  --text-secondary: #5F6770;
-  --text-muted: #939AA4;
-  --accent: #66B42A;
-  --accent-hover: #4E9C1F;
+  --bg-sidebar: #171717;
+  --bg-header: rgba(247, 245, 240, 0.9);
+  --border: #E3DFD5;
+  --border-light: #EDEAE1;
+  --text-primary: #171717;
+  --text-secondary: #5A5952;
+  --text-muted: #8C8A83;
+  --accent: #C9A227;
+  --accent-hover: #8F7211;
+  --gold: #C9A227;
+  --gold-light: #E3C15A;
+  --charcoal: #171717;
+  --graphite: #242424;
+  --warm-white: #F5F3EE;
+  --muted-gray: #B8B8B8;
+  --ivory: #F7F5F0;
+  /* Legacy token consumed by a few component stylesheets. */
+  --color-primary: #8F7211;
+  --brand-gold-text: #8F7211;
+  --color-primary-hover: #6E5809;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -30,23 +47,58 @@
 }
 
 .dark {
-  --bg-body: #0D0F11;
-  --bg-surface: #181A1D;
-  --bg-surface-hover: #1F2125;
-  --bg-surface-elevated: #1F2125;
-  --bg-sidebar: #0D0F11;
-  --bg-header: rgba(13, 15, 17, 0.88);
-  --border: #2A2C30;
-  --border-light: #333538;
-  --text-primary: #F0F2F5;
-  --text-secondary: #9BA1A8;
-  --text-muted: #5F6770;
-  --accent: #66B42A;
-  --accent-hover: #85C94E;
+  --bg-body: #171717;
+  --bg-surface: #242424;
+  --bg-surface-hover: #2A2926;
+  --bg-surface-elevated: #2A2926;
+  --bg-sidebar: #171717;
+  --bg-header: rgba(23, 23, 23, 0.88);
+  --border: #35342F;
+  --border-light: #3A3934;
+  --text-primary: #F5F3EE;
+  --text-secondary: #B8B8B8;
+  --text-muted: #8C8A83;
+  --accent: #E3C15A;
+  --accent-hover: #C9A227;
+  --gold: #C9A227;
+  --gold-light: #E3C15A;
+  --color-primary: #E3C15A;
+  --brand-gold-text: #E3C15A;
+  --color-primary-hover: #C9A227;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+
+/* ── Brand gold used as TEXT ─────────────────────────────────────────────
+   Premium Gold #C9A227 is tuned for fills: buttons, badges, borders, icons on
+   charcoal. As 12-16px text on the Ivory/white surfaces it is only ~2.2:1, so
+   `text-*-400/500` resolves to the deeper gold, which flips to Highlight Gold
+   on the charcoal surfaces. This lives after tailwind.css on purpose — same
+   specificity, so source order decides. */
+.text-saffron-400, .text-gold-400, .text-brand-400,
+.text-saffron-500, .text-gold-500, .text-brand-500,
+.text-\[\#C9A227\],
+.hover\:text-saffron-400:hover, .hover\:text-gold-400:hover, .hover\:text-brand-400:hover,
+.hover\:text-saffron-500:hover, .hover\:text-gold-500:hover, .hover\:text-brand-500:hover,
+.peer-focus\:text-saffron-500:focus-within, .peer-focus\:text-gold-500:focus-within,
+.peer-focus\:text-brand-500:focus-within {
+  color: var(--brand-gold-text);
+}
+
+/* On Deep Charcoal / Dark Graphite the same utilities read as Highlight Gold. */
+.bg-charcoal-900 .text-saffron-400, .bg-charcoal-900 .text-gold-400, .bg-charcoal-900 .text-brand-400,
+.bg-charcoal-900 .text-saffron-500, .bg-charcoal-900 .text-gold-500, .bg-charcoal-900 .text-brand-500,
+.bg-charcoal-900 .hover\:text-saffron-500:hover, .bg-charcoal-900 .hover\:text-gold-500:hover, .bg-charcoal-900 .hover\:text-brand-500:hover,
+.bg-charcoal-800 .text-saffron-400, .bg-charcoal-800 .text-gold-400, .bg-charcoal-800 .text-brand-400,
+.bg-charcoal-800 .text-saffron-500, .bg-charcoal-800 .text-gold-500, .bg-charcoal-800 .text-brand-500,
+.bg-charcoal-700 .text-saffron-400, .bg-charcoal-700 .text-gold-400, .bg-charcoal-700 .text-brand-400,
+.bg-charcoal-700 .text-saffron-500, .bg-charcoal-700 .text-gold-500, .bg-charcoal-700 .text-brand-500,
+.bg-brown-800 .text-saffron-500, .bg-brown-800 .text-gold-500, .bg-brown-800 .text-brand-500,
+.bg-brown-900 .text-saffron-500, .bg-brown-900 .text-gold-500, .bg-brown-900 .text-brand-500 {
+  color: #E3C15A;
 }
 
 html, body {
@@ -99,9 +151,9 @@ app-root {
 .radius-lg { border-radius: var(--radius-lg); }
 .radius-xl { border-radius: var(--radius-xl); }
 
-.text-sidebar-primary { color: #F0F2F5; }
-.text-sidebar-secondary { color: #9BA1A8; }
-.text-sidebar-muted { color: #5F6770; }
+.text-sidebar-primary { color: #F5F3EE; }
+.text-sidebar-secondary { color: #B8B8B8; }
+.text-sidebar-muted { color: #8C8A83; }
 
 .shadow-theme-xs { box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 

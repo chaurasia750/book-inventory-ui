@@ -36,10 +36,10 @@ export class AdminLayoutComponent {
 
   /** Account management is Super Admin only (spec R27); the route is guarded the same way. */
   private readonly superAdminNavItems: SidebarNavItem[] = [
-    { name: 'Companies', icon: TREE_ICON, section: 'MAIN', path: '/companies' },
-    { name: 'Users', icon: MEMBERS_ICON, section: 'MAIN', path: '/users' },
-    { name: 'Login log', icon: SETTINGS_ICON, section: 'MAIN', path: '/login-logs' },
-    { name: 'Audit log', icon: SETTINGS_ICON, section: 'MAIN', path: '/audit-logs' },
+    { name: 'Companies', icon: TREE_ICON, section: 'MANAGEMENT', path: '/companies' },
+    { name: 'Users', icon: MEMBERS_ICON, section: 'MANAGEMENT', path: '/users' },
+    { name: 'Login log', icon: SETTINGS_ICON, section: 'LOGS', path: '/login-logs' },
+    { name: 'Audit log', icon: SETTINGS_ICON, section: 'LOGS', path: '/audit-logs' },
   ];
 
   readonly navItems: SidebarNavItem[] = [

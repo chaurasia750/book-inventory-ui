@@ -1,9 +1,15 @@
-﻿import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, OnDestroy, OnInit } from '@angular/core';
+﻿import {
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, ElementRef, HostListener, inject, input, OnDestroy, OnInit, signal,
+  viewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { combineLatest, Subscription } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { combineLatest, map, Subscription } from 'rxjs';
+import { AuthService } from '@org/auth';
 import { SidebarService } from '../services/sidebar.service';
 import { SafeHtmlPipe } from '../pipes/safe-html.pipe';
+import { roleLabel, userDisplayName, userInitials } from '../services/user-label';
 import { APP_NAME } from '@org/constants';
 
 export interface SidebarNavSubItem {
@@ -17,6 +23,8 @@ export interface SidebarNavItem {
   path?: string;
   section?: string;
   subItems?: SidebarNavSubItem[];
+  /** A count shown beside the entry (platform.md U11); null or empty shows none. */
+  badge?: () => string | null;
 }
 
 /**
@@ -36,11 +44,31 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
   readonly sidebarService = inject(SidebarService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly auth = inject(AuthService);
 
   navItems = input.required<SidebarNavItem[]>();
   brandName = input(APP_NAME);
   appSubtitle = input('Admin Portal');
   homeRoute = input('/');
+
+  /** platform.md U11 (Plan 0089): the "Search menu" text; empty shows the whole menu. */
+  readonly query = signal('');
+  private readonly searchBox = viewChild<ElementRef<HTMLInputElement>>('searchBox');
+
+  /** The menu as the search leaves it: an entry stays when its name or one of its sub-pages matches (then only those sub-pages). */
+  readonly visibleItems = computed<SidebarNavItem[]>(() => {
+    const q = this.query().trim().toLowerCase();
+    if (!q) return this.navItems();
+    return this.navItems().flatMap((item) => {
+      if (item.name.toLowerCase().includes(q)) return [item];
+      const subs = (item.subItems ?? []).filter((s) => s.name.toLowerCase().includes(q));
+      return subs.length ? [{ ...item, subItems: subs }] : [];
+    });
+  });
+
+  readonly userName = computed(() => userDisplayName(this.auth.user()));
+  readonly userInitials = computed(() => userInitials(this.userName()));
+  readonly userRole = computed(() => roleLabel(this.auth.role()));
 
   openSubmenu: string | null = null;
   subMenuHeights: Record<string, number> = {};
@@ -48,6 +76,12 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
   readonly isExpanded$ = this.sidebarService.isExpanded$;
   readonly isMobileOpen$ = this.sidebarService.isMobileOpen$;
   readonly isHovered$ = this.sidebarService.isHovered$;
+
+  /** The menu shows names (expanded, hovered or the phone drawer); otherwise only icons. */
+  readonly isOpen = toSignal(
+    combineLatest([this.isExpanded$, this.isHovered$, this.isMobileOpen$]).pipe(map(([e, h, m]) => !!(e || h || m))),
+    { initialValue: false },
+  );
 
   private readonly subscription = new Subscription();
 
@@ -73,13 +107,46 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  /** Ctrl K (Cmd K on a Mac) focuses Search menu, opening the menu first when it is collapsed or off-canvas. */
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 'k') return;
+    event.preventDefault();
+    if (window.innerWidth >= 1280) this.sidebarService.setHovered(true);
+    else this.sidebarService.setMobileOpen(true);
+    setTimeout(() => this.searchBox()?.nativeElement.focus());
+  }
+
+  signOut(): void {
+    this.auth.logout().subscribe();
+  }
+
+  /**
+   * The menu item of the current page: the longest menu path that is the current path or one of its parents, ignoring
+   * the query. So "/crm/leads/<id>" and "/crm/leads?bucket=Overdue" keep "/crm/leads" highlighted, and "/crm" (the
+   * dashboard) is not highlighted while a deeper CRM page is open.
+   */
   isActive(path: string): boolean {
-    return this.router.url === path;
+    return !!path && path === this.activePath();
+  }
+
+  private activePath(): string | null {
+    const url = this.router.url.split(/[?#]/)[0];
+    const paths = this.navItems().flatMap((item) => [item.path, ...(item.subItems ?? []).map((sub) => sub.path)]);
+    return paths
+      .filter((p): p is string => !!p && (url === p || url.startsWith(p.endsWith('/') ? p : p + '/')))
+      .reduce<string | null>((best, p) => (best === null || p.length > best.length ? p : best), null);
   }
 
   isChildActive(path: string): boolean {
     const base = path.substring(0, path.lastIndexOf('/'));
     return base.length > 1 && this.router.url.startsWith(base + '/');
+  }
+
+  /** U11: a section label (MAIN, MANAGEMENT) is printed once per group - only where it differs from the item before. */
+  showSection(index: number): boolean {
+    const items = this.visibleItems();
+    return !!items[index].section && (index === 0 || items[index - 1].section !== items[index].section);
   }
 
   hasActiveSubItem(item: SidebarNavItem): boolean {

@@ -1,38 +1,39 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '@org/auth';
 import { APP_NAME } from '@org/constants';
 import { SidebarService } from '../services/sidebar.service';
 import { UserDropdownComponent } from '../user-dropdown/user-dropdown';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { roleLabel, userDisplayName } from '../services/user-label';
 
+/**
+ * platform spec U9: the one 56 px header bar of both apps - the menu button, the page title, then whatever the app
+ * projects (the Super Admin's company picker), the theme switch and the user menu.
+ */
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, RouterModule, UserDropdownComponent, ThemeToggleComponent],
   templateUrl: './app-header.html',
-  styleUrl: './app-header.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block' },
 })
 export class AppHeaderComponent {
+  /** The page title shown beside the menu button. */
+  readonly title = input('');
+  /** The app's home route. */
+  readonly homeRoute = input('/');
+
   private readonly authService = inject(AuthService);
   readonly sidebarService = inject(SidebarService);
 
   readonly appName = APP_NAME;
-
   readonly isMobileOpen$ = this.sidebarService.isMobileOpen$;
 
   get userName(): string {
-    return this.authService.user()?.fullName?.trim() || 'User';
-  }
-
-  get userInitials(): string {
-    const parts = this.userName.split(/\s+/).filter(Boolean);
-    return parts
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? '')
-      .join('') || 'U';
+    return userDisplayName(this.authService.user());
   }
 
   get userLoginId(): string {
@@ -43,22 +44,8 @@ export class AppHeaderComponent {
     return this.authService.user()?.email?.trim() || '';
   }
 
-  /** The real role from the API (`SUPER_ADMIN` -> "Super Admin"). */
   get userRole(): string {
-    const role = this.authService.role();
-    if (!role) return 'User';
-    return role
-      .split('_')
-      .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
-      .join(' ');
-  }
-
-  get isMember(): boolean {
-    return this.authService.roles().includes('member');
-  }
-
-  get isAdmin(): boolean {
-    return this.authService.roles().includes('admin');
+    return roleLabel(this.authService.role());
   }
 
   handleToggle(): void {
