@@ -42,6 +42,9 @@ export class MemberLayoutComponent {
   /** Price spec R5: the Owner and Staff both see the prices (Staff without the purchase price), in their own menu group. */
   private readonly priceNavItems: SidebarNavItem[] = [{ name: 'Prices', icon: SETTINGS_ICON, section: 'PRICES', path: '/prices' }];
 
+  /** Stock spec R10: the Owner and Staff both see the stock (Staff read-only), in their own menu group. */
+  private readonly stockNavItems: SidebarNavItem[] = [{ name: 'Stock', icon: SETTINGS_ICON, section: 'STOCK', path: '/stock' }];
+
   /** Item spec R9: the Owner and Staff both see the company's items (Staff read-only), in their own menu group. */
   private readonly itemNavItems: SidebarNavItem[] = [{ name: 'Items', icon: SETTINGS_ICON, section: 'ITEMS', path: '/items' }];
 
@@ -62,6 +65,7 @@ export class MemberLayoutComponent {
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.schoolNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.itemNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.priceNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.stockNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.vendorNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];

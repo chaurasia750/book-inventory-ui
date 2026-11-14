@@ -1,0 +1,136 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'stock.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'stock.subtitle' | translate }}</p>
+    </div>
+    @if (canEdit) {
+      <app-button variant="secondary" (clicked)="importOpen.set(true)">{{ 'stock.import.button' | translate }}</app-button>
+    }
+  </div>
+
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'stock.title' | translate" [detailLabel]="'stock.panelLabel' | translate">
+    <div list>
+      <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
+        <input type="search" [formControl]="search" [placeholder]="'stock.filters.search' | translate" [attr.aria-label]="'stock.filters.search' | translate"
+          class="h-10 min-w-[12rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+        @if (!hasPanel()) {
+          <select (change)="setCategory($any($event.target).value)" [attr.aria-label]="'stock.filters.category' | translate" [class]="select">
+            <option value="">{{ 'stock.filters.anyCategory' | translate }}</option>
+            @for (c of categories; track c) { <option [value]="c">{{ 'item.category.' + c | translate }}</option> }
+          </select>
+          <select (change)="setOrder($any($event.target).value)" [attr.aria-label]="'stock.filters.sort' | translate" [class]="select">
+            <option value="ItemName ASC">{{ 'stock.filters.sortNameAsc' | translate }}</option>
+            <option value="ItemName DESC">{{ 'stock.filters.sortNameDesc' | translate }}</option>
+            <option value="ItemCode ASC">{{ 'stock.filters.sortCodeAsc' | translate }}</option>
+            <option value="ItemCode DESC">{{ 'stock.filters.sortCodeDesc' | translate }}</option>
+          </select>
+          <label class="flex items-center gap-2 text-sm text-gray-600">
+            <input type="checkbox" [checked]="lowOnly()" (change)="setLowOnly($any($event.target).checked)" class="h-4 w-4 rounded border-gray-300" />
+            {{ 'stock.filters.lowOnly' | translate }}
+          </label>
+          <label class="flex items-center gap-2 text-sm text-gray-600">
+            <input type="checkbox" [checked]="includeInactive()" (change)="setIncludeInactive($any($event.target).checked)" class="h-4 w-4 rounded border-gray-300" />
+            {{ 'stock.filters.includeInactive' | translate }}
+          </label>
+        }
+      </div>
+
+      @if (loadError()) {
+        <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+          <span>{{ loadError() }}</span>
+          <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+        </div>
+      }
+
+      @if (hasPanel()) {
+        <ul class="m-0 list-none divide-y divide-neutral-100 p-0 dark:divide-charcoal-700">
+          @if (loading()) {
+            @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
+          } @else {
+            @for (row of result()?.items ?? []; track row.itemId) {
+              <li>
+                <button type="button" (click)="openItem(row.itemId)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700"
+                  [class.bg-gold-50]="row.itemId === selectedId()" [attr.aria-current]="row.itemId === selectedId() ? 'true' : null">
+                  <span class="min-w-0 flex-1">
+                    <span class="block truncate text-sm font-medium text-primary-fg">{{ row.itemName }}</span>
+                    <span class="block font-mono text-xs text-gray-500">{{ row.itemCode }}</span>
+                  </span>
+                  <span class="font-mono text-xs" [class.font-semibold]="row.isAtOrBelowZero" [class.text-red-600]="row.isAtOrBelowZero" [class.text-gray-600]="!row.isAtOrBelowZero">{{ row.mainQuantity }}</span>
+                </button>
+              </li>
+            } @empty {
+              @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'stock.empty' | translate }}</li> }
+            }
+          }
+        </ul>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">{{ 'stock.columns.itemCode' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'stock.columns.item' | translate }}</th>
+                <th class="px-4 py-3 text-right font-semibold">{{ 'stock.type.MAIN' | translate }}</th>
+                <th class="px-4 py-3 text-right font-semibold">{{ 'stock.type.DAMAGED' | translate }}</th>
+                <th class="px-4 py-3 text-right font-semibold">{{ 'stock.type.SAMPLE' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @if (loading()) {
+                @for (i of skeletonRows; track i) {
+                  <tr>
+                    <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="10rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="3rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="3rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="3rem" /></td>
+                  </tr>
+                }
+              } @else {
+                @for (row of result()?.items ?? []; track row.itemId) {
+                  <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="openItem(row.itemId)" (keydown.enter)="openItem(row.itemId)" tabindex="0">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ row.itemCode }}</td>
+                    <td class="px-4 py-3 font-medium text-primary-fg">
+                      {{ row.itemName }}
+                      @if (!row.isActive) {
+                        <span class="ml-2 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-500">{{ 'stock.inactive' | translate }}</span>
+                      }
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                      @if (row.isAtOrBelowZero) {
+                        <span class="inline-flex items-center gap-1 font-semibold text-red-600" [attr.title]="'stock.lowWarning' | translate">
+                          <span aria-hidden="true">&#9888;</span>{{ row.mainQuantity }}<span class="sr-only">{{ 'stock.lowWarning' | translate }}</span>
+                        </span>
+                      } @else {
+                        {{ row.mainQuantity }}
+                      }
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="row.damagedQuantity < 0">{{ row.damagedQuantity }}</td>
+                    <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="row.sampleQuantity < 0">{{ row.sampleQuantity }}</td>
+                  </tr>
+                } @empty {
+                  @if (!loadError()) {
+                    <tr><td colspan="5" class="py-10 text-center text-sm text-gray-400">{{ 'stock.empty' | translate }}</td></tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+    </div>
+
+    <div detail>
+      @if (selectedId(); as id) {
+        <app-item-stock [id]="id" (closed)="closePanel()" (changed)="load()" />
+      }
+    </div>
+  </app-list-detail>
+</div>
+
+@if (canEdit) {
+  <app-stock-import [open]="importOpen()" (closed)="importOpen.set(false)" (imported)="load()" />
+}

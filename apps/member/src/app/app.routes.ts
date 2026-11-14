@@ -47,6 +47,13 @@ export const appRoutes: Route[] = [
         children: [{ path: ':id', children: [] }],
       },
       {
+        path: 'stock',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/stock/stock-list').then((m) => m.StockListComponent),
+        // An item's stock opens beside the list (platform U10); the id is the item's. Writing is the Owner's (the panel shows no forms to Staff).
+        children: [{ path: ':id', children: [] }],
+      },
+      {
         path: 'items',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/items/item-list').then((m) => m.ItemListComponent),
