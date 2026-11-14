@@ -42,12 +42,9 @@ export class CompanyService {
     return this.api.post<void>(`/companies/${id}/activate`, { note });
   }
 
-  /**
-   * The company of this session: a company account's own, or the one a Super Admin entered. A Super Admin who has not
-   * entered one gets 404 by design (company spec R6), so no error toast; both callers show the empty state themselves.
-   */
+  /** The company of this session: a company account's own, or the one a Super Admin entered. */
   current(): Observable<CurrentCompany> {
-    return this.api.get<CurrentCompany>('/companies/current', undefined, { quiet: true });
+    return this.api.get<CurrentCompany>('/companies/current');
   }
 
   enter(id: string): Observable<SessionCompanyResponse> {
