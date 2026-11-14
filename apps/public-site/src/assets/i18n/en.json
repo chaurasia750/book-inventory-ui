@@ -170,6 +170,20 @@
     },
     "core": {
       "company_required": "Choose a company first."
+    },
+    "vendor": {
+      "not_found": "The vendor could not be found.",
+      "name_taken": "A vendor with this name already exists.",
+      "invalid_name": "The vendor name must be 2 to 150 characters.",
+      "invalid_field": "A vendor detail is too long.",
+      "invalid_state": "The state is not one of the states of India.",
+      "invalid_mobile": "The mobile number must have 10 to 15 digits.",
+      "invalid_email": "The email address is not valid.",
+      "invalid_gstin": "The GSTIN must be 15 characters in the GST format.",
+      "invalid_bank": "Give all five bank details (holder, bank, branch, a 9 to 18 digit account number and a valid IFSC) or none.",
+      "invalid_opening_balance": "The opening balance must be zero or more, with at most two decimals.",
+      "already_active": "The vendor is already active.",
+      "already_inactive": "The vendor is already inactive."
     }
   },
   "iam": {
@@ -698,5 +712,72 @@
     },
     "close": "Close",
     "detail": "School details"
+  },
+  "vendor": {
+    "title": "Vendors",
+    "subtitle": "The vendors and publications your company buys from.",
+    "close": "Close",
+    "panelLabel": "Vendor details",
+    "empty": "No vendors match these filters.",
+    "filters": {
+      "search": "Search name, code, contact, mobile or GSTIN",
+      "allStatuses": "All statuses",
+      "allStates": "All states"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Vendor",
+      "contact": "Contact",
+      "state": "State",
+      "bank": "Bank account",
+      "status": "Status"
+    },
+    "fields": {
+      "code": "Vendor code",
+      "name": "Vendor name",
+      "state": "State",
+      "noState": "No state",
+      "openingBalance": "Opening balance",
+      "openingBalanceHint": "What your company owed the vendor at the start. Zero or more.",
+      "contactPerson": "Contact person",
+      "mobile": "Mobile",
+      "email": "Email",
+      "gstin": "GSTIN",
+      "address": "Address"
+    },
+    "bank": {
+      "title": "Bank details",
+      "hint": "Give all five or none. The account number is shown in full only here, to the Owner.",
+      "accountHolder": "Account holder",
+      "bankName": "Bank",
+      "branch": "Branch",
+      "accountNumber": "Account number",
+      "ifsc": "IFSC",
+      "none": "No bank details."
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "add": {
+      "button": "Add vendor",
+      "title": "Add vendor",
+      "submit": "Add vendor"
+    },
+    "edit": {
+      "button": "Edit",
+      "title": "Edit vendor",
+      "submit": "Save changes"
+    },
+    "deactivate": {
+      "button": "Deactivate",
+      "title": "Deactivate vendor",
+      "confirm": "An inactive vendor cannot be chosen for new documents. You can activate it again."
+    },
+    "activate": {
+      "button": "Activate",
+      "title": "Activate vendor",
+      "confirm": "The vendor can be chosen for new documents again."
+    }
   }
 }

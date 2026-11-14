@@ -1,0 +1,75 @@
+<div class="flex flex-col gap-5">
+
+  @if (loading()) {
+    <div class="flex justify-end"><app-close-button [label]="'vendor.close' | translate" (clicked)="closed.emit()" /></div>
+    <app-card>
+      <div class="space-y-3">
+        <app-skeleton-loader width="14rem" />
+        <app-skeleton-loader width="100%" />
+        <app-skeleton-loader width="80%" />
+      </div>
+    </app-card>
+  } @else if (loadError()) {
+    <div class="flex justify-end"><app-close-button [label]="'vendor.close' | translate" (clicked)="closed.emit()" /></div>
+    <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+      <span>{{ loadError() }}</span>
+      <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+    </div>
+  } @else if (vendor(); as v) {
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="mr-auto flex min-w-0 flex-wrap items-center gap-3">
+        <h1 class="font-mono text-xl font-semibold text-primary-fg">{{ v.code }}</h1>
+        <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(v.status)">{{ 'vendor.status.' + v.status | translate }}</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <app-button variant="secondary" (clicked)="editRequested.emit()">{{ 'vendor.edit.button' | translate }}</app-button>
+        <app-button variant="secondary" (clicked)="openStatus()">
+          {{ (v.status === 'ACTIVE' ? 'vendor.deactivate.button' : 'vendor.activate.button') | translate }}
+        </app-button>
+      </div>
+      <app-close-button [label]="'vendor.close' | translate" (clicked)="closed.emit()" />
+    </div>
+
+    <app-card>
+      <dl class="grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.name' | translate }}</dt><dd class="mt-1 text-base font-semibold">{{ v.name }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.code' | translate }}</dt><dd class="mt-1 font-mono">{{ v.code }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.state' | translate }}</dt><dd class="mt-1">{{ v.state || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.openingBalance' | translate }}</dt><dd class="mt-1">{{ v.openingBalanceAmount | number: '1.2-2' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.contactPerson' | translate }}</dt><dd class="mt-1">{{ v.contactPerson || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.mobile' | translate }}</dt><dd class="mt-1">{{ v.mobile || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.email' | translate }}</dt><dd class="mt-1">{{ v.email || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.gstin' | translate }}</dt><dd class="mt-1">{{ v.gstin || '-' }}</dd></div>
+        <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.fields.address' | translate }}</dt><dd class="mt-1">{{ v.address || '-' }}</dd></div>
+      </dl>
+    </app-card>
+
+    <app-card>
+      <h2 class="mb-3 text-lg font-semibold text-primary-fg">{{ 'vendor.bank.title' | translate }}</h2>
+      @if (v.bank; as b) {
+        <dl class="grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2">
+          <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.bank.accountHolder' | translate }}</dt><dd class="mt-1">{{ b.accountHolder }}</dd></div>
+          <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.bank.bankName' | translate }}</dt><dd class="mt-1">{{ b.bankName }}</dd></div>
+          <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.bank.branch' | translate }}</dt><dd class="mt-1">{{ b.branch }}</dd></div>
+          <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.bank.ifsc' | translate }}</dt><dd class="mt-1 font-mono">{{ b.ifsc }}</dd></div>
+          <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'vendor.bank.accountNumber' | translate }}</dt><dd class="mt-1 font-mono">{{ b.accountNumber }}</dd></div>
+        </dl>
+      } @else {
+        <p class="text-sm text-gray-400">{{ 'vendor.bank.none' | translate }}</p>
+      }
+    </app-card>
+
+    <app-modal [open]="statusOpen()" [title]="(v.status === 'ACTIVE' ? 'vendor.deactivate.title' : 'vendor.activate.title') | translate" (closed)="statusOpen.set(false)">
+      <div class="space-y-4">
+        <p class="text-sm text-gray-600">{{ (v.status === 'ACTIVE' ? 'vendor.deactivate.confirm' : 'vendor.activate.confirm') | translate }}</p>
+        @if (statusError()) {
+          <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ statusError() }}</p>
+        }
+        <div class="flex justify-end gap-2">
+          <app-button variant="secondary" (clicked)="statusOpen.set(false)">{{ 'users.cancel' | translate }}</app-button>
+          <app-button [loading]="statusSaving()" (clicked)="changeStatus()">{{ (v.status === 'ACTIVE' ? 'vendor.deactivate.button' : 'vendor.activate.button') | translate }}</app-button>
+        </div>
+      </div>
+    </app-modal>
+  }
+</div>

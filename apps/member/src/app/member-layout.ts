@@ -39,6 +39,9 @@ export class MemberLayoutComponent {
     { name: 'Dashboard', icon: DASHBOARD_ICON, section: 'MAIN', path: '/' },
   ];
 
+  /** Vendor spec R8: vendors are the Owner's; Staff have no access. */
+  private readonly vendorNavItems: SidebarNavItem[] = [{ name: 'Vendors', icon: TREE_ICON, section: 'MANAGEMENT', path: '/vendors' }];
+
   /** R66: the Owner manages the Staff of their own company and reads the audit log of it (core A7). */
   private readonly ownerNavItems: SidebarNavItem[] = [
     { name: 'Staff', icon: MEMBERS_ICON, section: 'MANAGEMENT', path: '/staff' },
@@ -51,6 +54,7 @@ export class MemberLayoutComponent {
   readonly navItems: SidebarNavItem[] = [
     ...(FEATURES.iam ? this.iamNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.schoolNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') ? this.vendorNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];
 

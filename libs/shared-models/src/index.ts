@@ -15,4 +15,5 @@ export * from './lib/problem-details.model';
 export * from './lib/user-admin.model';
 export * from './lib/company.model';
 export * from './lib/school.model';
+export * from './lib/vendor.model';
 export * from './lib/login-history.model';
