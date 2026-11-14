@@ -1,0 +1,97 @@
+<div class="flex flex-col gap-5">
+
+  @if (loading()) {
+    <div class="flex justify-end"><app-close-button [label]="'item.close' | translate" (clicked)="closed.emit()" /></div>
+    <app-card>
+      <div class="space-y-3">
+        <app-skeleton-loader width="14rem" />
+        <app-skeleton-loader width="100%" />
+        <app-skeleton-loader width="80%" />
+      </div>
+    </app-card>
+  } @else if (loadError()) {
+    <div class="flex justify-end"><app-close-button [label]="'item.close' | translate" (clicked)="closed.emit()" /></div>
+    <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+      <span>{{ loadError() }}</span>
+      <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+    </div>
+  } @else if (item(); as i) {
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="mr-auto flex min-w-0 flex-wrap items-center gap-3">
+        <h1 class="font-mono text-xl font-semibold text-primary-fg">{{ i.code }}</h1>
+        <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(i.status)">{{ 'item.status.' + i.status | translate }}</span>
+      </div>
+      @if (canEdit) {
+        <div class="flex flex-wrap gap-2">
+          <app-button variant="secondary" (clicked)="editRequested.emit()">{{ 'item.edit.button' | translate }}</app-button>
+          <app-button variant="secondary" (clicked)="openStatus()">
+            {{ (i.status === 'ACTIVE' ? 'item.deactivate.button' : 'item.activate.button') | translate }}
+          </app-button>
+        </div>
+      }
+      <app-close-button [label]="'item.close' | translate" (clicked)="closed.emit()" />
+    </div>
+
+    <app-card>
+      <dl class="grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.name' | translate }}</dt><dd class="mt-1 text-base font-semibold">{{ i.name }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.code' | translate }}</dt><dd class="mt-1 font-mono">{{ i.code }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.category' | translate }}</dt><dd class="mt-1">{{ 'item.category.' + i.category | translate }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.vendor' | translate }}</dt><dd class="mt-1">{{ i.vendorName || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.className' | translate }}</dt><dd class="mt-1">{{ i.className || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.subject' | translate }}</dt><dd class="mt-1">{{ i.subject || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.hsnCode' | translate }}</dt><dd class="mt-1 font-mono">{{ i.hsnCode || '-' }}</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.gstRate' | translate }}</dt><dd class="mt-1">{{ i.gstRatePercent | number: '1.0-2' }}%</dd></div>
+        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'item.fields.stockManaged' | translate }}</dt><dd class="mt-1">{{ (i.isStockManaged ? 'item.yes' : 'item.no') | translate }}</dd></div>
+      </dl>
+    </app-card>
+
+    <app-card>
+      <h2 class="mb-3 text-lg font-semibold text-primary-fg">{{ 'item.barcodes.title' | translate }}</h2>
+      @if (barcodesError()) {
+        <p class="mb-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ barcodesError() }}</p>
+      }
+      @if (barcodes().length === 0) {
+        <p class="py-4 text-sm text-gray-400">{{ 'item.barcodes.empty' | translate }}</p>
+      }
+      <ul class="divide-y divide-gray-100">
+        @for (barcode of barcodes(); track barcode) {
+          <li class="flex items-center gap-2 py-2">
+            <span class="flex-1 font-mono text-sm">{{ barcode }}</span>
+            @if (canEdit) {
+              <button type="button" class="px-2 text-red-500 hover:text-red-700" (click)="removeBarcode($index)" [attr.aria-label]="'item.barcodes.remove' | translate">&times;</button>
+            }
+          </li>
+        }
+      </ul>
+      @if (canEdit) {
+        <div class="mt-3 flex gap-2">
+          <input [value]="newBarcode()" (input)="setNewBarcode($any($event.target).value)" (keydown.enter)="addBarcode()" [placeholder]="'item.barcodes.addPlaceholder' | translate"
+            class="h-10 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 font-mono text-sm uppercase focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+          <app-button variant="secondary" (clicked)="addBarcode()">{{ 'item.barcodes.add' | translate }}</app-button>
+        </div>
+        @if (barcodesDirty()) {
+          <div class="mt-4 flex justify-end gap-2 border-t border-gray-100 pt-4">
+            <app-button variant="secondary" (clicked)="discardBarcodes()">{{ 'item.barcodes.discard' | translate }}</app-button>
+            <app-button [loading]="barcodesSaving()" (clicked)="saveBarcodes()">{{ 'item.barcodes.save' | translate }}</app-button>
+          </div>
+        }
+      }
+    </app-card>
+
+    @if (canEdit) {
+      <app-modal [open]="statusOpen()" [title]="(i.status === 'ACTIVE' ? 'item.deactivate.title' : 'item.activate.title') | translate" (closed)="statusOpen.set(false)">
+        <div class="space-y-4">
+          <p class="text-sm text-gray-600">{{ (i.status === 'ACTIVE' ? 'item.deactivate.confirm' : 'item.activate.confirm') | translate }}</p>
+          @if (statusError()) {
+            <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ statusError() }}</p>
+          }
+          <div class="flex justify-end gap-2">
+            <app-button variant="secondary" (clicked)="statusOpen.set(false)">{{ 'users.cancel' | translate }}</app-button>
+            <app-button [loading]="statusSaving()" (clicked)="changeStatus()">{{ (i.status === 'ACTIVE' ? 'item.deactivate.button' : 'item.activate.button') | translate }}</app-button>
+          </div>
+        </div>
+      </app-modal>
+    }
+  }
+</div>

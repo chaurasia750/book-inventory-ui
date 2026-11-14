@@ -186,6 +186,19 @@
       "invalid_opening_balance": "The opening balance must be zero or more, with at most two decimals.",
       "already_active": "The vendor is already active.",
       "already_inactive": "The vendor is already inactive."
+    },
+    "item": {
+      "not_found": "The item could not be found.",
+      "invalid_name": "The item name must be 2 to 200 characters.",
+      "invalid_field": "An item detail is too long.",
+      "invalid_hsn": "The HSN code must have 4 to 8 digits.",
+      "invalid_gst_rate": "The GST rate must be 0, 5, 12, 18 or 28 percent.",
+      "invalid_vendor": "The vendor must be an active vendor of your company.",
+      "invalid_barcode": "A barcode must have 4 to 30 letters, digits or hyphens.",
+      "duplicate_barcode": "A barcode appears twice in the list.",
+      "barcode_taken": "A barcode is already used by another item.",
+      "already_active": "The item is already active.",
+      "already_inactive": "The item is already inactive."
     }
   },
   "iam": {
@@ -780,6 +793,88 @@
       "button": "Activate",
       "title": "Activate vendor",
       "confirm": "The vendor can be chosen for new documents again."
+    }
+  },
+  "item": {
+    "title": "Items",
+    "subtitle": "Books, copies, pens and everything else your company buys and sells.",
+    "close": "Close",
+    "panelLabel": "Item details",
+    "empty": "No items match these filters.",
+    "yes": "Yes",
+    "no": "No",
+    "filters": {
+      "search": "Search name, code, barcode, class, subject or vendor",
+      "allCategories": "All categories",
+      "allStatuses": "All statuses",
+      "anyStock": "Any stock setting",
+      "stockManaged": "Stock managed",
+      "notStockManaged": "Not stock managed"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Item",
+      "category": "Category",
+      "vendor": "Vendor",
+      "className": "Class",
+      "gst": "GST",
+      "status": "Status"
+    },
+    "fields": {
+      "code": "Item code",
+      "name": "Item name",
+      "category": "Category",
+      "vendor": "Vendor or publication",
+      "noVendor": "No vendor",
+      "className": "Class",
+      "subject": "Subject",
+      "hsnCode": "HSN code",
+      "hsnHint": "4 to 8 digits, optional.",
+      "gstRate": "GST rate",
+      "stockManaged": "Stock is counted for this item"
+    },
+    "category": {
+      "BOOK": "Book",
+      "COPY": "Copy",
+      "PEN": "Pen",
+      "PENCIL": "Pencil",
+      "BAG": "Bag",
+      "TIE": "Tie",
+      "OTHER": "Other"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "barcodes": {
+      "title": "Barcodes",
+      "empty": "This item has no barcode.",
+      "addPlaceholder": "New barcode or ISBN",
+      "add": "Add",
+      "remove": "Remove barcode",
+      "save": "Save barcodes",
+      "discard": "Discard changes",
+      "duplicate": "This barcode is already in the list."
+    },
+    "add": {
+      "button": "Add item",
+      "title": "Add item",
+      "submit": "Add item"
+    },
+    "edit": {
+      "button": "Edit",
+      "title": "Edit item",
+      "submit": "Save changes"
+    },
+    "deactivate": {
+      "button": "Deactivate",
+      "title": "Deactivate item",
+      "confirm": "An inactive item cannot be chosen for new documents and is hidden from Staff. You can activate it again."
+    },
+    "activate": {
+      "button": "Activate",
+      "title": "Activate item",
+      "confirm": "The item can be chosen for new documents again."
     }
   }
 }

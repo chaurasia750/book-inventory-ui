@@ -1,4 +1,4 @@
-import { AccountStatus, CompanyStatus, DeviceType, LoginResult, SchoolStatus, VendorStatus } from '@org/shared-models';
+import { AccountStatus, CompanyStatus, DeviceType, LoginResult, ItemStatus, SchoolStatus, VendorStatus } from '@org/shared-models';
 
 // Avatar initials reuse the existing `initials` of ./string.util (exported from the same index) rather than a second
 // implementation of the same rule.
@@ -44,6 +44,11 @@ export function schoolStatusBadgeClass(status: SchoolStatus): string {
 
 /** The colour a vendor status is shown in (vendor spec R7): the same two states and colours as a company. */
 export function vendorStatusBadgeClass(status: VendorStatus): string {
+  return companyStatusBadgeClass(status);
+}
+
+/** The colour an item status is shown in (item spec R8): the same two states and colours as a company. */
+export function itemStatusBadgeClass(status: ItemStatus): string {
   return companyStatusBadgeClass(status);
 }
 

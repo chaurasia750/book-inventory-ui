@@ -34,6 +34,17 @@ export const appRoutes: Route[] = [
         children: [{ path: ':id', children: [] }],
       },
       {
+        path: 'items',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/items/item-list').then((m) => m.ItemListComponent),
+        // The item, the form for a new one and the edit form open beside the list (platform U10); writing is for the Owner.
+        children: [
+          { path: 'new', canActivate: [appRoleGuard(['OWNER'])], children: [] },
+          { path: ':id/edit', canActivate: [appRoleGuard(['OWNER'])], children: [] },
+          { path: ':id', children: [] },
+        ],
+      },
+      {
         path: 'vendors',
         canActivate: [appRoleGuard(['OWNER'])],
         loadComponent: () => import('./pages/vendors/vendor-list').then((m) => m.VendorListComponent),
