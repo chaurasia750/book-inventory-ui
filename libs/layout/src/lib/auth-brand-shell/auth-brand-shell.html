@@ -1,0 +1,44 @@
+<div class="grid min-h-screen items-start bg-ivory lg:grid-cols-[1.05fr_1fr]">
+  <aside class="relative hidden h-screen flex-col justify-between overflow-hidden bg-charcoal-900 p-12 lg:sticky lg:top-0 lg:flex">
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-charcoal-900 from-[35%] via-charcoal-800 to-charcoal-700 opacity-90"></div>
+    <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-gold-500/10 blur-3xl"></div>
+    <div class="relative flex items-center gap-3">
+      <span class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5">
+        <img src="/assets/brand/logo.svg" alt="" class="h-full w-full object-contain" />
+      </span>
+      <span class="text-lg font-semibold text-white">Book Inventory</span>
+    </div>
+    <div class="relative max-w-md">
+      <span class="inline-flex items-center rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-1 text-xs tracking-wide text-gold-400">{{ 'login.hero.badge' | translate }}</span>
+      <h1 class="mt-4 text-4xl font-bold leading-tight text-white">{{ 'login.hero.title' | translate }}</h1>
+      <p class="mt-3 text-white/70">{{ 'login.hero.description' | translate }}</p>
+      <ul class="mt-8 space-y-4">
+        @for (point of points; track point.key) {
+          <li class="flex items-center gap-3 text-white/85">
+            <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 text-gold-400">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="point.path" /></svg>
+            </span>
+            {{ point.key | translate }}
+          </li>
+        }
+      </ul>
+    </div>
+    <p class="relative text-xs text-white/40">
+      {{ 'login.hero.footer.dpdp' | translate }} · {{ 'login.hero.footer.iso' | translate }} · {{ 'login.hero.footer.ssl' | translate }}
+    </p>
+  </aside>
+
+  <main class="flex min-h-screen flex-col px-4 py-6 sm:px-8 lg:px-12">
+    <div class="flex items-center gap-2 lg:hidden">
+      <span class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5 ring-1 ring-neutral-200">
+        <img src="/assets/brand/logo.svg" alt="" class="h-full w-full object-contain" />
+      </span>
+      <span class="text-base font-semibold text-charcoal-900">Book Inventory</span>
+    </div>
+    <div class="flex flex-1 items-center">
+      <div class="mx-auto w-full py-10" [class]="wide() ? 'max-w-2xl' : 'max-w-md'">
+        <ng-content />
+      </div>
+    </div>
+  </main>
+</div>

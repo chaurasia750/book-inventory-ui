@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
+import { AuthBrandShellComponent } from '@org/layout';
 import { messageForError } from '@org/interceptors';
 import { APP_URLS } from '@org/constants';
 
@@ -33,7 +34,7 @@ function redirectTarget(roles: readonly string[], returnUrl: string | null): str
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, AuthBrandShellComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

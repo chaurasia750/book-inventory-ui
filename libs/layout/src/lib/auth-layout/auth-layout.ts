@@ -1,15 +1,13 @@
-﻿import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { APP_NAME } from '@org/constants';
+import { AuthBrandShellComponent } from '../auth-brand-shell/auth-brand-shell';
 
+/** Platform spec U11: the frame of the forgot / reset password and welcome routes - the shared brand shell. */
 @Component({
   selector: 'app-auth-layout',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, AuthBrandShellComponent],
   templateUrl: './auth-layout.html',
-  styleUrl: './auth-layout.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuthLayoutComponent {
-  readonly brand = APP_NAME;
-}
+export class AuthLayoutComponent {}

@@ -2,6 +2,7 @@ export * from './lib/app-sidebar/app-sidebar';
 export * from './lib/app-header/app-header';
 export * from './lib/app-layout/app-layout';
 export * from './lib/member-footer/member-footer';
+export * from './lib/auth-brand-shell/auth-brand-shell';
 export * from './lib/auth-layout/auth-layout';
 export * from './lib/services/sidebar.service';
 export * from './lib/backdrop/backdrop';
