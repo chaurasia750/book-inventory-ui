@@ -13,7 +13,7 @@ import { AppLayoutComponent, SidebarNavItem, DASHBOARD_ICON, TREE_ICON, MEMBERS_
       [navItems]="navItems"
       [brandName]="appName"
       appSubtitle="Administration Console"
-      title="Admin Console"
+      title="My Account"
       homeRoute="/dashboard"
     >
       @if (isSuperAdmin) {
