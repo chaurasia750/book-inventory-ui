@@ -7,7 +7,7 @@ import {
   CompanySummary,
   CreateCompanyRequest,
   CreatedCompany,
-  CurrentCompany,
+  CurrentCompanyView,
   PagedList,
   SessionCompanyResponse,
 } from '@org/shared-models';
@@ -43,8 +43,8 @@ export class CompanyService {
   }
 
   /** The company of this session: a company account's own, or the one a Super Admin entered. */
-  current(): Observable<CurrentCompany> {
-    return this.api.get<CurrentCompany>('/companies/current');
+  current(): Observable<CurrentCompanyView> {
+    return this.api.get<CurrentCompanyView>('/companies/current');
   }
 
   enter(id: string): Observable<SessionCompanyResponse> {

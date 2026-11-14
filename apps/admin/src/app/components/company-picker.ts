@@ -77,9 +77,9 @@ export class CompanyPickerComponent {
 
   private loadCurrent(): void {
     this.service.current().subscribe({
-      next: (company) => {
+      next: (view) => {
         this.loading.set(false);
-        this.selectedId.set(company.id);
+        this.selectedId.set(view.company?.id ?? '');
       },
       error: () => {
         this.loading.set(false);

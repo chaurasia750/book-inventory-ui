@@ -87,6 +87,11 @@ export interface CurrentCompany {
   state: string | null;
 }
 
+/** `GET companies/current`: the company of the session, or null for a Super Admin who has not entered one (company spec R10). */
+export interface CurrentCompanyView {
+  company: CurrentCompany | null;
+}
+
 /** The answer of entering or leaving a company; the new access cookie is set by the same response. */
 export interface SessionCompanyResponse {
   company: CurrentCompany | null;

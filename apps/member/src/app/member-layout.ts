@@ -56,7 +56,7 @@ export class MemberLayoutComponent {
 
   constructor() {
     this.companies.current().subscribe({
-      next: (company) => this.subtitle.set(company.name),
+      next: (view) => this.subtitle.set(view.company?.name ?? ''),
       error: () => this.subtitle.set(''),
     });
   }
