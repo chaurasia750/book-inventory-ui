@@ -6,6 +6,7 @@
     </div>
     @if (canEdit) {
       <div class="flex flex-wrap gap-2">
+        <app-button variant="secondary" (clicked)="openBulk()">{{ 'price.bulk.button' | translate }}</app-button>
         <app-button variant="secondary" (clicked)="copyOpen.set(true)">{{ 'price.copy.button' | translate }}</app-button>
       </div>
     }
