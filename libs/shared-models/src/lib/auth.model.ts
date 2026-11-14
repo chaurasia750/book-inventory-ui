@@ -1,5 +1,5 @@
 /**
- * The four fixed roles, exactly as the API sends them in tokens and responses.
+ * The fixed roles, exactly as the API sends them in tokens and responses.
  * (The legacy `Role` type in user.model.ts is the older `admin` | `member` bucket that existing pages still use;
  * `AuthService.roles()` maps these real roles onto it.)
  */
@@ -8,9 +8,16 @@ export const APP_ROLES = {
   SALES_CRM: 'SALES_CRM',
   ACCOUNTS: 'ACCOUNTS',
   MEMBER: 'MEMBER',
+  /** The main account of a company; works in the company workspace (`member` app). */
+  OWNER: 'OWNER',
+  /** A login the Owner creates; works in the company workspace (`member` app). */
+  STAFF: 'STAFF',
 } as const;
 
 export type AppRole = (typeof APP_ROLES)[keyof typeof APP_ROLES];
+
+/** Roles of a company's own accounts. */
+export const COMPANY_ROLES: readonly AppRole[] = [APP_ROLES.OWNER, APP_ROLES.STAFF];
 
 /** Roles that work in the admin app. */
 export const STAFF_ROLES: readonly AppRole[] = [APP_ROLES.SUPER_ADMIN, APP_ROLES.SALES_CRM, APP_ROLES.ACCOUNTS];
@@ -36,7 +43,7 @@ export interface AuthUser {
 }
 
 export interface LoginRequest {
-  /** Agents use their generated user id; staff use their email or username. */
+  /** Company accounts and agents use their generated user id; the Super Admin uses an email or username. */
   identifier: string;
   password: string;
   rememberMe: boolean;

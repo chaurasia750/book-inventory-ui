@@ -24,7 +24,7 @@
     },
     "security": "Your connection is encrypted and secure",
     "fields": {
-      "userId": "User ID, email or username",
+      "userId": "User ID",
       "password": "Password",
       "forgotPassword": "Forgot Password?",
       "rememberMe": "Keep me signed in"
@@ -47,7 +47,7 @@
       }
     },
     "validation": {
-      "userIdRequired": "User ID, email or username is required",
+      "userIdRequired": "User ID is required",
       "passwordRequired": "Password is required"
     }
   },
@@ -77,7 +77,8 @@
         "password_change_required": "You must change your password before continuing.",
         "reset_token_invalid": "This reset link is invalid or has expired.",
         "rate_limited": "Too many attempts from this address. Please wait a minute and try again.",
-        "not_active": "Your account is not active. Please contact support."
+        "not_active": "Your account is not active. Please contact support.",
+        "company_inactive": "Your company is not active. Please contact support."
       },
       "password": {
         "policy_violation": "The password does not meet the password rules.",
@@ -125,7 +126,10 @@
         "role_not_staff": "That role is not a staff role.",
         "member_role_immutable": "The role of an agent cannot be changed.",
         "role_unchanged": "The user already has that role.",
-        "role_change_reason_required": "A reason of 5 to 500 characters is required."
+        "role_change_reason_required": "A reason of 5 to 500 characters is required.",
+        "company_role_immutable": "The role of a company account cannot be changed.",
+        "company_invalid": "A company account needs a valid company.",
+        "password_reset_not_allowed": "A temporary password can only be set for a company account."
       },
       "system_account": {
         "immutable": "The system account cannot be modified."
@@ -134,7 +138,21 @@
         "already_closed": "The login record for this session was already closed.",
         "export_too_large": "Too many rows match. Narrow the filters (dates, user, result) and export again.",
         "invalid_ip": "The IP address filter is not a valid IPv4 or IPv6 address."
+      },
+      "staff": {
+        "invalid_short_name": "The short name must be 2 to 20 lower-case letters or digits."
       }
+    },
+    "company": {
+      "not_found": "The company could not be found.",
+      "name_taken": "A company with this name already exists.",
+      "invalid_name": "The company name must be 2 to 150 characters.",
+      "invalid_field": "A company detail is too long.",
+      "owner_id_invalid": "The company name needs at least 3 letters or digits to make a login id.",
+      "reason_required": "A reason of 5 to 500 characters is required.",
+      "already_active": "The company is already active.",
+      "already_inactive": "The company is already inactive.",
+      "not_active": "The company is not active."
     }
   },
   "iam": {
@@ -233,7 +251,9 @@
       "SUPER_ADMIN": "Super Admin",
       "SALES_CRM": "Sales / CRM",
       "ACCOUNTS": "Accounts",
-      "MEMBER": "Agent"
+      "MEMBER": "Agent",
+      "OWNER": "Owner",
+      "STAFF": "Staff"
     },
     "status": {
       "PENDING": "Pending",
@@ -324,7 +344,8 @@
       "release-identity": "E-mail and mobile released.",
       "profile": "Profile saved.",
       "revoke": "Session ended."
-    }
+    },
+    "retry": "Retry"
   },
   "account": {
     "unknown": "Unknown",
@@ -435,5 +456,136 @@
     "newValue": "New value",
     "changed": "changed",
     "noValues": "This entry holds no values."
+  },
+  "company": {
+    "title": "Companies",
+    "subtitle": "Create companies and manage their logins.",
+    "empty": "No companies yet.",
+    "back": "Back to companies",
+    "create": {
+      "button": "Add company",
+      "title": "Add a company",
+      "submit": "Create company"
+    },
+    "fields": {
+      "name": "Company name",
+      "ownerName": "Owner's full name",
+      "address": "Address",
+      "mobile": "Mobile",
+      "email": "Email",
+      "gstin": "GSTIN",
+      "pan": "PAN",
+      "state": "State",
+      "tagline": "Tagline"
+    },
+    "filters": {
+      "search": "Search by name",
+      "allStatuses": "All statuses"
+    },
+    "columns": {
+      "name": "Company",
+      "state": "State",
+      "status": "Status",
+      "created": "Created"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "detail": {
+      "profile": "Company details",
+      "accounts": "Accounts",
+      "noAccounts": "No accounts.",
+      "history": "Status history",
+      "edit": "Edit",
+      "save": "Save",
+      "deactivate": "Deactivate",
+      "activate": "Reactivate",
+      "reason": "Reason",
+      "reasonHint": "5 to 500 characters. Every login of this company stops working at once.",
+      "note": "Note (optional)",
+      "confirmActivate": "Reactivate this company?",
+      "login": "User ID",
+      "role": "Role",
+      "statusReason": "Reason"
+    },
+    "history": {
+      "when": "When",
+      "from": "From",
+      "to": "To",
+      "reason": "Reason",
+      "created": "Created"
+    },
+    "credentials": {
+      "title": "Owner's login",
+      "intro": "The company was created. Give this login to the Owner of",
+      "once": "The password is shown only now. Copy it and hand it over; it cannot be shown again.",
+      "userId": "User ID",
+      "password": "Temporary password",
+      "copy": "Copy password",
+      "copied": "Copied",
+      "done": "Done"
+    },
+    "picker": {
+      "label": "Company",
+      "none": "No company",
+      "leave": "Leave company",
+      "empty": "No active company",
+      "loadError": "Could not load the companies."
+    }
+  },
+  "staff": {
+    "title": "Staff",
+    "subtitle": "Logins for the people of your company. They can only create orders and sell to customers.",
+    "empty": "No staff yet.",
+    "back": "Back to staff",
+    "add": {
+      "button": "Add staff",
+      "title": "Add a staff login",
+      "submit": "Create login"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "shortName": "Short name",
+      "shortNameHint": "2 to 20 letters or digits. The login becomes"
+    },
+    "filters": {
+      "search": "Search by name or user id",
+      "allStatuses": "All statuses"
+    },
+    "columns": {
+      "name": "Name",
+      "userId": "User ID",
+      "status": "Status",
+      "lastLogin": "Last login"
+    },
+    "detail": {
+      "profile": "Details",
+      "sessions": "Active sessions",
+      "noSessions": "No active sessions.",
+      "reason": "Reason",
+      "reasonHint": "5 to 500 characters.",
+      "started": "Started",
+      "lastSeen": "Last seen"
+    },
+    "actions": {
+      "deactivate": "Deactivate",
+      "activate": "Reactivate",
+      "unlock": "Unlock",
+      "forceLogout": "Log out everywhere",
+      "resetPassword": "Reset password",
+      "done": "Done"
+    },
+    "credentials": {
+      "title": "Staff login",
+      "resetTitle": "New temporary password",
+      "intro": "Give this login to",
+      "once": "The password is shown only now. Copy it and hand it over; it cannot be shown again.",
+      "userId": "User ID",
+      "password": "Temporary password",
+      "copy": "Copy password",
+      "copied": "Copied",
+      "done": "Done"
+    }
   }
 }

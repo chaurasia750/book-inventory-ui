@@ -6,7 +6,9 @@
   [homeRoute]="homeRoute()"
 />
 <div class="app-layout-main">
-  <app-header [title]="title()" />
+  <app-header [title]="title()">
+    <ng-content select="[headerExtra]" />
+  </app-header>
   <main class="app-layout-content">
     <router-outlet />
   </main>

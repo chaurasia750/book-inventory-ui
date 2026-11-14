@@ -29,3 +29,4 @@ export * from './lib/disable-on-request/disable-on-request';
 export * from './lib/date-picker/date-picker';
 export * from './lib/status-badge/status-badge';
 export * from './lib/reject-modal/reject-modal';
+export * from './lib/credentials-dialog/credentials-dialog';
