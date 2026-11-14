@@ -1,0 +1,105 @@
+<div class="flex flex-col gap-5">
+  <div class="flex flex-wrap items-center gap-3">
+    <div class="mr-auto min-w-0">
+      <h1 class="truncate text-xl font-semibold text-primary-fg">{{ item()?.name || ('price.panelLabel' | translate) }}</h1>
+      @if (item(); as i) {
+        <p class="font-mono text-xs text-gray-500">{{ i.code }}</p>
+      }
+    </div>
+    @if (canEdit && !loading() && !loadError()) {
+      <app-button (clicked)="openNew()">{{ 'price.add.button' | translate }}</app-button>
+    }
+    <app-close-button [label]="'price.close' | translate" (clicked)="closed.emit()" />
+  </div>
+
+  @if (formFor() !== null) {
+    <app-card>
+      <h2 class="mb-3 text-lg font-semibold text-primary-fg">{{ (formFor() === 'new' ? 'price.add.title' : 'price.edit.title') | translate }}</h2>
+      <app-price-version-form [version]="versionBeingEdited()" [saving]="saving()" [error]="saveError()"
+        [submitLabel]="formFor() === 'new' ? 'price.add.submit' : 'price.edit.submit'" (submitted)="save($event)" (cancelled)="formFor.set(null)" />
+    </app-card>
+  }
+
+  @if (loading()) {
+    <app-card>
+      <div class="space-y-3">
+        <app-skeleton-loader width="100%" />
+        <app-skeleton-loader width="80%" />
+      </div>
+    </app-card>
+  } @else if (loadError()) {
+    <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+      <span>{{ loadError() }}</span>
+      <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+    </div>
+  } @else {
+    <app-card [padding]="false">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+            <tr>
+              <th class="px-4 py-3 font-semibold">{{ 'price.columns.version' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'price.columns.effectiveFrom' | translate }}</th>
+              <th class="px-4 py-3 text-right font-semibold">{{ 'price.columns.mrp' | translate }}</th>
+              <th class="px-4 py-3 text-right font-semibold">{{ 'price.columns.sale' | translate }}</th>
+              @if (canEdit) {
+                <th class="px-4 py-3 text-right font-semibold">{{ 'price.columns.purchase' | translate }}</th>
+                <th class="px-4 py-3 font-semibold"><span class="sr-only">{{ 'price.columns.actions' | translate }}</span></th>
+              }
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (v of versions(); track v.id) {
+              <tr>
+                <td class="px-4 py-3 font-medium text-primary-fg">
+                  {{ v.versionName }}
+                  @if (v.isDefault) {
+                    <span class="ml-2 rounded-full bg-gold-100 px-2 py-0.5 text-[11px] font-semibold text-gold-700">{{ 'price.default' | translate }}</span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-gray-600">{{ v.effectiveFrom | date: 'dd MMM yyyy' }}</td>
+                <td class="px-4 py-3 text-right font-mono">{{ v.mrpAmount | number: '1.2-2' }}</td>
+                <td class="px-4 py-3 text-right font-mono">{{ v.saleAmount | number: '1.2-2' }}</td>
+                @if (canEdit) {
+                  <td class="px-4 py-3 text-right font-mono">{{ (v.purchaseAmount ?? 0) | number: '1.2-2' }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex justify-end gap-2">
+                      <app-button size="sm" variant="secondary" (clicked)="openEdit(v)">{{ 'price.edit.button' | translate }}</app-button>
+                      <app-button size="sm" variant="secondary" (clicked)="toggleHistory(v)">{{ 'price.history.button' | translate }}</app-button>
+                    </div>
+                  </td>
+                }
+              </tr>
+              @if (canEdit && historyOf() === v.id) {
+                <tr>
+                  <td [attr.colspan]="6" class="bg-gray-50/60 px-4 py-3">
+                    <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">{{ 'price.history.title' | translate }}</h3>
+                    @if (historyLoading()) {
+                      <app-skeleton-loader width="60%" />
+                    } @else if (historyError()) {
+                      <p class="text-xs text-red-600" role="alert">{{ historyError() }}</p>
+                    } @else {
+                      <ol class="m-0 flex list-none flex-col gap-3 p-0">
+                        @for (e of history(); track e.id) {
+                          <li class="text-xs">
+                            <div class="font-semibold text-primary-fg">{{ 'price.history.action.' + e.action | translate }} <span class="font-normal text-gray-500">· {{ e.actor.name || ('price.history.system' | translate) }} · {{ e.createdAt | date: 'dd MMM yyyy, HH:mm' }}</span></div>
+                            @if (e.oldValue) { <div class="text-gray-600">{{ 'price.history.before' | translate }}: {{ describe(e.oldValue) }}</div> }
+                            <div class="text-gray-600">{{ 'price.history.after' | translate }}: {{ describe(e.newValue) }}</div>
+                          </li>
+                        } @empty {
+                          <li class="text-xs text-gray-400">{{ 'price.history.empty' | translate }}</li>
+                        }
+                      </ol>
+                    }
+                  </td>
+                </tr>
+              }
+            } @empty {
+              <tr><td [attr.colspan]="canEdit ? 6 : 4" class="py-8 text-center text-sm text-gray-400">{{ 'price.noVersions' | translate }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  }
+</div>

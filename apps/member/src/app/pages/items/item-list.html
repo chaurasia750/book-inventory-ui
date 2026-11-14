@@ -1,0 +1,136 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'item.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'item.subtitle' | translate }}</p>
+    </div>
+    @if (canEdit) {
+      <app-button (clicked)="openAdd()">{{ 'item.add.button' | translate }}</app-button>
+    }
+  </div>
+
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'item.title' | translate" [detailLabel]="'item.panelLabel' | translate">
+    <div list>
+      <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
+        <input type="search" [formControl]="search" [placeholder]="'item.filters.search' | translate" [attr.aria-label]="'item.filters.search' | translate"
+          class="h-10 min-w-[12rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+        @if (!hasPanel()) {
+          <select (change)="setCategory($any($event.target).value)" [attr.aria-label]="'item.fields.category' | translate" [class]="select">
+            <option value="">{{ 'item.filters.allCategories' | translate }}</option>
+            @for (c of categories; track c) { <option [value]="c">{{ 'item.category.' + c | translate }}</option> }
+          </select>
+          <select (change)="setStock($any($event.target).value)" [attr.aria-label]="'item.fields.stockManaged' | translate" [class]="select">
+            <option value="">{{ 'item.filters.anyStock' | translate }}</option>
+            <option value="true">{{ 'item.filters.stockManaged' | translate }}</option>
+            <option value="false">{{ 'item.filters.notStockManaged' | translate }}</option>
+          </select>
+          @if (canEdit) {
+            <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'item.columns.status' | translate" [class]="select">
+              <option value="">{{ 'item.filters.allStatuses' | translate }}</option>
+              @for (s of statuses; track s) { <option [value]="s">{{ 'item.status.' + s | translate }}</option> }
+            </select>
+          }
+        }
+      </div>
+
+      @if (loadError()) {
+        <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+          <span>{{ loadError() }}</span>
+          <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+        </div>
+      }
+
+      @if (hasPanel()) {
+        <ul class="m-0 list-none divide-y divide-neutral-100 p-0 dark:divide-charcoal-700">
+          @if (loading()) {
+            @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
+          } @else {
+            @for (item of result()?.items ?? []; track item.id) {
+              <li>
+                <button type="button" (click)="openView(item.id)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700"
+                  [class.bg-gold-50]="item.id === selectedId()" [attr.aria-current]="item.id === selectedId() ? 'true' : null">
+                  <span class="min-w-0 flex-1">
+                    <span class="block truncate text-sm font-medium text-primary-fg">{{ item.name }}</span>
+                    <span class="block font-mono text-xs text-gray-500">{{ item.code }}</span>
+                  </span>
+                  <span class="rounded-full px-2 py-0.5 text-[11px] font-medium" [class]="statusClass(item.status)">{{ 'item.status.' + item.status | translate }}</span>
+                </button>
+              </li>
+            } @empty {
+              @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'item.empty' | translate }}</li> }
+            }
+          }
+        </ul>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">{{ 'item.columns.code' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'item.columns.name' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'item.columns.category' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'item.columns.vendor' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'item.columns.className' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'item.columns.gst' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'item.columns.status' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @if (loading()) {
+                @for (i of skeletonRows; track i) {
+                  <tr>
+                    <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="10rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="3rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                  </tr>
+                }
+              } @else {
+                @for (item of result()?.items ?? []; track item.id) {
+                  <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="openView(item.id)" (keydown.enter)="openView(item.id)" tabindex="0">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ item.code }}</td>
+                    <td class="px-4 py-3 font-medium text-primary-fg">{{ item.name }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ 'item.category.' + item.category | translate }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ item.vendorName || '-' }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ item.className || '-' }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ item.gstRatePercent }}%</td>
+                    <td class="px-4 py-3">
+                      <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(item.status)">{{ 'item.status.' + item.status | translate }}</span>
+                    </td>
+                  </tr>
+                } @empty {
+                  @if (!loadError()) {
+                    <tr><td colspan="7" class="py-10 text-center text-sm text-gray-400">{{ 'item.empty' | translate }}</td></tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+    </div>
+
+    <div detail>
+      @switch (panel().mode) {
+        @case ('new') {
+          <app-item-add (created)="openCreated($event)" (closed)="closePanel()" />
+        }
+        @case ('edit') {
+          @if (selectedId(); as id) {
+            <app-item-edit [id]="id" (saved)="afterEdit(id)" (closed)="openView(id)" />
+          }
+        }
+        @default {
+          @if (selectedId(); as id) {
+            <app-item-detail [id]="id" (closed)="closePanel()" (changed)="load()" (editRequested)="openEdit(id)" />
+          }
+        }
+      }
+    </div>
+  </app-list-detail>
+</div>
