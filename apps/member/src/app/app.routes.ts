@@ -34,8 +34,12 @@ export const appRoutes: Route[] = [
         path: 'schools',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/schools/school-list').then((m) => m.SchoolListComponent),
-        // The school opens beside the list (platform U10); the id is the child route.
-        children: [{ path: ':id', children: [] }],
+        // The school, the form for a new one and the edit form open beside the list (platform U10); writing is for the Owner.
+        children: [
+          { path: 'new', canActivate: [appRoleGuard(['OWNER'])], children: [] },
+          { path: ':id/edit', canActivate: [appRoleGuard(['OWNER'])], children: [] },
+          { path: ':id', children: [] },
+        ],
       },
       {
         // The screen the forced-change guard and the header's user menu open (`/change-password`); the Settings tab shows the same page.

@@ -14,15 +14,15 @@ import {
   SCHOOL_STATUSES,
   SESSION_TYPES,
   SaleType,
-  SchoolFields,
   SchoolStatus,
   SchoolSummary,
   SessionType,
 } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, ListDetailComponent, ModalComponent, PaginationComponent, SkeletonLoaderComponent, injectSelectedId } from '@org/ui';
+import { ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
+import { SchoolAddComponent } from './school-add';
 import { SchoolDetailComponent } from './school-detail';
-import { SchoolFormComponent } from './school-form';
+import { SchoolEditComponent } from './school-edit';
 
 const PAGE_SIZE = 20;
 const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -40,11 +40,11 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
     TranslatePipe,
     ButtonComponent,
     ListDetailComponent,
-    ModalComponent,
     PaginationComponent,
     SkeletonLoaderComponent,
-    SchoolFormComponent,
+    SchoolAddComponent,
     SchoolDetailComponent,
+    SchoolEditComponent,
   ],
   templateUrl: './school-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,9 +58,10 @@ export class SchoolListComponent {
   /** R9: only the Owner adds schools; Staff read. */
   readonly canEdit = inject(AuthService).hasAppRole('OWNER');
 
-  /** Platform U10: the school open beside the list (child route `:id`), or null. */
-  readonly selectedId = injectSelectedId();
-  readonly hasPanel = computed(() => this.selectedId() !== null);
+  /** Platform U10: what the panel beside the list shows (child routes `new`, `:id`, `:id/edit`), or nothing. */
+  readonly panel = injectPanelState();
+  readonly selectedId = computed(() => this.panel().id);
+  readonly hasPanel = computed(() => this.panel().mode !== null);
 
   readonly select = SELECT;
   readonly statuses = SCHOOL_STATUSES;
@@ -80,10 +81,6 @@ export class SchoolListComponent {
   readonly loading = signal(false);
   readonly loadError = signal('');
   readonly skeletonRows = [1, 2, 3];
-
-  readonly addOpen = signal(false);
-  readonly adding = signal(false);
-  readonly addError = signal('');
 
   constructor() {
     this.search.valueChanges
@@ -135,24 +132,25 @@ export class SchoolListComponent {
   }
 
   openAdd(): void {
-    this.addError.set('');
-    this.addOpen.set(true);
+    void this.router.navigate(['/schools', 'new']);
   }
 
-  add(fields: SchoolFields): void {
-    this.adding.set(true);
-    this.addError.set('');
-    this.schools.create(fields).subscribe({
-      next: (created) => {
-        this.adding.set(false);
-        this.addOpen.set(false);
-        void this.router.navigate(['/schools', created.id]);
-      },
-      error: (error: unknown) => {
-        this.adding.set(false);
-        this.addError.set(messageForError(error, this.translate));
-      },
-    });
+  openCreated(id: string): void {
+    this.load();
+    void this.router.navigate(['/schools', id]);
+  }
+
+  openEdit(id: string): void {
+    void this.router.navigate(['/schools', id, 'edit']);
+  }
+
+  openView(id: string): void {
+    void this.router.navigate(['/schools', id]);
+  }
+
+  afterEdit(id: string): void {
+    this.load();
+    this.openView(id);
   }
 
   load(): void {

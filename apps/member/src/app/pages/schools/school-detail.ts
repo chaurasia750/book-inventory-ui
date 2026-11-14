@@ -4,10 +4,9 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
 import { SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
-import { SchoolDetail, SchoolFields } from '@org/shared-models';
+import { SchoolDetail } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
-import { SchoolFormComponent } from './school-form';
 
 /**
  * One school (school spec R6-R8, R10, R12): the master data with the generated code read-only, the edit dialog, the class
@@ -17,7 +16,7 @@ import { SchoolFormComponent } from './school-form';
 @Component({
   selector: 'app-school-detail',
   standalone: true,
-  imports: [DecimalPipe, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, SchoolFormComponent],
+  imports: [DecimalPipe, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
   templateUrl: './school-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,6 +27,8 @@ export class SchoolDetailComponent {
   readonly closed = output<void>();
   /** The school's name, status or code-bearing data changed: the list beside it reloads. */
   readonly changed = output<void>();
+  /** The Edit button: the page opens the edit form in the panel. */
+  readonly editRequested = output<void>();
 
   private readonly schools = inject(SchoolService);
   private readonly translate = inject(TranslateService);
@@ -37,10 +38,6 @@ export class SchoolDetailComponent {
   readonly school = signal<SchoolDetail | null>(null);
   readonly loading = signal(true);
   readonly loadError = signal('');
-
-  readonly editOpen = signal(false);
-  readonly saving = signal(false);
-  readonly editError = signal('');
 
   readonly classNames = signal<string[]>([]);
   readonly classesDirty = signal(false);
@@ -73,28 +70,6 @@ export class SchoolDetailComponent {
       error: (error: unknown) => {
         this.loading.set(false);
         this.loadError.set(messageForError(error, this.translate));
-      },
-    });
-  }
-
-  openEdit(): void {
-    this.editError.set('');
-    this.editOpen.set(true);
-  }
-
-  edit(fields: SchoolFields): void {
-    this.saving.set(true);
-    this.editError.set('');
-    this.schools.edit(this.id(), fields).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.editOpen.set(false);
-        this.load();
-        this.changed.emit();
-      },
-      error: (error: unknown) => {
-        this.saving.set(false);
-        this.editError.set(messageForError(error, this.translate));
       },
     });
   }

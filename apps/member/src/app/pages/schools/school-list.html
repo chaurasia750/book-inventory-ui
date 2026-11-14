@@ -116,17 +116,21 @@
     </div>
 
     <div detail>
-      @if (selectedId(); as id) {
-        <app-school-detail [id]="id" (closed)="closePanel()" (changed)="load()" />
+      @switch (panel().mode) {
+        @case ('new') {
+          <app-school-add (created)="openCreated($event)" (closed)="closePanel()" />
+        }
+        @case ('edit') {
+          @if (selectedId(); as id) {
+            <app-school-edit [id]="id" (saved)="afterEdit(id)" (closed)="openView(id)" />
+          }
+        }
+        @default {
+          @if (selectedId(); as id) {
+            <app-school-detail [id]="id" (closed)="closePanel()" (changed)="load()" (editRequested)="openEdit(id)" />
+          }
+        }
       }
     </div>
   </app-list-detail>
 </div>
-
-@if (canEdit) {
-  <app-modal [open]="addOpen()" [title]="'school.add.title' | translate" (closed)="addOpen.set(false)">
-    @if (addOpen()) {
-      <app-school-form [saving]="adding()" [error]="addError()" submitLabel="school.add.submit" (submitted)="add($event)" (cancelled)="addOpen.set(false)" />
-    }
-  </app-modal>
-}
