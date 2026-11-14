@@ -24,10 +24,14 @@ export interface AuditEntry {
   action: string;
   oldValue: string | null;
   newValue: string | null;
+  /** The company of the changed row; null for a platform row. */
+  companyId: string | null;
 }
 
 /** The filters and paging of `GET audit` (core A8). */
 export interface AuditSearchParams {
+  /** Only a Super Admin's value counts; an Owner always gets their own company. */
+  companyId?: string;
   entityType?: string;
   entityId?: string;
   userId?: string;

@@ -10,6 +10,7 @@ export * from './lib/user-dropdown/user-dropdown';
 export * from './lib/pipes/safe-html.pipe';
 export * from './lib/menu-icons';
 export * from './lib/welcome/welcome';
+export * from './lib/audit-log-screen/audit-log-screen';
 export * from './lib/change-password-screen/change-password-screen';
 export * from './lib/account-screens/profile-screen';
 export * from './lib/account-screens/sessions-screen';

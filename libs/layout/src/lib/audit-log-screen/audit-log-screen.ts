@@ -2,9 +2,10 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { CoreAuditService } from '@org/api-services';
+import { AuthService } from '@org/auth';
+import { CompanyService, CoreAuditService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
-import { AuditEntry, PagedList } from '@org/shared-models';
+import { AuditEntry, CompanySummary, PagedList } from '@org/shared-models';
 import { ButtonComponent, CardComponent, PaginationComponent } from '@org/ui';
 
 const PAGE_SIZE = 20;
@@ -19,13 +20,14 @@ interface ValueRow {
 }
 
 /**
- * The Super Admin's audit log (core A7, A8, B5): newest first and paged, filtered by entity type, entity id, user and date
- * range; opening a row shows the old and the new value side by side. A job and the hidden system account both show under
- * one fixed label and never with an id (core A5). Other roles cannot open the page: the route is guarded and the API
- * answers 403 anyway.
+ * The audit log (core A7-A9) for the Super Admin and for the Owner: newest first and paged, filtered by entity type, entity
+ * id, user and date range; opening a row shows the old and the new value side by side. The Super Admin also filters by
+ * company and sees the company of each row; an Owner sees only their own company, which the server decides, so no company
+ * filter is offered to them. A job and the hidden system account both show under one fixed label and never with an id
+ * (core A4). Other roles cannot open the page: the routes are guarded and the API answers 403 anyway.
  */
 @Component({
-  selector: 'app-audit-logs',
+  selector: 'app-audit-log-screen',
   standalone: true,
   imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, PaginationComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +40,12 @@ interface ValueRow {
 
       <app-card [padding]="false">
         <form [formGroup]="filters" (ngSubmit)="apply()" class="flex flex-wrap items-center gap-3 border-b border-gray-100 p-4">
+          @if (isSuperAdmin) {
+            <select formControlName="companyId" [attr.aria-label]="'auditLog.company' | translate" class="${FIELD_CLASS}">
+              <option value="">{{ 'auditLog.anyCompany' | translate }}</option>
+              @for (c of companies(); track c.id) { <option [value]="c.id">{{ c.name }}</option> }
+            </select>
+          }
           <select formControlName="entityType" class="${FIELD_CLASS}">
             <option value="">{{ 'auditLog.anyType' | translate }}</option>
             @for (type of entityTypes(); track type) { <option [value]="type">{{ type }}</option> }
@@ -62,6 +70,9 @@ interface ValueRow {
               <tr>
                 <th class="px-4 py-3 font-semibold">{{ 'auditLog.time' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'auditLog.user' | translate }}</th>
+                @if (isSuperAdmin) {
+                  <th class="px-4 py-3 font-semibold">{{ 'auditLog.company' | translate }}</th>
+                }
                 <th class="px-4 py-3 font-semibold">{{ 'auditLog.entityType' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'auditLog.entityIdColumn' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'auditLog.action' | translate }}</th>
@@ -70,7 +81,7 @@ interface ValueRow {
             <tbody class="divide-y divide-gray-100">
               @if (loading()) {
                 @for (n of skeleton; track n) {
-                  <tr aria-hidden="true"><td colspan="5" class="px-4 py-3"><div class="h-4 animate-pulse rounded bg-gray-100"></div></td></tr>
+                  <tr aria-hidden="true"><td [attr.colspan]="columnCount" class="px-4 py-3"><div class="h-4 animate-pulse rounded bg-gray-100"></div></td></tr>
                 }
               } @else {
                 @for (row of result()?.items ?? []; track row.id) {
@@ -83,13 +94,16 @@ interface ValueRow {
                         <span class="font-medium text-primary-fg">{{ row.actor.name ?? '-' }}</span>
                       }
                     </td>
+                    @if (isSuperAdmin) {
+                      <td class="px-4 py-3 text-gray-600">{{ companyName(row.companyId) }}</td>
+                    }
                     <td class="px-4 py-3 text-gray-600">{{ row.entityType }}</td>
                     <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ row.entityId }}</td>
                     <td class="px-4 py-3 font-medium text-primary-fg">{{ row.action }}</td>
                   </tr>
                 } @empty {
                   @if (!error()) {
-                    <tr><td colspan="5" class="py-10 text-center text-sm text-gray-400">{{ 'auditLog.empty' | translate }}</td></tr>
+                    <tr><td [attr.colspan]="columnCount" class="py-10 text-center text-sm text-gray-400">{{ 'auditLog.empty' | translate }}</td></tr>
                   }
                 }
               }
@@ -124,19 +138,30 @@ interface ValueRow {
               }
             </tbody>
           </table>
+          <details class="mt-4 text-sm">
+            <summary class="cursor-pointer text-gray-600">{{ 'auditLog.rawJson' | translate }}</summary>
+            <pre class="mt-2 overflow-x-auto rounded-xl bg-gray-50 p-3 text-xs">{{ entry.oldValue ?? '-' }}</pre>
+            <pre class="mt-2 overflow-x-auto rounded-xl bg-gray-50 p-3 text-xs">{{ entry.newValue ?? '-' }}</pre>
+          </details>
         </app-card>
       }
     </div>
   `,
 })
-export class AuditLogsComponent {
+export class AuditLogScreenComponent {
   private readonly audit = inject(CoreAuditService);
+  private readonly companyService = inject(CompanyService);
   private readonly translate = inject(TranslateService);
 
   readonly pageSize = PAGE_SIZE;
   readonly skeleton = [1, 2, 3, 4, 5];
 
+  /** Only the Super Admin can filter by company; for an Owner the server applies their own company. */
+  readonly isSuperAdmin = inject(AuthService).hasAppRole('SUPER_ADMIN');
+  readonly columnCount = this.isSuperAdmin ? 6 : 5;
+
   readonly filters = new FormGroup({
+    companyId: new FormControl('', { nonNullable: true }),
     entityType: new FormControl('', { nonNullable: true }),
     entityId: new FormControl('', { nonNullable: true }),
     userId: new FormControl('', { nonNullable: true }),
@@ -148,11 +173,18 @@ export class AuditLogsComponent {
   readonly loading = signal(true);
   readonly result = signal<PagedList<AuditEntry> | null>(null);
   readonly entityTypes = signal<string[]>([]);
+  readonly companies = signal<CompanySummary[]>([]);
   readonly error = signal('');
   readonly selected = signal<AuditEntry | null>(null);
 
   constructor() {
     this.audit.entityTypes().subscribe({ next: (types) => this.entityTypes.set(types), error: () => this.entityTypes.set([]) });
+    if (this.isSuperAdmin) {
+      this.companyService.list({ orderBy: 'Name ASC', pageIndex: 1, pageSize: 200 }).subscribe({
+        next: (result) => this.companies.set(result.items),
+        error: () => this.companies.set([]),
+      });
+    }
     this.load();
   }
 
@@ -176,6 +208,7 @@ export class AuditLogsComponent {
     this.error.set('');
     this.audit
       .search({
+        companyId: this.isSuperAdmin ? value.companyId || undefined : undefined,
         entityType: value.entityType || undefined,
         entityId: value.entityId.trim() || undefined,
         userId: value.userId.trim() || undefined,
@@ -194,6 +227,12 @@ export class AuditLogsComponent {
           this.loading.set(false);
         },
       });
+  }
+
+  /** The name of a company, for the Super Admin's list; a row without a company is a platform row. */
+  companyName(id: string | null): string {
+    if (!id) return '-';
+    return this.companies().find((c) => c.id === id)?.name ?? id;
   }
 
   /** The old and the new value side by side, one row per field, a differing field marked as changed. */

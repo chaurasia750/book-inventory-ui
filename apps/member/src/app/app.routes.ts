@@ -19,6 +19,11 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('@org/layout').then((m) => m.WelcomeComponent),
       },
       {
+        path: 'audit',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('@org/layout').then((m) => m.AuditLogScreenComponent),
+      },
+      {
         path: 'staff',
         canActivate: [appRoleGuard(['OWNER'])],
         loadComponent: () => import('./pages/staff/staff-list').then((m) => m.StaffListComponent),
