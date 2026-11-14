@@ -208,6 +208,20 @@
       "invalid_amount": "A price must be zero or more, with at most two decimals.",
       "invalid_change": "A price change needs a direction, a kind and a value of zero or more with at most two decimals.",
       "nothing_selected": "No item matches the selection."
+    },
+    "stock": {
+      "item_not_found": "The item could not be found.",
+      "not_stock_managed": "This item is not stock managed, so it has no stock.",
+      "invalid_quantity": "A quantity must be a whole number greater than zero.",
+      "invalid_movement": "This movement is not allowed for this stock type.",
+      "invalid_date": "The movement date is required.",
+      "invalid_reason": "The reason must be 5 to 500 characters.",
+      "opening_exists": "This item already has an opening stock for this stock type; correct it with an adjustment.",
+      "nothing_to_adjust": "The counted quantity equals the current quantity; nothing to adjust.",
+      "document_already_posted": "The stock of this document was already posted.",
+      "document_not_posted": "This document has no stock posted.",
+      "document_already_reversed": "The stock of this document was already reversed.",
+      "invalid_document": "The document type, id and number are required."
     }
   },
   "iam": {
@@ -1010,6 +1024,85 @@
         "UPDATED": "Changed",
         "DELETED": "Deleted"
       }
+    }
+  },
+  "stock": {
+    "title": "Stock",
+    "subtitle": "Main, Damaged and Sample stock of every book and copy. A quantity at zero or below is marked; it never blocks a sale.",
+    "panelLabel": "Item stock",
+    "close": "Close item stock",
+    "empty": "No stock-managed items match these filters.",
+    "inactive": "Inactive",
+    "lowWarning": "Zero or below",
+    "type": {
+      "MAIN": "Main",
+      "DAMAGED": "Damaged",
+      "SAMPLE": "Sample"
+    },
+    "kind": {
+      "OPENING": "Opening",
+      "ADJUSTMENT": "Adjustment",
+      "PURCHASE": "Purchase",
+      "SCHOOL_INVOICE": "School invoice",
+      "COUNTER_SALE": "Counter sale",
+      "SCHOOL_RETURN_GOOD": "School return (good)",
+      "SCHOOL_RETURN_DAMAGED": "School return (damaged)",
+      "VENDOR_RETURN": "Return to vendor",
+      "SAMPLE_FROM_VENDOR": "Sample from vendor",
+      "SAMPLE_TO_SCHOOL": "Sample to school",
+      "SAMPLE_FROM_SCHOOL": "Sample back from school",
+      "SAMPLE_TO_VENDOR": "Sample back to vendor",
+      "REVERSAL": "Reversal (cancelled)"
+    },
+    "filters": {
+      "search": "Search item name, code, barcode, class, subject or vendor",
+      "category": "Category",
+      "anyCategory": "All categories",
+      "sort": "Sort",
+      "sortNameAsc": "Name A-Z",
+      "sortNameDesc": "Name Z-A",
+      "sortCodeAsc": "Code ascending",
+      "sortCodeDesc": "Code descending",
+      "lowOnly": "Zero or below only",
+      "includeInactive": "Show inactive items"
+    },
+    "columns": {
+      "itemCode": "Code",
+      "item": "Item"
+    },
+    "fields": {
+      "stockType": "Stock type",
+      "quantity": "Quantity",
+      "openingDate": "Opening date",
+      "countedQuantity": "Counted quantity",
+      "reason": "Reason",
+      "reasonHint": "5 to 500 characters, for example \"physical count on 31 March\".",
+      "wholeAboveZero": "Fill every field; the quantity is a whole number greater than zero.",
+      "adjustmentInvalid": "Fill every field; the counted quantity is a whole number (zero or more) and the reason has 5 to 500 characters."
+    },
+    "opening": {
+      "button": "Opening stock",
+      "title": "Enter opening stock",
+      "hint": "Once per stock type: the quantity on the day counting starts. Later corrections are adjustments.",
+      "submit": "Save opening"
+    },
+    "adjustment": {
+      "button": "Adjust stock",
+      "title": "Adjust after a physical count",
+      "hint": "Type the quantity you counted; the difference is posted as one adjustment dated today.",
+      "submit": "Save adjustment"
+    },
+    "history": {
+      "title": "History",
+      "date": "Date",
+      "kind": "Movement",
+      "document": "Document",
+      "in": "In",
+      "out": "Out",
+      "after": "After",
+      "by": "By",
+      "otherUser": "Super Admin",
+      "empty": "No movement yet."
     }
   }
 }
