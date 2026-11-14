@@ -40,7 +40,7 @@ const API_WWWROOT = path.resolve(
 const APPS = [
   { name: 'public-site', baseHref: '/' },
   { name: 'admin', baseHref: '/admin/' },
-  { name: 'member', baseHref: '/member/' },
+  { name: 'member', baseHref: '/' }, // the base address is the company's slug, read from the address (platform spec U12)
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -207,7 +207,7 @@ if (shouldCopy) {
   console.log(`\n✓ Deployed to ${siteRoot}`);
   console.log('  - Public site loads at /');
   console.log('  - Admin portal loads at /admin/');
-  console.log('  - Member portal loads at /member/');
+  console.log('  - Company app loads at /<company slug>/ (the host maps it to the member app)');
 } else {
   console.log(`\n✓ To copy to IIS, run:`);
   console.log(`  node scripts/production-deploy.js --copy`);

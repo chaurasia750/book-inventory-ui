@@ -83,6 +83,8 @@ export interface CreatedCompany {
 export interface CurrentCompany {
   id: string;
   name: string;
+  /** The company's address segment (company spec R15): its screens live at `/<slug>/...`. */
+  slug: string;
   status: CompanyStatus;
   state: string | null;
 }

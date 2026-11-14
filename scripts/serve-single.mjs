@@ -1,7 +1,8 @@
 // Serves all 3 built Angular apps from a single HTTP server/port.
 // Path routing:
 //   /admin/*   -> dist/apps/admin/browser      (SPA fallback to /admin/index.html)
-//   /member/*  -> dist/apps/member/browser     (SPA fallback to /member/index.html)
+//   /<company slug>/* -> dist/apps/member/browser (SPA fallback to its index.html; platform spec U12). /member/* still
+//                        reaches the same app (the old address; the app moves the user to the company's own address).
 //   /*         -> dist/apps/public-site/browser (SPA fallback to /index.html)
 //
 // Run `npx nx run-many -t build` first, then `node scripts/serve-single.mjs`.
@@ -35,11 +36,12 @@ const MIME_TYPES = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
-const apps = [
-  { mount: '/admin', dir: join(root, 'dist/apps/admin/browser') },
-  { mount: '/member', dir: join(root, 'dist/apps/member/browser') },
-  { mount: '', dir: join(root, 'dist/apps/public-site/browser') }, // fallback / default app
-];
+const memberDir = join(root, 'dist/apps/member/browser');
+const adminApp = { mount: '/admin', dir: join(root, 'dist/apps/admin/browser') };
+const publicApp = { mount: '', dir: join(root, 'dist/apps/public-site/browser') };
+
+// The first address segments that belong to the application itself (company spec R15); any other is a company slug.
+const OWN_SEGMENTS = new Set(['', 'admin', 'login', 'auth', 'error', 'welcome', 'api', 'assets', 'unauthorized']);
 
 async function fileExists(path) {
   try {
@@ -51,12 +53,11 @@ async function fileExists(path) {
 }
 
 async function resolveApp(pathname) {
-  for (const app of apps) {
-    if (app.mount && (pathname === app.mount || pathname.startsWith(app.mount + '/'))) {
-      return app;
-    }
-  }
-  return apps[apps.length - 1];
+  const first = pathname.split('/')[1] ?? '';
+  if (first === 'admin') return adminApp;
+  if (OWN_SEGMENTS.has(first) || first.includes('.')) return publicApp;
+  // /member or /<company slug>: the member app, mounted at that first segment.
+  return { mount: `/${first}`, dir: memberDir };
 }
 
 function proxyToApi(req, res) {
@@ -116,5 +117,6 @@ server.listen(PORT, () => {
   console.log(`\nAll 3 apps served on one port: http://localhost:${PORT}`);
   console.log(`  Public site -> http://localhost:${PORT}/`);
   console.log(`  Admin       -> http://localhost:${PORT}/admin`);
-  console.log(`  Member      -> http://localhost:${PORT}/member\n`);
+  console.log(`  Company app -> http://localhost:${PORT}/<company slug>/  (for example /abc-book-center/)
+`);
 });

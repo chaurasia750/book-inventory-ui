@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
 import { AccessDeniedComponent } from '@org/ui';
 import { appRoleGuard, authGuard, mustChangePasswordGuard, roleGuard } from '@org/guards';
+import { companyAddressGuard } from './company-address';
 import { MemberLayoutComponent } from './member-layout';
 
 export const appRoutes: Route[] = [
@@ -11,7 +12,9 @@ export const appRoutes: Route[] = [
   {
     path: '',
     component: MemberLayoutComponent,
-    canActivate: [authGuard, roleGuard(['member', 'admin']), mustChangePasswordGuard],
+    canActivate: [authGuard, roleGuard(['member', 'admin']), mustChangePasswordGuard, companyAddressGuard],
+    // Runs again after the first navigation so a forced password change (which blocks the address lookup) is corrected afterwards.
+    runGuardsAndResolvers: 'always',
     children: [
       {
         path: '',

@@ -11,6 +11,7 @@ export const DEFAULT_PAGE_SIZE = 10;
 export const APP_URLS = {
   PUBLIC: '/',
   ADMIN: '/admin',
+  /** The old address of the company app, kept only as a fallback: the app lives at `/<company slug>/` (platform spec U12) and moves a user there. */
   MEMBER: '/member',
 } as const;
 
