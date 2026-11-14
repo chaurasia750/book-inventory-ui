@@ -1,0 +1,15 @@
+<div class="settings">
+  <h1 class="settings__title">Settings</h1>
+
+  <app-card title="General" subtitle="Basic information about your site">
+    <form [formGroup]="form" class="settings__form">
+      <app-text-field label="Site name" [control]="form.controls.siteName" />
+      <app-text-field label="Support email" type="email" [control]="form.controls.supportEmail" />
+
+      <app-checkbox-field label="Enable dark mode by default" [control]="form.controls.darkModeDefault" />
+      <app-checkbox-field label="Enable notifications" [control]="form.controls.notificationsEnabled" />
+
+      <app-button (clicked)="onSave()">Save</app-button>
+    </form>
+  </app-card>
+</div>

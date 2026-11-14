@@ -1,0 +1,106 @@
+{
+  "name": "member",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/member/src",
+  "tags": [
+    "scope:member"
+  ],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "development",
+      "options": {
+        "outputPath": "dist/apps/member",
+        "browser": "apps/member/src/main.ts",
+        "tsConfig": "apps/member/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "polyfills": ["zone.js"],
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/member/public"
+          },
+          {
+            "glob": "assets/**/*",
+            "input": "."
+          }
+        ],
+        "styles": [
+          "apps/member/src/tailwind.css",
+          "apps/member/src/styles.scss"
+        ]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "1.5mb",
+              "maximumError": "2mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "16kb",
+              "maximumError": "32kb"
+            }
+          ],
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "apps/member/src/environments/environment.ts",
+              "with": "apps/member/src/environments/environment.production.ts"
+            }
+          ]
+        },
+        "staging": {
+          "fileReplacements": [
+            {
+              "replace": "apps/member/src/environments/environment.ts",
+              "with": "apps/member/src/environments/environment.staging.ts"
+            }
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "outputHashing": "all"
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "options": { "proxyConfig": "proxy.conf.json" },
+      "defaultConfiguration": "development",
+      "configurations": {
+        "production": {
+          "buildTarget": "member:build:production"
+        },
+        "staging": {
+          "buildTarget": "member:build:staging"
+        },
+        "development": {
+          "buildTarget": "member:build:development"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "member:build",
+        "staticFilePath": "dist/apps/member/browser",
+        "spa": true
+      }
+    }
+  }
+}

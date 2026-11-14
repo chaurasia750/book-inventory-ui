@@ -1,0 +1,260 @@
+<!--
+  Task D3 of Member_Dashboard_Rebuild_Plan.md. Layout follows the client's mockup
+  (docs/Member_Dashboard_UI/member-dashboard.html) -- the level ladder, the two money cards, the
+  team strip -- but every colour comes from this app's own theme tokens (apps/member/src/styles.scss)
+  rather than the mockup's standalone palette, so it sits with the rest of the member portal and
+  follows dark mode for free.
+-->
+<div class="space-y-5">
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20">
+      <div class="h-9 w-9 animate-spin rounded-full border-2 border-default border-t-[#66B42A]"></div>
+    </div>
+  } @else if (error()) {
+    <p class="radius-md bg-red-50 px-4 py-3 text-sm font-medium text-red-600 dark:bg-red-500/10">{{ error() }}</p>
+  } @else if (summary()) {
+
+    @if (summary()!.member.status !== 'ACTIVE') {
+      <p class="radius-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-200">
+        Your account is pending activation. Your pool position opens once your joining payment is approved.
+      </p>
+    }
+
+    <!-- ============ Hero: the ladder ============ -->
+    <section class="radius-card border border-default bg-surface p-5 shadow-card sm:p-6">
+      <!--
+        Standing position on the first line, the week's movement on the second -- the one line on
+        the page that actually differs from the last visit, since balance/level/team size read the
+        same every time.
+      -->
+      <h1 class="font-heading text-lg font-semibold text-primary-fg sm:text-xl">
+        You're on Level {{ summary()!.currentLevel }}
+        <span class="font-normal text-secondary-fg">
+          · &#8377;{{ money(progress()!.incomeOnComplete) }} waiting at the end of it
+          · nothing for you to do
+        </span>
+      </h1>
+      <p class="mb-5 mt-1 text-sm text-secondary-fg">{{ thisWeekLine() }}</p>
+
+      <!-- Ladder: scrolls sideways on narrow screens rather than shrinking illegibly. -->
+      <div class="-mx-1 overflow-x-auto px-1 pb-1">
+        <div class="flex min-w-[460px] items-end gap-2 sm:min-w-0">
+          @for (rung of summary()!.ladder; track rung.level) {
+            <div class="flex flex-1 flex-col items-center gap-2">
+              <div [style.height.px]="rungHeight(rung.level)" [class]="rungClass(rung.state)">
+                @if (rung.state === 'CURRENT') {
+                  <div
+                    class="absolute inset-x-0 bottom-0 bg-[#66B42A]/30"
+                    [style.height.%]="progress()!.fillPercent"
+                  ></div>
+                }
+                <span class="relative z-10 font-heading">{{ rung.level }}</span>
+              </div>
+              <small [class]="rungLabelClass(rung.state)">{{ rungLabel(rung) }}</small>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Progress for the current level -->
+      <div class="mt-5 radius-md bg-body p-4">
+        <div class="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <b class="font-heading text-2xl font-semibold text-primary-fg">
+            &#8377;{{ money(progress()!.collectedAmount) }}
+            <span class="text-sm font-normal text-secondary-fg">of &#8377;{{ money(progress()!.requiredAmount) }} collected</span>
+          </b>
+          <span class="text-sm text-secondary-fg">
+            <strong class="font-heading font-semibold text-primary-fg">{{ progress()!.qualifiedMembers }}</strong>
+            of {{ progress()!.requiredMembers }} contributions
+            @if (membersNeeded() > 0) {
+              · <span class="text-accent">{{ membersNeededLabel() }}</span>
+            }
+          </span>
+        </div>
+        <div class="flex h-2.5 gap-1">
+          @for (tick of progressTicks(); track $index) {
+            <span
+              class="flex-1 rounded-full"
+              [class]="tick ? 'bg-accent' : 'bg-[#C9CFD6] dark:bg-[#3A3D42]'"
+            ></span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Money: two cards, equal height ============ -->
+    <section class="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
+      <!-- Main Wallet -->
+      <div class="flex flex-col radius-card border border-default bg-surface p-5 shadow-card">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-medium text-secondary-fg">Main Wallet</p>
+            <p class="mt-1 font-heading text-4xl font-semibold text-primary-fg">
+              &#8377;{{ money(summary()!.mainWallet.balance) }}
+            </p>
+          </div>
+          <span class="radius-sm bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-[#66B42A]/15 dark:text-brand-300">
+            Withdrawable
+          </span>
+        </div>
+        <p class="mt-1 text-xs text-muted-fg">Your earnings — send to your bank any time.</p>
+
+        @if (earnedBreakup().length > 0) {
+          <ul class="mt-4 text-sm">
+            @for (row of earnedBreakup(); track row.level) {
+              <li class="flex items-center justify-between border-t border-light py-2">
+                <span class="text-secondary-fg">Level {{ row.level }}</span>
+                <span class="font-heading font-semibold text-primary-fg">&#8377;{{ money(row.amount) }}</span>
+              </li>
+            }
+          </ul>
+        }
+        @if (passThroughLevels().length > 0) {
+          <p class="mt-3 text-xs text-muted-fg">
+            @if (passThroughLevels().length === 1) {
+              Level {{ passThroughLevels()[0] }} pays no income — it passes everything upward.
+            } @else {
+              Levels {{ passThroughLevels().join(', ') }} pay no income — they pass everything upward.
+            }
+            That's by design, not a missing payment.
+          </p>
+        }
+
+        <button
+          type="button"
+          (click)="goToWithdrawal()"
+          class="mt-5 w-full radius-md bg-accent px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+        >
+          Withdraw
+        </button>
+      </div>
+
+      <!-- Level Pool -->
+      @if (summary()!.levelPool; as pool) {
+        <div class="flex flex-col radius-card border border-default bg-surface p-5 shadow-card">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-medium text-secondary-fg">Level {{ pool.level }} Pool</p>
+              <p class="mt-1 font-heading text-4xl font-semibold text-primary-fg">
+                &#8377;{{ money(pool.balance) }}
+              </p>
+            </div>
+            <span class="radius-sm bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-400/10 dark:text-amber-300">
+              Locked
+            </span>
+          </div>
+          <p class="mt-1 text-xs text-muted-fg">
+            Builds up from your team, then opens Level {{ pool.level }}. Can't be withdrawn.
+          </p>
+
+          @if (pool.contributions.length === 0) {
+            <div class="mt-4 flex flex-1 items-center justify-center radius-md bg-body px-4 py-6 text-center">
+              <p class="text-sm text-secondary-fg">
+                Nothing collected yet — this fills as members join below you.
+              </p>
+            </div>
+          } @else {
+            <ul class="mt-4 text-sm">
+              @for (c of pool.contributions; track $index) {
+                <li class="flex items-center justify-between border-t border-light py-2">
+                  <span class="text-secondary-fg">{{ c.memberCode }}</span>
+                  <span class="font-heading font-semibold text-primary-fg">&#8377;{{ money(c.amount) }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- ============ Team + Recent, side by side on desktop ============ -->
+    <section class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <!-- Team -->
+      <div class="radius-card border border-default bg-surface shadow-card">
+        <div class="flex items-baseline justify-between gap-3 border-b border-light px-5 py-4">
+          <h2 class="font-heading text-base font-semibold text-primary-fg">My Team</h2>
+          <button type="button" (click)="goToTeam()" class="text-sm font-medium text-accent hover:underline">View all</button>
+        </div>
+
+        <div class="grid grid-cols-4 divide-x divide-[var(--border-light)] border-b border-light">
+          <div class="px-3 py-3 text-center">
+            <b class="block font-heading text-xl font-semibold text-primary-fg">{{ summary()!.team.direct }}</b>
+            <span class="text-xs text-secondary-fg">Direct</span>
+          </div>
+          <div class="px-3 py-3 text-center">
+            <b class="block font-heading text-xl font-semibold text-primary-fg">{{ summary()!.team.total }}</b>
+            <span class="text-xs text-secondary-fg">Total</span>
+          </div>
+          <div class="px-3 py-3 text-center">
+            <b class="block font-heading text-xl font-semibold text-primary-fg">{{ summary()!.team.left }}</b>
+            <span class="text-xs text-secondary-fg">Left</span>
+          </div>
+          <div class="px-3 py-3 text-center">
+            <b class="block font-heading text-xl font-semibold text-primary-fg">{{ summary()!.team.right }}</b>
+            <span class="text-xs text-secondary-fg">Right</span>
+          </div>
+        </div>
+
+        <!-- Mini tree: actual hierarchy, one row per depth -->
+        <div class="p-5">
+          @if (treeRows().length === 0) {
+            <p class="py-6 text-center text-sm text-secondary-fg">No members under you yet.</p>
+          } @else {
+            <!--
+              Scrolls sideways rather than truncating: a deeper row is wider than a phone, and a
+              cut-off name is worse than one the reader can swipe to.
+            -->
+            <div class="-mx-1 space-y-3 overflow-x-auto px-1">
+              @for (row of treeRows(); track row.depth) {
+                <div class="min-w-max">
+                  <p class="mb-1.5 text-center text-xs text-muted-fg">
+                    {{ row.depth === 0 ? 'You' : 'Level ' + row.depth }}
+                  </p>
+                  <div class="flex justify-center gap-2">
+                    @for (node of row.nodes; track node.regNo) {
+                      <span [class]="treeNodeClass(node.depth === 0)">
+                        <b class="block text-xs font-semibold leading-tight">{{ node.name || node.registrationNumber }}</b>
+                        <span [class]="node.depth === 0 ? 'text-[11px] text-white/70' : 'text-[11px] text-secondary-fg'">
+                          Level {{ node.currentLevel }}
+                        </span>
+                      </span>
+                    }
+                    @for (empty of row.emptySlots; track $index) {
+                      <span class="grid w-24 shrink-0 place-items-center radius-md border border-dashed border-default text-sm text-muted-fg">+</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Recent -->
+      <div class="radius-card border border-default bg-surface shadow-card">
+        <div class="flex items-baseline justify-between gap-3 border-b border-light px-5 py-4">
+          <h2 class="font-heading text-base font-semibold text-primary-fg">Recent</h2>
+          <button type="button" (click)="goToWallet()" class="text-sm font-medium text-accent hover:underline">Full ledger</button>
+        </div>
+        <div class="px-5">
+          @if (activity().length === 0) {
+            <p class="py-10 text-center text-sm text-secondary-fg">Nothing has happened yet.</p>
+          } @else {
+            <ul>
+              @for (item of activity(); track $index) {
+                <li class="flex items-start justify-between gap-3 border-b border-light py-3.5 last:border-0">
+                  <div class="min-w-0">
+                    <!-- Wraps rather than truncating -- the title carries the member code. -->
+                    <div class="break-words text-sm font-medium text-primary-fg">{{ item.title }}</div>
+                    <div class="mt-0.5 text-xs text-muted-fg">{{ item.date | date: 'dd MMM yyyy' }}</div>
+                  </div>
+                  <div [class]="activityValueClass(item)">{{ item.display }}</div>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+    </section>
+  }
+</div>

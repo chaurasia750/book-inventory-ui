@@ -1,0 +1,7 @@
+@media print {
+  .no-print { display: none !important; }
+  app-breadcrumb { display: none !important; }
+  @page { margin: 0; size: A4 portrait; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; padding: 0; background: white; }
+  .rounded-2xl { padding: 0 !important; border: none !important; box-shadow: none !important; background: white !important; }
+}

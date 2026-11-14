@@ -1,0 +1,15 @@
+<div class="app-accordion">
+  @for (item of items(); track item.title; let i = $index) {
+    <div class="app-accordion__item" [class.open]="isOpen(i)">
+      <button type="button" class="app-accordion__header" (click)="toggle(i)">
+        <span>{{ item.title }}</span>
+        <span class="chevron">{{ isOpen(i) ? '−' : '+' }}</span>
+      </button>
+      @if (isOpen(i)) {
+        <div class="app-accordion__content">
+          {{ item.content }}
+        </div>
+      }
+    </div>
+  }
+</div>

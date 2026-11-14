@@ -1,0 +1,7 @@
+<div class="app-error-state">
+  <div class="app-error-state__icon" aria-hidden="true">!</div>
+  <p class="app-error-state__message">{{ message() }}</p>
+  @if (showRetry()) {
+    <button type="button" class="app-error-state__retry" (click)="onRetry()">Retry</button>
+  }
+</div>

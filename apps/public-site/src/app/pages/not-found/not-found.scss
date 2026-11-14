@@ -1,0 +1,29 @@
+.not-found {
+  max-width: 500px;
+  margin: 5rem auto;
+  padding: 0 2rem;
+  text-align: center;
+
+  &__code {
+    font-size: 5rem;
+    font-weight: 800;
+    color: #66B42A;
+    line-height: 1;
+  }
+
+  &__title {
+    margin: 1rem 0 0.5rem;
+  }
+
+  &__message {
+    line-height: 1.6;
+    color: var(--text-secondary, #444);
+    margin-bottom: 1.5rem;
+  }
+
+  &__link {
+    color: #4E9C1F;
+    text-decoration: none;
+    font-weight: 500;
+  }
+}

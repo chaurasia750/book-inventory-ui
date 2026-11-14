@@ -1,0 +1,10 @@
+<div class="app-field">
+  @if (label()) {
+    <label class="app-field-label" [for]="fieldId">{{ label() }}</label>
+  }
+  <textarea [id]="fieldId" class="app-field-textarea" [rows]="rows()" [formControl]="control()"></textarea>
+  @if (hint() && !(control().touched && control().invalid)) {
+    <p class="app-field-hint">{{ hint() }}</p>
+  }
+  <app-form-error [control]="control()" />
+</div>

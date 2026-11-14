@@ -1,0 +1,177 @@
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <button (click)="goTo('credit-in')"
+    [class]="'rounded-2xl border bg-white p-5 shadow-sm text-left transition-all cursor-pointer hover:shadow-md ' + (activeTab() === 'credit-in' ? 'border-[#66B42A] ring-2 ring-[#66B42A]/20' : 'border-gray-100')">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600">
+        <span class="text-lg font-bold">â‚¹</span>
+      </div>
+      <div>
+        <p class="text-xs font-medium text-gray-400">Credit In</p>
+        <p class="text-xl font-bold text-gray-900">â‚¹{{ totalInAmount().toLocaleString() }}</p>
+      </div>
+    </div>
+  </button>
+  <button (click)="goTo('credit-out')"
+    [class]="'rounded-2xl border bg-white p-5 shadow-sm text-left transition-all cursor-pointer hover:shadow-md ' + (activeTab() === 'credit-out' ? 'border-[#66B42A] ring-2 ring-[#66B42A]/20' : 'border-gray-100')">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      </div>
+      <div>
+        <p class="text-xs font-medium text-gray-400">Credit Out</p>
+        <p class="text-xl font-bold text-gray-900">â‚¹{{ totalOutAmount().toLocaleString() }}</p>
+      </div>
+    </div>
+  </button>
+  <button (click)="goTo('lock-amount')"
+    [class]="'rounded-2xl border bg-white p-5 shadow-sm text-left transition-all cursor-pointer hover:shadow-md ' + (activeTab() === 'lock-amount' ? 'border-[#66B42A] ring-2 ring-[#66B42A]/20' : 'border-gray-100')">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <div>
+        <p class="text-xs font-medium text-gray-400">Lock Amount</p>
+        <p class="text-xl font-bold text-gray-900">â‚¹{{ lockAmount().toLocaleString() }}</p>
+      </div>
+    </div>
+  </button>
+  <div
+    [class]="'rounded-2xl border bg-white p-5 shadow-sm text-left ' + (activeTab() === 'balance' ? 'border-[#66B42A] ring-2 ring-[#66B42A]/20' : 'border-gray-100')">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF8E1] text-[#66B42A]">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      </div>
+      <div>
+        <p class="text-xs font-medium text-gray-400">Balance</p>
+        <p class="text-xl font-bold text-gray-900">â‚¹{{ availableBalance().toLocaleString() }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+  <div class="border-b border-gray-100">
+    <div class="flex gap-0 overflow-x-auto">
+      <button
+        (click)="goTo('credit-in')"
+        [class]="'px-5 py-3.5 text-sm font-medium whitespace-nowrap transition-all border-b-2 ' + (activeTab() === 'credit-in' ? 'border-[#66B42A] text-[#66B42A]' : 'border-transparent text-gray-500 hover:text-gray-700')">
+        Credit In
+      </button>
+      <button
+        (click)="goTo('credit-out')"
+        [class]="'px-5 py-3.5 text-sm font-medium whitespace-nowrap transition-all border-b-2 ' + (activeTab() === 'credit-out' ? 'border-[#66B42A] text-[#66B42A]' : 'border-transparent text-gray-500 hover:text-gray-700')">
+        Credit Out
+      </button>
+      <button
+        (click)="goTo('lock-amount')"
+        [class]="'px-5 py-3.5 text-sm font-medium whitespace-nowrap transition-all border-b-2 ' + (activeTab() === 'lock-amount' ? 'border-[#66B42A] text-[#66B42A]' : 'border-transparent text-gray-500 hover:text-gray-700')">
+        Lock Amount
+      </button>
+    
+    </div>
+  </div>
+
+  <div class="p-5">
+    @if (loading()) {
+      <div class="flex items-center justify-center py-10">
+        <div class="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-amber-500"></div>
+      </div>
+    } @else {
+      <!-- Credit In Tab -->
+      @if (activeTab() === 'credit-in') {
+        @if (creditInTransactions().length) {
+          <div class="border-t border-gray-100 pt-4">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-gray-100 bg-gray-50/80">
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Date</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Type</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Description</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Amount</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                  @for (tx of creditInTransactions(); track tx.id) {
+                    <tr class="hover:bg-gray-50/60">
+                      <td class="px-4 py-3 text-sm text-gray-600">{{ tx.transDate | date:'dd MMM yyyy, hh:mm a' }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-600">{{ tx.transType }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ tx.remark }}</td>
+                      <td class="px-4 py-3 text-sm text-green-600 text-right font-semibold">+{{ abs(tx.amount) | currency:'INR':'symbol':'1.0-0' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        } @else {
+          <p class="text-center text-sm text-gray-400">No credit in transactions</p>
+        }
+      }
+
+      <!-- Credit Out Tab -->
+      @if (activeTab() === 'credit-out') {
+        @if (creditOutTransactions().length) {
+          <div class="border-t border-gray-100 pt-4">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-gray-100 bg-gray-50/80">
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Date</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Type</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Description</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Amount</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                  @for (tx of creditOutTransactions(); track tx.id) {
+                    <tr class="hover:bg-gray-50/60">
+                      <td class="px-4 py-3 text-sm text-gray-600">{{ tx.transDate | date:'dd MMM yyyy, hh:mm a' }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-600">{{ tx.transType }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ tx.remark }}</td>
+                      <td class="px-4 py-3 text-sm text-red-500 text-right font-semibold">-{{ abs(tx.amount) | currency:'INR' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        } @else {
+          <p class="text-center text-sm text-gray-400">No credit out transactions</p>
+        }
+      }
+
+      <!-- Lock Amount Tab -->
+      @if (activeTab() === 'lock-amount') {
+        @if (lockTransactions().length) {
+          <div class="border-t border-gray-100 pt-4">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-gray-100 bg-gray-50/80">
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Date</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Type</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Description</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Amount</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                  @for (tx of lockTransactions(); track tx.id) {
+                    <tr class="hover:bg-gray-50/60">
+                      <td class="px-4 py-3 text-sm text-gray-600">{{ tx.transDate | date:'dd MMM yyyy, hh:mm a' }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-600">{{ tx.transType }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ tx.remark }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900 text-right font-semibold">{{ abs(tx.amount) | currency:'INR':'symbol':'1.0-0' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        } @else {
+          <p class="text-center text-sm text-gray-400">No lock amount transactions</p>
+        }
+      }
+    }
+  </div>
+</div>

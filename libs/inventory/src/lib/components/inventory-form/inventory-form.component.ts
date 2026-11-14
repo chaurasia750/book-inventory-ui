@@ -1,0 +1,367 @@
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { MediaService, TempUploadResult } from '@org/api-services';
+import { INVENTORY_SERVICE } from '../../services/inventory.service';
+import { PROPERTY_FIELD_MAPPER } from '../../services/property-field.mapper';
+import { INVENTORY_PAYLOAD_BUILDER } from '../../services/inventory-payload.builder';
+import { PropertyTypeItem } from '../../models/property-field.model';
+import { DynamicField, UploadedFile } from '../../models/inventory-form.model';
+import { PropertyDetail } from '../../models/property-detail.model';
+import { DynamicFieldsCardComponent } from '../dynamic-fields-card/dynamic-fields-card.component';
+import { InventorySummaryCardComponent } from '../inventory-summary-card/inventory-summary-card.component';
+import { BackButtonComponent, ButtonComponent, BreadcrumbComponent, LoadingSpinnerComponent, SidePanelComponent } from '@org/ui';
+
+@Component({
+  selector: 'app-inventory-form',
+  standalone: true,
+  imports: [CommonModule, FormsModule, DynamicFieldsCardComponent, InventorySummaryCardComponent, BackButtonComponent, ButtonComponent, BreadcrumbComponent, LoadingSpinnerComponent, SidePanelComponent],
+  templateUrl: './inventory-form.component.html',
+  styleUrl: './inventory-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class InventoryFormComponent implements OnInit {
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly inventoryService = inject(INVENTORY_SERVICE);
+  readonly mediaService = inject(MediaService);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly fieldMapper = inject(PROPERTY_FIELD_MAPPER);
+  private readonly payloadBuilder = inject(INVENTORY_PAYLOAD_BUILDER);
+  private readonly destroyRef = inject(DestroyRef);
+  private fieldsSub?: Subscription;
+  private fieldsCache = new Map<string, DynamicField[]>();
+  private pendingRequests = new Set<string>();
+  private pendingFieldValues: Record<string, string> | null = null;
+
+  private _editId: number | null = null;
+  private isLoadingExistingData = false;
+  @Input() set editId(value: number | null) {
+    this._editId = value;
+  }
+  get editId(): number | null {
+    return this._editId;
+  }
+  @Output() readonly saved = new EventEmitter<{ id: number; isDraft: boolean }>();
+  @Output() readonly cancelled = new EventEmitter<void>();
+  @Output() readonly back = new EventEmitter<void>();
+  @Input() backLabel = '';
+
+  selectedType = '';
+  isDragging = false;
+  propertyImage: string | null = null;
+  propertyImageId: number | null = null;
+  uploadProgress: number | null = null;
+  uploadedFiles: UploadedFile[] = [];
+  fieldDefinitions: DynamicField[] = [];
+  propertyTypes: PropertyTypeItem[] = [];
+
+  previewFile: UploadedFile | null = null;
+  safePreviewUrl: SafeResourceUrl | null = null;
+
+  get isPreviewOpen(): boolean {
+    return this.previewFile !== null;
+  }
+
+  openPreview(file: UploadedFile): void {
+    this.previewFile = file;
+    this.safePreviewUrl = file.url ? this.sanitizer.bypassSecurityTrustResourceUrl(file.url) : null;
+  }
+
+  closePreview(): void {
+    this.previewFile = null;
+    this.safePreviewUrl = null;
+  }
+
+  readonly loadingTypes = signal(false);
+  readonly loadingFields = signal(false);
+  readonly isUploading = signal(false);
+  readonly isSaving = signal(false);
+  readonly isLoadingEditData = signal(false);
+
+  formModel = {
+    propertyName: '',
+    description: '',
+    locationUrl: '',
+    dynamic: {} as Record<string, string>,
+  };
+
+  get currentType(): PropertyTypeItem | undefined {
+    return this.propertyTypes.find(t => t.id === +this.selectedType);
+  }
+
+  get typeLabel(): string {
+    return this.currentType?.name || '';
+  }
+
+  get isEditMode(): boolean {
+    return this._editId !== null;
+  }
+
+  get pageTitle(): string {
+    return this.isEditMode ? 'Edit Inventory' : 'Add Inventory';
+  }
+
+  get breadcrumbItems() {
+    return [
+      { label: 'Inventory', link: '..' },
+      { label: this.pageTitle },
+    ];
+  }
+
+  ngOnInit(): void {
+    this.fetchPropertyTypes();
+  }
+
+  private loadExistingData(): void {
+    if (!this._editId || this.isLoadingExistingData) return;
+    this.isLoadingExistingData = true;
+    this.isLoadingEditData.set(true);
+    this.inventoryService.getPropertyById(this._editId).pipe(
+      finalize(() => this.isLoadingEditData.set(false)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((data) => this.populateForm(data));
+  }
+
+  private populateForm(data: PropertyDetail): void {
+    this.formModel.propertyName = data.title;
+    this.formModel.description = data.description ?? '';
+    this.selectedType = String(data.propertyType);
+    this.propertyImageId = data.profile?.mediaDetails?.id ?? data.profile?.mediaFileId ?? null;
+    if (this.propertyImageId) {
+      this.propertyImage = this.mediaService.getFileUrl(this.propertyImageId);
+    }
+    if (data.files?.length) {
+      this.uploadedFiles = data.files.map(f => ({
+        id: crypto.randomUUID(),
+        fileId: f.mediaDetails?.id ?? 0,
+        name: f.mediaDetails?.originalFileName || f.mediaDetails?.fileName || 'File',
+        size: '',
+        type: (f.mediaDetails?.contentType?.startsWith('image/')) ? 'image' as const : 'pdf' as const,
+        url: f.mediaDetails?.id ? this.mediaService.getFileUrl(f.mediaDetails.id) : '',
+        preview: '',
+      }));
+    }
+    this.pendingFieldValues = data.fields?.length ? Object.fromEntries(data.fields.map(f => [f.fieldName, f.value])) : null;
+    this.onTypeChange(true);
+  }
+
+  private fetchPropertyTypes(): void {
+    this.loadingTypes.set(true);
+    this.inventoryService.getPropertyTypes().pipe(
+      finalize(() => {
+        this.loadingTypes.set(false);
+        if (!this.propertyTypes.length) this.propertyTypes = [];
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((types) => {
+      this.propertyTypes = types;
+      if (!this._editId && types.length) {
+        this.selectedType = String(types[0].id);
+        this.onTypeChange();
+      }
+      if (this.isEditMode) {
+        this.loadExistingData();
+      }
+    });
+  }
+
+  onTypeChange(applyPendingValues = false): void {
+    if (!this.selectedType) return;
+    this.formModel.dynamic = {};
+    if (this.fieldsCache.has(this.selectedType)) {
+      this.fieldDefinitions = this.fieldsCache.get(this.selectedType)!;
+      if (applyPendingValues) this.applyFieldValues();
+    } else {
+      this.loadingFields.set(true);
+      this.fetchFields(this.selectedType);
+    }
+  }
+
+  private applyFieldValues(): void {
+    if (!this.pendingFieldValues) return;
+    for (const [key, value] of Object.entries(this.pendingFieldValues)) {
+      this.formModel.dynamic[key] = value;
+    }
+    this.pendingFieldValues = null;
+  }
+
+  private fetchFields(typeId: string): void {
+    if (this.pendingRequests.has(typeId)) return;
+    this.pendingRequests.add(typeId);
+    this.fieldsSub?.unsubscribe();
+    this.fieldsSub = this.inventoryService.getPropertyFields(typeId).pipe(
+      finalize(() => this.pendingRequests.delete(typeId)),
+    ).subscribe((fields) => {
+      const mapped = this.fieldMapper.toDynamicFields(fields);
+      this.fieldsCache.set(typeId, mapped);
+      if (this.selectedType === typeId) {
+        this.fieldDefinitions = mapped;
+        this.formModel.dynamic = {};
+        this.loadingFields.set(false);
+        this.applyFieldValues();
+      }
+    });
+  }
+
+  onPropertyImageSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.propertyImage = e.target?.result as string;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+      this.isUploading.set(true);
+      this.uploadProgress = 0;
+      this.mediaService.tempUploadWithProgress([file]).pipe(
+        finalize(() => {
+          this.isUploading.set(false);
+          this.uploadProgress = null;
+          this.cdr.detectChanges();
+        }),
+      ).subscribe({
+        next: (event: HttpEvent<TempUploadResult>) => {
+          switch (event.type) {
+            case HttpEventType.UploadProgress:
+              this.uploadProgress = Math.round(100 * event.loaded / (event.total ?? event.loaded));
+              this.cdr.detectChanges();
+              break;
+            case HttpEventType.Response: {
+              const res = event.body;
+              if (res?.files?.length) {
+                this.propertyImageId = res.files[0].id;
+                this.propertyImage = this.mediaService.getFileUrl(res.files[0].id);
+              }
+              break;
+            }
+          }
+        },
+      });
+    }
+    input.value = '';
+  }
+
+  removePropertyImage(event: Event): void {
+    event.stopPropagation();
+    this.propertyImage = null;
+    this.propertyImageId = null;
+  }
+
+  removeFile(id: string): void {
+    this.uploadedFiles = this.uploadedFiles.filter(f => f.id !== id);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragging = false;
+    if (event.dataTransfer?.files.length) {
+      this.uploadFiles(Array.from(event.dataTransfer.files));
+    }
+  }
+
+  onFileSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      this.uploadFiles(Array.from(input.files));
+    }
+    input.value = '';
+  }
+
+  private uploadFiles(files: File[]): void {
+    this.isUploading.set(true);
+    this.uploadProgress = 0;
+    this.mediaService.tempUploadWithProgress(files).pipe(
+      finalize(() => {
+        this.isUploading.set(false);
+        this.uploadProgress = null;
+        this.cdr.detectChanges();
+      }),
+    ).subscribe({
+      next: (event: HttpEvent<TempUploadResult>) => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            this.uploadProgress = Math.round(100 * event.loaded / (event.total ?? event.loaded));
+            this.cdr.detectChanges();
+            break;
+          case HttpEventType.Response: {
+            const res = event.body;
+            if (!res?.files?.length) return;
+            this.uploadedFiles = [...this.uploadedFiles, ...res.files.map((f, i) => {
+              const file = files[i];
+              const fullUrl = this.mediaService.getFileUrl(f.id);
+              return {
+                id: crypto.randomUUID(),
+                fileId: f.id,
+                name: f.fileName || file.name,
+                size: this.formatSize(file.size),
+                type: file.type.startsWith('image/') ? 'image' as const : 'pdf' as const,
+                url: fullUrl,
+                preview: file.type.startsWith('image/') ? fullUrl : '',
+              };
+            })];
+            break;
+          }
+        }
+      },
+    });
+  }
+
+  private formatSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  onSubmit(status?: string): void {
+    if (this.isSaving()) return;
+    if (!this.selectedType) return;
+    if (!this.formModel.propertyName.trim()) return;
+
+    const payload = this.payloadBuilder.build({
+      selectedType: this.selectedType,
+      propertyName: this.formModel.propertyName,
+      description: this.formModel.description,
+      fieldDefinitions: this.fieldDefinitions,
+      dynamicValues: this.formModel.dynamic,
+      uploadedFiles: this.uploadedFiles,
+      propertyImageId: this.propertyImageId,
+      status,
+    });
+
+    this.isSaving.set(true);
+    const request = this.isEditMode && this.editId
+      ? this.inventoryService.updateProperty(this.editId, payload)
+      : this.inventoryService.createInventory(payload);
+
+    request.pipe(
+      finalize(() => this.isSaving.set(false)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((result: any) => {
+      const id = typeof result === 'number' ? result : result?.id;
+      if (id) {
+        this.saved.emit({ id, isDraft: status === 'draft' });
+      }
+    });
+  }
+
+  onCancel(): void {
+    this.cancelled.emit();
+  }
+}

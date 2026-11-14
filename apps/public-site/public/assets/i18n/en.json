@@ -1,0 +1,537 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "contact": "Contact",
+    "franchise": "Franchise",
+    "videos": "Our Video",
+    "courses": "Course"
+  },
+  "login": {
+    "hero": {
+      "badge": "Property sales and agent management",
+      "title": "Welcome to Book Inventory",
+      "description": "Manage leads, bookings and commissions in one place.",
+      "features": {
+        "earningsTitle": "Leads and bookings",
+        "earningsDescription": "Follow every enquiry from the first contact to the booking.",
+        "securityTitle": "Transparent commissions",
+        "securityDescription": "See what you earn and when it is paid, with a full statement.",
+        "supportTitle": "Dedicated support",
+        "supportDescription": "The admin team is always one message away."
+      },
+      "footer": {
+        "dpdp": "Private by design",
+        "iso": "Secure sign-in",
+        "ssl": "Encrypted connection"
+      }
+    },
+    "header": {
+      "title": "Sign in to your account",
+      "subtitle": "Sign in to manage your leads, team and earnings."
+    },
+    "security": "Your connection is encrypted and secure",
+    "fields": {
+      "userId": "User ID, email or username",
+      "password": "Password",
+      "forgotPassword": "Forgot Password?",
+      "rememberMe": "Keep me signed in"
+    },
+    "submit": {
+      "idle": "Sign In",
+      "loading": "Signing in..."
+    },
+    "signup": {
+      "prompt": "Don't have an account?",
+      "link": "Sign up"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "subtitle": "Enter your registered email and we'll send you a reset link.",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Send Reset Link",
+      "sending": "Sending...",
+      "success": {
+        "title": "Reset Link Sent",
+        "description": "If an account exists for that email, a password reset link has been sent. Please check your inbox.",
+        "backToLogin": "Back to Login"
+      },
+      "usernameLabel": "Email address",
+      "usernamePlaceholder": "you@example.com"
+    },
+    "validation": {
+      "userIdRequired": "User ID, email or username is required",
+      "passwordRequired": "Password is required"
+    }
+  },
+  "signup": {
+    "hero": {
+      "badge": "Farm Fresh, Direct From Farmers",
+      "title": "Fresh Vegetables &amp; Fruits Straight From The Farm",
+      "description": "Discover farm-fresh vegetables and fruits, sourced directly from local farmers and delivered to your doorstep — quality you can trust, prices you will love.",
+      "benefits": {
+        "earningsTitle": "Farm-Direct Sourcing",
+        "earningsDescription": "Fresh produce sourced straight from local farmers — no middlemen, just farm freshness.",
+        "kycTitle": "Same-Day Delivery",
+        "kycDescription": "Handpicked in the morning and delivered to your door within hours.",
+        "supportTitle": "Quality Assured",
+        "supportDescription": "Every item is quality-checked before it reaches your kitchen.",
+        "dashboardTitle": "Honest Prices",
+        "dashboardDescription": "Fair weights and honest prices your whole family can trust."
+      },
+      "footer": {
+        "dpdp": "DPDP Compliant",
+        "iso": "ISO 27001 Certified",
+        "ssl": "SSL Secured"
+      }
+    },
+    "form": {
+      "title": "Register New Member",
+      "subtitle": "Fill in the details below to create a new member account.",
+      "sponsorId": "Sponsor ID",
+      "sponsorPlaceholder": "Enter Sponsor ID",
+      "verifyingSponsor": "Verifying sponsor...",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "addressLine1": "Address Line 1",
+      "addressLine2": "Address Line 2",
+      "postalCode": "Postal Code",
+      "city": "City",
+      "country": "Country",
+      "state": "State",
+      "selectCity": "Select City",
+      "selectState": "Select State",
+      "fetchingLocation": "Fetching location...",
+      "required": "is required",
+      "submit": "Register Member",
+      "submitting": "Registering..."
+    },
+    "success": {
+      "title": "Registration Successful!",
+      "welcome": "Welcome to the Book Inventory family.",
+      "subtitle": "Your Membership ID",
+      "membershipId": "Membership ID",
+      "verificationDesc": "Your account is under verification. You will receive a confirmation within 24 hours.",
+      "assistanceDesc": "For any assistance, contact us at +91 94547 99616.",
+      "safeMsg": "Your information is secure and encrypted.",
+      "thankYou": "Thank you for choosing Book Inventory. We look forward to serving you."
+    },
+    "signin": {
+      "prompt": "Already have an account?",
+      "link": "Sign In"
+    }
+  },
+  "footer": {
+    "brand": "Book Inventory brings you the freshest vegetables and fruits, sourced directly from local farms and delivered to your doorstep the very same day. Farm-fresh quality, honest weights, and fair prices your whole family can trust.",
+    "quickLinks": "Quick Links",
+    "services": "Our Services",
+    "contactInfo": "Contact Info",
+    "categoriesList": {
+      "nepali": "Nepali Rudraksha",
+      "indonesian": "Indonesian Rudraksha",
+      "mala": "Rudraksha Mala",
+      "bracelets": "Bracelets & Pendants",
+      "puja": "Puja Accessories"
+    },
+    "copyright": "All rights reserved. | Fresh. Honest. Farm Direct.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "refund": "Refund Policy"
+  },
+  "topBar": {
+    "login": "Login",
+    "register": "Register"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Cannot reach the server. Check your connection and try again.",
+    "http": {
+      "400": "The request is not valid.",
+      "401": "Please sign in to continue.",
+      "403": "You do not have permission to do this.",
+      "404": "The requested item was not found.",
+      "409": "This conflicts with existing data.",
+      "422": "Please check the form and try again.",
+      "429": "Too many attempts. Please wait a moment and try again.",
+      "500": "Something went wrong on our side. Please try again later.",
+      "502": "The service is temporarily unavailable. Please try again shortly.",
+      "503": "The service is under maintenance. Please try again later."
+    },
+    "iam": {
+      "auth": {
+        "invalid_credentials": "Invalid credentials. Please check your details and try again.",
+        "account_locked": "Too many failed attempts. Please try again in a few minutes.",
+        "pending_approval": "Your account is waiting for approval. Please contact the admin team.",
+        "account_inactive": "Your account is disabled. Please contact support.",
+        "account_suspended": "Your account is suspended. Please contact support.",
+        "application_rejected": "Your application was not approved. Please contact support.",
+        "password_change_required": "You must change your password before continuing.",
+        "reset_token_invalid": "This reset link is invalid or has expired.",
+        "rate_limited": "Too many attempts from this address. Please wait a minute and try again.",
+        "not_active": "Your account is not active. Please contact support."
+      },
+      "password": {
+        "policy_violation": "The password does not meet the password rules.",
+        "current_incorrect": "The current password is not correct.",
+        "same_as_current": "The new password must be different from the current one.",
+        "too_short": "The password is too short. Use at least 8 characters.",
+        "missing_digit": "The password needs at least one digit.",
+        "missing_lowercase": "The password needs at least one lower case letter.",
+        "missing_uppercase": "The password needs at least one upper case letter.",
+        "hash_missing": "The password could not be stored."
+      },
+      "session": {
+        "not_found": "The session could not be found.",
+        "expired": "The session has expired. Please sign in again.",
+        "revoked": "The session has ended. Please sign in again.",
+        "refresh_reuse": "The session has ended. Please sign in again."
+      },
+      "token": {
+        "not_found": "This reset link is not valid.",
+        "expired": "This reset link has expired. Please request a new one.",
+        "already_used": "This reset link has already been used. Please request a new one."
+      },
+      "user": {
+        "not_found": "The user could not be found.",
+        "invalid_username": "The user name must be 3 to 32 characters and may contain letters, digits, dot, underscore or hyphen.",
+        "invalid_email": "The email address is not valid.",
+        "invalid_mobile": "The mobile number must be 10 to 15 digits.",
+        "invalid_full_name": "The full name is required and must be at most 200 characters.",
+        "duplicate_username": "That user name is already taken.",
+        "duplicate_email": "That email address is already registered.",
+        "duplicate_mobile": "That mobile number is already registered.",
+        "reserved_username": "That user name cannot be used.",
+        "email_required": "An email address is required.",
+        "email_missing": "This user has no email address, so no link can be sent.",
+        "mobile_required": "A mobile number is required.",
+        "invalid_transition": "The account is not in a state that allows this change.",
+        "self_status_change": "You cannot change the status of your own account.",
+        "self_action_forbidden": "You cannot perform this action on your own account.",
+        "last_super_admin": "This is the last active Super Admin, so the account must stay active.",
+        "reason_required": "A reason of 5 to 500 characters is required.",
+        "suspension_end_in_past": "The end of a suspension must be in the future.",
+        "reset_link_not_allowed": "A password reset link can only be sent to an active user.",
+        "self_role_change": "You cannot change your own role.",
+        "role_required": "A role is required.",
+        "role_not_staff": "That role is not a staff role.",
+        "member_role_immutable": "The role of an agent cannot be changed.",
+        "role_unchanged": "The user already has that role.",
+        "role_change_reason_required": "A reason of 5 to 500 characters is required."
+      },
+      "system_account": {
+        "immutable": "The system account cannot be modified."
+      },
+      "login_log": {
+        "already_closed": "The login record for this session was already closed.",
+        "export_too_large": "Too many rows match. Narrow the filters (dates, user, result) and export again.",
+        "invalid_ip": "The IP address filter is not a valid IPv4 or IPv6 address."
+      }
+    }
+  },
+  "iam": {
+    "forgot": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your registered email and we'll send you a link to reset your password.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Send reset link",
+      "success": "If an account exists for that email, a reset link has been sent.",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "Reset your password",
+      "subtitle": "Choose a new, strong password for your account.",
+      "verifying": "Verifying your reset link...",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "hint": "At least 8 characters, with upper and lower case letters and a digit.",
+      "submit": "Reset password",
+      "success": "Your password has been reset successfully.",
+      "back": "Back to sign in",
+      "invalidLink": "This reset link is invalid or has expired."
+    },
+    "home": {
+      "welcome": "Welcome, {{name}}",
+      "signedInAs": "You are signed in as {{role}}."
+    },
+    "welcome": {
+      "title": "Thank you for registering",
+      "body": "Your application is being reviewed. Please contact the admin team to have your account approved.",
+      "login": "Go to sign in"
+    }
+  },
+  "changePassword": {
+    "title": "Change password",
+    "forced": "You must choose a new password before you can continue.",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm new password",
+    "hint": "At least 8 characters with an upper case letter, a lower case letter and a digit.",
+    "weak": "The password does not meet the requirements.",
+    "mismatch": "The passwords do not match.",
+    "submit": "Change password",
+    "saving": "Changing...",
+    "success": "Your password has been changed."
+  },
+  "users": {
+    "title": "User management",
+    "back": "Back to users",
+    "loading": "Loading...",
+    "empty": "No users match these filters.",
+    "locked": "Locked",
+    "mustChange": "Must change password",
+    "yes": "Yes",
+    "no": "No",
+    "optional": "optional",
+    "cancel": "Cancel",
+    "list": {
+      "title": "Users",
+      "subtitle": "Staff and agents of the system"
+    },
+    "create": {
+      "button": "Create staff",
+      "title": "Create a staff account",
+      "submit": "Create"
+    },
+    "temp": {
+      "title": "Temporary password",
+      "intro": "The staff account was created for",
+      "once": "Copy this password now. It is shown only once and cannot be retrieved again; if it is lost, send a reset link instead.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "done": "Done"
+    },
+    "filters": {
+      "search": "Search name, user name, e-mail or mobile",
+      "allRoles": "All roles",
+      "allStatuses": "All statuses",
+      "anyLock": "Any lock state",
+      "lockedOnly": "Locked only",
+      "unlockedOnly": "Not locked",
+      "sort": "Sort by",
+      "sortCreated": "Newest first",
+      "sortLastLogin": "Last login"
+    },
+    "columns": {
+      "name": "Name",
+      "contact": "Contact",
+      "role": "Role",
+      "status": "Status",
+      "lastLogin": "Last login",
+      "created": "Created"
+    },
+    "role": {
+      "SUPER_ADMIN": "Super Admin",
+      "SALES_CRM": "Sales / CRM",
+      "ACCOUNTS": "Accounts",
+      "MEMBER": "Agent"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "SUSPENDED": "Suspended",
+      "REJECTED": "Rejected"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "userName": "User name",
+      "email": "E-mail",
+      "mobile": "Mobile",
+      "role": "Role",
+      "reason": "Reason",
+      "until": "Suspended until"
+    },
+    "detail": {
+      "actions": "Actions",
+      "status": "Status",
+      "profile": "Profile",
+      "history": "Status history",
+      "sessions": "Active sessions",
+      "reason": "Reason",
+      "changedAt": "Changed at",
+      "suspendedUntil": "Suspended until",
+      "lock": "Lock (failed attempts)",
+      "notLocked": "Not locked",
+      "lastLogin": "Last login",
+      "mustChange": "Must change password",
+      "save": "Save",
+      "logins": "Login log"
+    },
+    "history": {
+      "when": "When",
+      "change": "Change",
+      "reason": "Reason",
+      "by": "By",
+      "system": "System",
+      "empty": "No status changes yet."
+    },
+    "sessions": {
+      "started": "Started",
+      "lastSeen": "Last seen",
+      "ip": "IP address",
+      "agent": "Browser",
+      "revoke": "Sign out",
+      "empty": "No active sessions."
+    },
+    "action": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "suspend": "Suspend",
+      "change-role": "Change role",
+      "unlock": "Unlock",
+      "force-logout": "Force logout",
+      "force-password-change": "Force password change",
+      "reset-password": "Send reset link",
+      "release-identity": "Release e-mail and mobile"
+    },
+    "confirm": {
+      "submit": "Confirm",
+      "approve": "Approve this application? The user must change the generated password at the first login.",
+      "reject": "Reject this application? This is final; the e-mail and mobile stay reserved until released.",
+      "activate": "Bring this account back to Active?",
+      "deactivate": "Deactivate this account? Every session of the user ends.",
+      "suspend": "Suspend this account? Every session of the user ends; it lifts by itself on the end date, if you set one.",
+      "change-role": "Move this user to another staff role? Their sessions end so the new role applies at the next login.",
+      "unlock": "Clear the lockout of this account now?",
+      "force-logout": "End every session of this user?",
+      "force-password-change": "Require this user to choose a new password at the next login?",
+      "reset-password": "Send a password reset link to the e-mail address on file?",
+      "release-identity": "Free the e-mail and mobile of this rejected application so a new one can use them?"
+    },
+    "done": {
+      "approve": "Application approved.",
+      "reject": "Application rejected.",
+      "activate": "Account activated.",
+      "deactivate": "Account deactivated.",
+      "suspend": "Account suspended.",
+      "change-role": "Role changed.",
+      "unlock": "Account unlocked.",
+      "force-logout": "The user was signed out.",
+      "force-password-change": "The user must change the password at the next login.",
+      "reset-password": "Reset link queued.",
+      "release-identity": "E-mail and mobile released.",
+      "profile": "Profile saved.",
+      "revoke": "Session ended."
+    }
+  },
+  "account": {
+    "unknown": "Unknown",
+    "role": {
+      "SUPER_ADMIN": "Super Admin",
+      "SALES_CRM": "Sales / CRM",
+      "ACCOUNTS": "Accounts",
+      "MEMBER": "Agent"
+    },
+    "device": {
+      "DESKTOP": "Desktop",
+      "MOBILE": "Mobile",
+      "TABLET": "Tablet",
+      "BOT": "Bot",
+      "UNKNOWN": "Unknown device"
+    },
+    "result": {
+      "SUCCESS": "Signed in",
+      "FAILED_BAD_PASSWORD": "Wrong password",
+      "FAILED_UNKNOWN_USER": "Unknown user",
+      "FAILED_LOCKED": "Account locked",
+      "FAILED_PENDING": "Awaiting approval",
+      "FAILED_INACTIVE": "Inactive account",
+      "FAILED_SUSPENDED": "Suspended account",
+      "FAILED_REJECTED": "Rejected application"
+    },
+    "reason": {
+      "USER_LOGOUT": "Signed out",
+      "LOGOUT_ALL": "Signed out everywhere",
+      "EXPIRED": "Expired",
+      "REVOKED_BY_ADMIN": "Ended by an administrator",
+      "REVOKED_BY_USER": "Ended from another device",
+      "PASSWORD_CHANGED": "Password changed",
+      "PASSWORD_RESET": "Password reset",
+      "ACCOUNT_DEACTIVATED": "Account deactivated",
+      "ACCOUNT_SUSPENDED": "Account suspended",
+      "FORCED_LOGOUT": "Forced logout",
+      "REFRESH_REUSE": "Security: token reused"
+    },
+    "profile": {
+      "title": "My profile",
+      "fullName": "Full name",
+      "email": "E-mail",
+      "mobile": "Mobile",
+      "currentPassword": "Current password",
+      "passwordHint": "Changing your e-mail or mobile needs your current password.",
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "Your profile has been saved."
+    },
+    "sessions": {
+      "title": "My sessions",
+      "everywhere": "Sign out everywhere",
+      "current": "This device",
+      "started": "Started",
+      "lastSeen": "last seen",
+      "signOut": "Sign out",
+      "revoked": "That device was signed out.",
+      "empty": "No active sessions.",
+      "subtitle": "active session(s)"
+    },
+    "history": {
+      "title": "Login history",
+      "when": "When",
+      "result": "Result",
+      "browser": "Browser",
+      "ip": "IP address",
+      "ended": "Ended",
+      "duration": "Duration",
+      "newDevice": "New device",
+      "empty": "No sign-ins yet."
+    }
+  },
+  "loginLogs": {
+    "title": "Login log",
+    "subtitle": "Every sign-in attempt in the system",
+    "user": "User",
+    "system": "System",
+    "empty": "No sign-ins match these filters.",
+    "export": "Export CSV",
+    "search": "Search",
+    "anyResult": "Any result",
+    "ip": "IP address",
+    "userId": "User id",
+    "from": "From",
+    "to": "To"
+  },
+  "auditLog": {
+    "title": "Audit log",
+    "subtitle": "Who changed what, and from which value to which",
+    "time": "Time",
+    "user": "User",
+    "system": "System",
+    "entityType": "Entity type",
+    "entityIdColumn": "Entity id",
+    "action": "Action",
+    "anyType": "Any entity type",
+    "entityId": "Entity id",
+    "userId": "User id",
+    "from": "From",
+    "to": "To",
+    "search": "Search",
+    "empty": "No entries match these filters.",
+    "retry": "Try again",
+    "close": "Close",
+    "field": "Field",
+    "oldValue": "Old value",
+    "newValue": "New value",
+    "changed": "changed",
+    "noValues": "This entry holds no values."
+  }
+}

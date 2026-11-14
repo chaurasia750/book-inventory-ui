@@ -1,0 +1,160 @@
+<div class="space-y-5">
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20">
+      <div class="h-9 w-9 animate-spin rounded-full border-2 border-default border-t-[#66B42A]"></div>
+    </div>
+  } @else if (error()) {
+    <p class="radius-md bg-red-50 px-4 py-3 text-sm font-medium text-red-600 dark:bg-red-500/10">{{ error() }}</p>
+  } @else if (income(); as data) {
+
+    <!-- Headline: what has actually been paid, and what is next. Kept apart on purpose --
+         mixing the two is what made the old single "Income" column impossible to total. -->
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="radius-card border border-default bg-surface p-5 shadow-card">
+        <p class="text-sm font-medium text-secondary-fg">Total earned</p>
+        <p class="mt-1 font-heading text-4xl font-semibold text-accent">&#8377;{{ money(data.totalEarned) }}</p>
+        <p class="mt-1.5 text-xs text-muted-fg">Paid into your Main Wallet so far</p>
+      </div>
+      <div class="radius-card border border-default bg-surface p-5 shadow-card">
+        <p class="text-sm font-medium text-secondary-fg">Next payout</p>
+        <p class="mt-1 font-heading text-4xl font-semibold text-primary-fg">&#8377;{{ money(data.pendingFromCurrentLevel) }}</p>
+        <p class="mt-1.5 text-xs text-muted-fg">
+          When Level {{ data.currentLevel }} completes
+          @if (currentRow(); as cur) {
+            · {{ cur.receivedMembers }} of {{ cur.requiredMembers }} members so far
+          }
+        </p>
+      </div>
+    </section>
+
+    <!--
+      One table telling the whole level story: what it collected, what went upward, what stayed.
+      There is deliberately no transaction list here -- those rows are the Main Wallet ledger and
+      live on the Wallet tab. Showing them in both places is what made the two screens read as
+      contradicting each other.
+    -->
+    <section class="radius-card border border-default bg-surface shadow-card">
+      <div class="border-b border-light px-5 py-4">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h2 class="font-heading text-base font-semibold text-primary-fg">Level by level</h2>
+          <button type="button" (click)="goToWallet()" class="text-sm font-medium text-accent hover:underline">
+            See wallet transactions
+          </button>
+        </div>
+        <p class="mt-1 text-xs text-muted-fg">
+          Each level collects from your team, sends most of it upward, and what's left is yours.
+        </p>
+      </div>
+
+      <div class="hidden md:block">
+        <table class="w-full text-sm">
+          <thead class="text-left text-xs uppercase tracking-wide text-muted-fg">
+            <tr class="border-b border-light">
+              <th class="px-5 py-3 font-medium">Level</th>
+              <th class="px-5 py-3 font-medium">Status</th>
+              <th class="px-5 py-3 font-medium">Collected</th>
+              <th class="px-5 py-3 font-medium">Sent upward</th>
+              <th class="px-5 py-3 font-medium">Your share</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of data.levelSummary; track row.levelNo) {
+              <tr class="border-b border-light last:border-0" [class.opacity-60]="row.state === 'LOCKED'">
+                <td class="px-5 py-3">
+                  <span class="font-medium text-primary-fg">Level {{ row.levelNo }}</span>
+                  @if (row.state === 'DONE' && row.completedOn) {
+                    <span class="block text-xs text-muted-fg">{{ row.completedOn | date: 'dd MMM yyyy' }}</span>
+                  }
+                </td>
+                <td class="px-5 py-3"><span [class]="stateClass(row)">{{ stateLabel(row) }}</span></td>
+                <td class="px-5 py-3">
+                  <span class="font-heading font-semibold text-primary-fg">&#8377;{{ money(row.collectedAmount) }}</span>
+                  <span class="text-xs text-muted-fg"> of &#8377;{{ money(row.requiredAmount) }}</span>
+                  @if (row.state === 'CURRENT') {
+                    <span class="mt-1.5 block h-1.5 w-28 overflow-hidden rounded-full bg-[#C9CFD6] dark:bg-[#3A3D42]">
+                      <span class="block h-full rounded-full bg-accent" [style.width.%]="fillPercent(row)"></span>
+                    </span>
+                  }
+                </td>
+                <td class="px-5 py-3">
+                  <span class="text-secondary-fg">&#8377;{{ money(row.transferAmount) }}</span>
+                  @if (row.stepsUp > 0) {
+                    <span class="block text-xs text-muted-fg">{{ row.stepsUp }} {{ row.stepsUp === 1 ? 'level' : 'levels' }} up</span>
+                  }
+                </td>
+                <td class="px-5 py-3">
+                  @if (row.state === 'DONE') {
+                    <span class="font-heading font-semibold" [class]="row.earned! > 0 ? 'text-accent' : 'text-muted-fg'">
+                      &#8377;{{ money(row.earned!) }}
+                    </span>
+                    <span class="block text-xs text-muted-fg">received</span>
+                  } @else {
+                    <span class="font-heading font-semibold text-primary-fg">&#8377;{{ money(row.payableOnComplete!) }}</span>
+                    <span class="block text-xs text-muted-fg">on completion</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Same five fields per level, stacked, for phones. -->
+      <ul class="md:hidden">
+        @for (row of data.levelSummary; track row.levelNo) {
+          <li class="border-b border-light px-5 py-4 last:border-0" [class.opacity-60]="row.state === 'LOCKED'">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold text-primary-fg">Level {{ row.levelNo }}</span>
+              <span [class]="stateClass(row)">{{ stateLabel(row) }}</span>
+            </div>
+
+            @if (row.state === 'CURRENT') {
+              <span class="mt-2 block h-1.5 overflow-hidden rounded-full bg-[#C9CFD6] dark:bg-[#3A3D42]">
+                <span class="block h-full rounded-full bg-accent" [style.width.%]="fillPercent(row)"></span>
+              </span>
+            }
+
+            <dl class="mt-2 space-y-1 text-sm">
+              <div class="flex justify-between gap-3">
+                <dt class="text-secondary-fg">Collected</dt>
+                <dd class="text-primary-fg">
+                  <span class="font-heading font-semibold">&#8377;{{ money(row.collectedAmount) }}</span>
+                  <span class="text-xs text-muted-fg"> of &#8377;{{ money(row.requiredAmount) }}</span>
+                </dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-secondary-fg">Sent upward</dt>
+                <dd class="text-right text-primary-fg">
+                  &#8377;{{ money(row.transferAmount) }}
+                  @if (row.stepsUp > 0) {
+                    <span class="text-xs text-muted-fg">({{ row.stepsUp }} up)</span>
+                  }
+                </dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-secondary-fg">Your share</dt>
+                <dd>
+                  @if (row.state === 'DONE') {
+                    <span class="font-heading font-semibold" [class]="row.earned! > 0 ? 'text-accent' : 'text-muted-fg'">
+                      &#8377;{{ money(row.earned!) }}
+                    </span>
+                    <span class="text-xs text-muted-fg"> received</span>
+                  } @else {
+                    <span class="font-heading font-semibold text-primary-fg">&#8377;{{ money(row.payableOnComplete!) }}</span>
+                    <span class="text-xs text-muted-fg"> on completion</span>
+                  }
+                </dd>
+              </div>
+              @if (row.state === 'DONE' && row.completedOn) {
+                <div class="flex justify-between gap-3">
+                  <dt class="text-secondary-fg">Completed</dt>
+                  <dd class="text-muted-fg">{{ row.completedOn | date: 'dd MMM yyyy' }}</dd>
+                </div>
+              }
+            </dl>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</div>

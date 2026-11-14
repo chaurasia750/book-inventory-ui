@@ -1,0 +1,53 @@
+<div class="app-data-grid">
+  <div class="app-data-grid__table-wrapper">
+    <table class="app-data-grid__table">
+      <thead>
+        <tr>
+          @for (col of columns(); track col.key) {
+            <th [class.sortable]="col.sortable" (click)="onSort(col)">
+              <span class="th-content">
+                {{ col.label }}
+                @if (col.sortable) {
+                  <span class="sort-icon">
+                    @if (currentSortKey() === col.key) {
+                      {{ currentSortDir() === 'asc' ? '▲' : '▼' }}
+                    } @else {
+                      ⇅
+                    }
+                  </span>
+                }
+              </span>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          <tr class="app-data-grid__state-row">
+            <td [attr.colspan]="columns().length">Loading...</td>
+          </tr>
+        } @else if (rows().length === 0) {
+          <tr class="app-data-grid__state-row">
+            <td [attr.colspan]="columns().length">No data</td>
+          </tr>
+        } @else {
+          @for (row of rows(); track row) {
+            <tr>
+              @for (col of columns(); track col.key) {
+                <td>{{ cellValue(row, col.key) }}</td>
+              }
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="app-data-grid__pagination">
+    <span class="summary">Page {{ page() }} of {{ totalPages() }} ({{ total() }} items)</span>
+    <div class="controls">
+      <button type="button" [disabled]="page() <= 1" (click)="goToPage(page() - 1)">Prev</button>
+      <button type="button" [disabled]="page() >= totalPages()" (click)="goToPage(page() + 1)">Next</button>
+    </div>
+  </div>
+</div>

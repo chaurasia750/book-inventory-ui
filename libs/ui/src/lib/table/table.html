@@ -1,0 +1,30 @@
+<div class="app-table-wrapper">
+  <table class="app-table">
+    <thead>
+      <tr>
+        @for (col of columns(); track col.key) {
+          <th>{{ col.label }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr class="app-table__state-row">
+          <td [attr.colspan]="columns().length">Loading...</td>
+        </tr>
+      } @else if (rows().length === 0) {
+        <tr class="app-table__state-row">
+          <td [attr.colspan]="columns().length">No data</td>
+        </tr>
+      } @else {
+        @for (row of rows(); track row) {
+          <tr (click)="onRowClick(row)">
+            @for (col of columns(); track col.key) {
+              <td>{{ cellValue(row, col.key) }}</td>
+            }
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

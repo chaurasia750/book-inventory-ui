@@ -1,0 +1,21 @@
+<section class="blog">
+  <h1>From the Blog</h1>
+  <p class="intro">
+    Product updates, tips, and stories from our team and our customers.
+  </p>
+
+  <div class="blog__grid">
+    @for (post of posts; track post.id) {
+      <a class="blog__link" [routerLink]="['/blog', post.slug]">
+        <app-card [title]="post.title" [subtitle]="post.author + ' · ' + post.publishedAt">
+          <p>{{ post.excerpt }}</p>
+          <div class="blog__tags">
+            @for (tag of post.tags; track tag) {
+              <span class="blog__tag">{{ tag }}</span>
+            }
+          </div>
+        </app-card>
+      </a>
+    }
+  </div>
+</section>

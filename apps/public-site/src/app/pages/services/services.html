@@ -1,0 +1,14 @@
+<section class="services">
+  <h1>Our Services</h1>
+  <p class="intro">
+    Beyond the platform itself, our team offers a range of services designed to help you get the most
+    out of your investment — from initial setup through ongoing optimization.
+  </p>
+  <div class="services__grid">
+    @for (service of services; track service.title) {
+      <app-card [title]="service.icon + ' ' + service.title">
+        <p>{{ service.description }}</p>
+      </app-card>
+    }
+  </div>
+</section>

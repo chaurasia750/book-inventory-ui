@@ -1,0 +1,16 @@
+<div class="app-field">
+  @if (label()) {
+    <label class="app-field-label" [for]="fieldId">{{ label() }}</label>
+  }
+  <input
+    [id]="fieldId"
+    class="app-field-input"
+    [type]="type()"
+    [formControl]="control()"
+    [placeholder]="placeholder()"
+  />
+  @if (hint() && !(control().touched && control().invalid)) {
+    <p class="app-field-hint">{{ hint() }}</p>
+  }
+  <app-form-error [control]="control()" />
+</div>

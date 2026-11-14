@@ -1,0 +1,26 @@
+@if (open()) {
+  <div class="fixed inset-0 z-[99999] flex items-center justify-center">
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" (click)="onCancel()" (keydown.escape)="onCancel()" tabindex="0" role="button" aria-label="Close dialog"></div>
+    <div class="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl mx-4">
+      <h3 class="text-lg font-semibold text-[#111111]">{{ title() }}</h3>
+      <p class="mt-2 text-sm text-gray-500">{{ message() }}</p>
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Reason <span class="text-red-500">*</span></label>
+        <textarea
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none resize-none"
+          rows="3"
+          [placeholder]="placeholder()"
+          [(ngModel)]="reason"
+          maxlength="500"
+        ></textarea>
+        @if (error()) {
+          <p class="mt-1 text-xs text-red-500">Reason is required</p>
+        }
+      </div>
+      <div class="mt-5 flex items-center justify-end gap-3">
+        <app-button variant="outline" (clicked)="onCancel()">{{ cancelText() }}</app-button>
+        <app-button variant="danger" [disabled]="!reason.trim()" (clicked)="onConfirm()">{{ confirmText() }}</app-button>
+      </div>
+    </div>
+  </div>
+}

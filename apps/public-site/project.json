@@ -1,0 +1,106 @@
+{
+  "name": "public-site",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/public-site/src",
+  "tags": [
+    "scope:public-site"
+  ],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "development",
+      "options": {
+        "outputPath": "dist/apps/public-site",
+        "browser": "apps/public-site/src/main.ts",
+        "tsConfig": "apps/public-site/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "polyfills": ["zone.js"],
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/public-site/public"
+          },
+          {
+            "glob": "**/*",
+            "input": "apps/public-site/src/assets"
+          }
+        ],
+        "styles": [
+          "apps/public-site/src/tailwind.css",
+          "apps/public-site/src/styles.scss"
+        ]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "1.5mb",
+              "maximumError": "2mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "16kb",
+              "maximumError": "32kb"
+            }
+          ],
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "apps/public-site/src/environments/environment.ts",
+              "with": "apps/public-site/src/environments/environment.production.ts"
+            }
+          ]
+        },
+        "staging": {
+          "fileReplacements": [
+            {
+              "replace": "apps/public-site/src/environments/environment.ts",
+              "with": "apps/public-site/src/environments/environment.staging.ts"
+            }
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "outputHashing": "all"
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "options": { "proxyConfig": "proxy.conf.json" },
+      "defaultConfiguration": "development",
+      "configurations": {
+        "production": {
+          "buildTarget": "public-site:build:production"
+        },
+        "staging": {
+          "buildTarget": "public-site:build:staging"
+        },
+        "development": {
+          "buildTarget": "public-site:build:development"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "public-site:build",
+        "staticFilePath": "dist/apps/public-site/browser",
+        "spa": true
+      }
+    }
+  }
+}

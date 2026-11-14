@@ -1,0 +1,173 @@
+<div class="mx-auto max-w-7xl space-y-6 p-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'users.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'users.list.subtitle' | translate }}</p>
+    </div>
+    <app-button (clicked)="openCreate()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14" /></svg>
+      {{ 'users.create.button' | translate }}
+    </app-button>
+  </div>
+
+  <app-card [padding]="false">
+    <div class="flex flex-wrap items-center gap-3 border-b border-gray-100 p-4">
+      <div class="relative min-w-[16rem] flex-1">
+        <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7" /><path d="m21 21-4.35-4.35" stroke-linecap="round" />
+        </svg>
+        <input type="search" [formControl]="search" [placeholder]="'users.filters.search' | translate"
+          class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm transition-colors focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+      </div>
+      <select (change)="setRole($any($event.target).value)" class="h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
+        <option value="">{{ 'users.filters.allRoles' | translate }}</option>
+        @for (r of roles; track r) {
+          <option [value]="r">{{ 'users.role.' + r | translate }}</option>
+        }
+      </select>
+      <select (change)="setStatus($any($event.target).value)" class="h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
+        <option value="">{{ 'users.filters.allStatuses' | translate }}</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ 'users.status.' + s | translate }}</option>
+        }
+      </select>
+      <select (change)="setLocked($any($event.target).value)" class="h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
+        <option value="">{{ 'users.filters.anyLock' | translate }}</option>
+        <option value="true">{{ 'users.filters.lockedOnly' | translate }}</option>
+        <option value="false">{{ 'users.filters.unlockedOnly' | translate }}</option>
+      </select>
+      <div class="ml-auto flex items-center gap-2 text-sm">
+        <label for="orderBy" class="text-gray-400">{{ 'users.filters.sort' | translate }}</label>
+        <select id="orderBy" (change)="setOrder($any($event.target).value)" class="h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
+          <option value="CreatedAt DESC">{{ 'users.filters.sortCreated' | translate }}</option>
+          <option value="LastLoginAt DESC">{{ 'users.filters.sortLastLogin' | translate }}</option>
+        </select>
+      </div>
+    </div>
+
+    @if (loadError()) {
+      <p class="mx-4 mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">{{ loadError() }}</p>
+    }
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+          <tr>
+            <th class="px-4 py-3 font-semibold">{{ 'users.columns.name' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'users.columns.contact' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'users.columns.role' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'users.columns.status' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'users.columns.lastLogin' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'users.columns.created' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @if (loading()) {
+            @for (i of skeletonRows; track i) {
+              <tr>
+                <td class="px-4 py-3"><div class="flex items-center gap-3"><app-skeleton-loader type="circle" width="2.25rem" /><div class="space-y-1.5"><app-skeleton-loader width="8rem" /><app-skeleton-loader width="5rem" /></div></div></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="9rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="7rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+              </tr>
+            }
+          } @else {
+            @for (user of result()?.items ?? []; track user.id) {
+              <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="open(user)" (keydown.enter)="open(user)" tabindex="0">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold" [class]="avatarClass(user.fullName)">{{ avatarInitials(user.fullName) }}</div>
+                    <div>
+                      <div class="font-medium text-primary-fg">{{ user.fullName }}</div>
+                      <div class="text-xs text-gray-500">{{ '@' }}{{ user.userName }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3"><div>{{ user.email || '-' }}</div><div class="text-xs text-gray-500">{{ user.mobile || '-' }}</div></td>
+                <td class="px-4 py-3"><span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">{{ 'users.role.' + user.role | translate }}</span></td>
+                <td class="px-4 py-3">
+                  <div class="flex flex-wrap items-center gap-1">
+                    <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(user.status)">{{ 'users.status.' + user.status | translate }}</span>
+                    @if (user.isLocked) { <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">{{ 'users.locked' | translate }}</span> }
+                    @if (user.mustChangePassword) { <span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">{{ 'users.mustChange' | translate }}</span> }
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-gray-600">{{ user.lastLoginAt ? (user.lastLoginAt | date: 'medium') : '-' }}</td>
+                <td class="px-4 py-3 text-gray-600">{{ user.createdAt | date: 'mediumDate' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="py-10 text-center text-sm text-gray-400">{{ 'users.empty' | translate }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+  </app-card>
+</div>
+
+<app-modal [open]="createOpen()" [title]="'users.create.title' | translate" (closed)="createOpen.set(false)">
+  <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="space-y-4">
+    @if (createError()) {
+      <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ createError() }}</p>
+    }
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="sm:col-span-2">
+        <label for="c-fullName" class="mb-1 block text-sm font-semibold">{{ 'users.fields.fullName' | translate }}</label>
+        <input id="c-fullName" formControlName="fullName" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+      </div>
+      <div>
+        <label for="c-userName" class="mb-1 block text-sm font-semibold">{{ 'users.fields.userName' | translate }}</label>
+        <input id="c-userName" formControlName="userName" autocomplete="off" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+      </div>
+      <div>
+        <label for="c-role" class="mb-1 block text-sm font-semibold">{{ 'users.fields.role' | translate }}</label>
+        <select id="c-role" formControlName="role" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100">
+          @for (r of staffRoles; track r) {
+            <option [value]="r">{{ 'users.role.' + r | translate }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="c-email" class="mb-1 block text-sm font-semibold">{{ 'users.fields.email' | translate }}</label>
+        <input id="c-email" type="email" formControlName="email" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+      </div>
+      <div>
+        <label for="c-mobile" class="mb-1 block text-sm font-semibold">{{ 'users.fields.mobile' | translate }}</label>
+        <input id="c-mobile" formControlName="mobile" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+      <app-button variant="secondary" (clicked)="createOpen.set(false)">{{ 'users.cancel' | translate }}</app-button>
+      <app-button type="submit" [loading]="creating()">{{ 'users.create.submit' | translate }}</app-button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal [open]="created() !== null" [title]="'users.temp.title' | translate" (closed)="closeCreated()">
+  @if (created(); as c) {
+    <div class="mb-4 flex items-center gap-3 rounded-xl bg-gray-50 p-3">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold" [class]="avatarClass(c.fullName)">{{ avatarInitials(c.fullName) }}</div>
+      <p class="text-sm">{{ 'users.temp.intro' | translate }} <strong>{{ c.fullName }}</strong> ({{ c.userName }}).</p>
+    </div>
+    <p class="mb-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700" role="alert">
+      <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86l-8.18 14.18A2 2 0 004 21h16a2 2 0 001.89-2.96L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+      {{ 'users.temp.once' | translate }}
+    </p>
+    <div class="mb-3 flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
+      <code class="select-all text-center text-lg font-semibold tracking-wider text-primary-fg">{{ c.temporaryPassword }}</code>
+      <button type="button" (click)="copyPassword()" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-200" [title]="'users.temp.copy' | translate">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>
+      </button>
+    </div>
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-medium text-emerald-600">{{ copied() ? ('users.temp.copied' | translate) : '' }}</span>
+      <app-button (clicked)="closeCreated()">{{ 'users.temp.done' | translate }}</app-button>
+    </div>
+  }
+</app-modal>

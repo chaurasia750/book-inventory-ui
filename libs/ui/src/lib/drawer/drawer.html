@@ -1,0 +1,24 @@
+@if (open()) {
+  <div
+    class="app-drawer-backdrop"
+    tabindex="0"
+    role="button"
+    aria-label="Close overlay"
+    (click)="onBackdropClick()"
+    (keydown.enter)="onBackdropClick()"
+    (keydown.space)="onBackdropClick()"
+  >
+    <div
+      class="app-drawer-panel"
+      [class]="'side-' + side()"
+      tabindex="-1"
+      (click)="onPanelClick($event)"
+      (keydown)="onPanelClick($event)"
+    >
+      <button type="button" class="app-drawer-close" aria-label="Close" (click)="onBackdropClick()">&times;</button>
+      <div class="app-drawer-content">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+}

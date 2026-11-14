@@ -1,0 +1,83 @@
+:host {
+  --color-bg: #ffffff;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  display: contents;
+}
+
+.app-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+}
+
+.app-drawer-panel {
+  position: relative;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  width: 100%;
+  max-width: 24rem;
+  height: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  overflow-y: auto;
+  animation: app-drawer-slide-in 200ms ease;
+
+  &.side-right {
+    margin-left: auto;
+  }
+
+  &.side-left {
+    margin-right: auto;
+  }
+}
+
+.app-drawer-panel.side-right {
+  animation-name: app-drawer-slide-in-right;
+}
+
+.app-drawer-panel.side-left {
+  animation-name: app-drawer-slide-in-left;
+}
+
+@keyframes app-drawer-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes app-drawer-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.app-drawer-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: color 150ms ease;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.app-drawer-content {
+  margin-top: 1.5rem;
+}

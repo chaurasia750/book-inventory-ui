@@ -1,0 +1,45 @@
+:host {
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-danger: #dc2626;
+  --color-primary: #4E9C1F;
+  display: block;
+}
+
+.app-access-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+}
+
+.app-access-denied__code {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--color-danger);
+  line-height: 1;
+}
+
+.app-access-denied__title {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.app-access-denied__message {
+  margin: 0 0 1.5rem;
+  color: var(--color-text-muted);
+}
+
+.app-access-denied__link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 150ms ease;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

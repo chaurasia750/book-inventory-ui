@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  flex-shrink: 0;
+  height: 100vh;
+}
+
+aside {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.45) transparent;
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.45); border-radius: 3px; min-height: 32px; }
+  &:hover::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.65); }
+}

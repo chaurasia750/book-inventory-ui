@@ -1,0 +1,236 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <app-breadcrumb pageTitle="Manage Orders" [items]="breadcrumbItems" />
+
+  <!-- Filters - Full Width -->
+  <app-order-filters
+    (filterChange)="onFilterChange($event)"
+    (searchClick)="onSearchClick($event)"
+    (clearClick)="onClearFilters()"
+  />
+
+  <!-- List + Summary -->
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+    <!-- Left: Table -->
+    <div class="lg:col-span-9">
+      @if (loading()) {
+        <app-loading-spinner />
+      } @else {
+        <app-order-table
+          [items]="items()"
+          [currentPage]="currentPage()"
+          [pageSize]="pageSize"
+          [totalCount]="totalCount()"
+          (viewOrder)="openDetail($event)"
+          (pageChange)="onPageChange($event)"
+        />
+      }
+    </div>
+
+    <!-- Right: Summary -->
+    <div class="lg:col-span-3">
+      @if (summary()) {
+        <app-order-dashboard [summary]="summary()!" />
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Side Panel -->
+<app-side-panel [isOpen]="panelOpen()" [title]="'Order ' + (detail()?.orderNo ?? '')" panelWidth="580px"
+  (closed)="closePanel()">
+  @if (panelLoading()) {
+    <app-loading-spinner />
+  } @else if (detail()) {
+    <div class="space-y-5">
+      <!-- Order Info -->
+      <div>
+        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Order Information</h4>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <p class="text-xs text-gray-500">Type</p>
+            <p class="text-sm font-semibold text-gray-800 dark:text-white/90">{{ detail()!.orderType }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Amount</p>
+            <p class="text-sm font-semibold text-saffron-500">{{ detail()!.totalAmount | currency:'INR' }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Payment Mode</p>
+            <p class="text-sm text-gray-700 dark:text-gray-300">{{ detail()!.paymentMode }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Status</p>
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+              [class]="getStatusClass(detail()!.status)">
+              {{ detail()!.status }}
+            </span>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Created</p>
+            <p class="text-sm text-gray-700 dark:text-gray-300">{{ detail()!.createdDate | date:'dd MMM yyyy, h:mm a' }}</p>
+          </div>
+          @if (detail()!.approvedOn) {
+            <div>
+              <p class="text-xs text-gray-500">Approved On</p>
+              <p class="text-sm text-gray-700 dark:text-gray-300">{{ detail()!.approvedOn | date:'dd MMM yyyy, h:mm a' }}</p>
+            </div>
+          }
+          @if (detail()!.rejectedReason) {
+            <div class="col-span-2">
+              <p class="text-xs text-gray-500">Rejection Reason</p>
+              <p class="text-sm font-semibold text-red-600">{{ detail()!.rejectedReason }}</p>
+            </div>
+          }
+          @if (detail()!.remarks) {
+            <div class="col-span-2">
+              <p class="text-xs text-gray-500">Remarks</p>
+              <p class="text-sm text-gray-700 dark:text-gray-300">{{ detail()!.remarks }}</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <hr class="border-gray-100 dark:border-white/5" />
+
+      <!-- Order Items -->
+      <div>
+        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Items</h4>
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100 dark:border-white/5">
+              <th class="pb-1 text-start text-xs font-medium text-gray-500">Item</th>
+              <th class="pb-1 text-start text-xs font-medium text-gray-500">Qty</th>
+              <th class="pb-1 text-end text-xs font-medium text-gray-500">Amount</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50 dark:divide-white/[0.03]">
+            @for (item of detail()!.items; track item.id) {
+              <tr>
+                <td class="py-2 text-gray-700 dark:text-gray-300">{{ item.itemName }}</td>
+                <td class="py-2 text-gray-700 dark:text-gray-300">{{ item.quantity }}</td>
+                <td class="py-2 text-end font-medium text-gray-800 dark:text-white/90">{{ item.amount | currency:'INR' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="border-gray-100 dark:border-white/5" />
+
+      <!-- Member + Sponsor -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Member</h4>
+          <div class="space-y-1">
+            <p class="text-sm font-semibold text-gray-800 dark:text-white/90">{{ detail()!.member.memberName }}</p>
+            <p class="text-xs text-gray-500">{{ detail()!.member.registrationNumber }}</p>
+            <p class="text-xs text-gray-500">{{ detail()!.member.mobile }}</p>
+            <p class="text-xs text-gray-500">{{ detail()!.member.email }}</p>
+          </div>
+        </div>
+        <div>
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Sponsor</h4>
+          <div class="space-y-1">
+            <p class="text-sm font-semibold text-gray-800 dark:text-white/90">{{ detail()!.sponsor.sponsorName }}</p>
+            <p class="text-xs text-gray-500">{{ detail()!.sponsor.registrationNumber }}</p>
+            <p class="text-xs text-gray-500">{{ detail()!.sponsor.mobile }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment -->
+      @if (payment()) {
+        <hr class="border-gray-100 dark:border-white/5" />
+        <div>
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Payment</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <p class="text-xs text-gray-500">Payment No</p>
+              <p class="text-sm font-semibold text-gray-800 dark:text-white/90">{{ payment()!.paymentNo }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Method</p>
+              <p class="text-sm text-gray-700 dark:text-gray-300">{{ payment()!.paymentMethod }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Amount</p>
+              <p class="text-sm font-semibold text-saffron-500">{{ payment()!.amount | currency:'INR' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Reference</p>
+              <p class="text-sm text-gray-700 dark:text-gray-300">{{ payment()!.transactionReference }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Status</p>
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                [class]="getPaymentStatusClass(payment()!.status)">
+                {{ payment()!.status }}
+              </span>
+            </div>
+            @if (payment()!.paidOn) {
+              <div>
+                <p class="text-xs text-gray-500">Paid On</p>
+                <p class="text-sm text-gray-700 dark:text-gray-300">{{ payment()!.paidOn | date:'dd MMM yyyy, h:mm a' }}</p>
+              </div>
+            }
+          </div>
+          @if (payment()?.mediaFileId) {
+            <div class="mt-3">
+              <p class="text-xs text-gray-500 mb-1">Screenshot</p>
+              <a [href]="getScreenshotUrl(payment()!.mediaFileId!)" target="_blank">
+                <img [src]="getScreenshotUrl(payment()!.mediaFileId!)" alt="Payment Screenshot"
+                  class="w-32 rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-shadow" />
+              </a>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Status History -->
+      @if (detail()!.statusHistory.length > 0) {
+        <hr class="border-gray-100 dark:border-white/5" />
+        <div>
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Status History</h4>
+          <div class="space-y-2">
+            @for (h of detail()!.statusHistory; track h.changedOn) {
+              <div class="flex items-start gap-2 text-sm">
+                <div class="w-1.5 h-1.5 rounded-full bg-saffron-500 mt-1.5 flex-shrink-0"></div>
+                <div>
+                  <p class="text-gray-800 dark:text-white/90">
+                    <span class="font-semibold">{{ h.fromStatus || 'New' }}</span>
+                    <i class="fa fa-arrow-right mx-1 text-xs text-gray-400"></i>
+                    <span class="font-semibold">{{ h.toStatus }}</span>
+                  </p>
+                  @if (h.remarks) {
+                    <p class="text-xs text-gray-500">{{ h.remarks }}</p>
+                  }
+                  <p class="text-xs text-gray-400">{{ h.changedOn | date:'dd MMM yyyy, h:mm a' }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Action Buttons -->
+      @if (canApprove() || canReject()) {
+        <hr class="border-gray-100 dark:border-white/5" />
+        <div class="flex flex-wrap gap-3">
+          @if (canApprove()) {
+            <button (click)="approveOrder()" [disabled]="actionLoading()"
+              class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50">
+              <i class="fa fa-thumbs-up mr-1.5"></i>Approve
+            </button>
+          }
+          @if (canReject()) {
+            <button (click)="rejectOrder()" [disabled]="actionLoading()"
+              class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50">
+              <i class="fa fa-thumbs-down mr-1.5"></i>Reject
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</app-side-panel>

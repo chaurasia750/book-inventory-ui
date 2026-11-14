@@ -1,0 +1,39 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@org/ui": ["./libs/ui/src/index.ts"],
+      "@org/layout": ["./libs/layout/src/index.ts"],
+      "@org/auth": ["./libs/auth/src/index.ts"],
+      "@org/api-services": ["./libs/api-services/src/index.ts"],
+      "@org/shared-models": ["./libs/shared-models/src/index.ts"],
+      "@org/shared-utils": ["./libs/shared-utils/src/index.ts"],
+      "@org/form-controls": ["./libs/form-controls/src/index.ts"],
+      "@org/directives": ["./libs/directives/src/index.ts"],
+      "@org/pipes": ["./libs/pipes/src/index.ts"],
+      "@org/constants": ["./libs/constants/src/index.ts"],
+      "@org/guards": ["./libs/guards/src/index.ts"],
+      "@org/interceptors": ["./libs/interceptors/src/index.ts"],
+      "@org/leads": ["./libs/leads/src/index.ts"],
+      "@org/inventory": ["./libs/inventory/src/index.ts"],
+      "@org/member-detail": ["./libs/member-detail/src/index.ts"],
+      "@org/member-data-access": ["./libs/member/data-access/src/index.ts"],
+      "@org/member-ui-sidebar": ["./libs/member/ui-sidebar/src/index.ts"],
+      "@org/member-feature-dashboard": ["./libs/member/feature-dashboard/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

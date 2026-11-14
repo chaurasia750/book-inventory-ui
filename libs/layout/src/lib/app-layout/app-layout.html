@@ -1,0 +1,16 @@
+<app-backdrop />
+<app-sidebar
+  [navItems]="navItems()"
+  [brandName]="brandName()"
+  [appSubtitle]="appSubtitle()"
+  [homeRoute]="homeRoute()"
+/>
+<div class="app-layout-main">
+  <app-header [title]="title()" />
+  <main class="app-layout-content">
+    <router-outlet />
+  </main>
+  @if (showFooter()) {
+    <app-member-footer />
+  }
+</div>
