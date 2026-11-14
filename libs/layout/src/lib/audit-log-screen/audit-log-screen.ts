@@ -50,8 +50,8 @@ interface ValueRow {
             <option value="">{{ 'auditLog.anyType' | translate }}</option>
             @for (type of entityTypes(); track type) { <option [value]="type">{{ type }}</option> }
           </select>
-          <input formControlName="entityId" [placeholder]="'auditLog.entityId' | translate" class="${FIELD_CLASS} w-72" />
-          <input formControlName="userId" [placeholder]="'auditLog.userId' | translate" class="${FIELD_CLASS} w-72" />
+          <input formControlName="entityId" [placeholder]="'auditLog.entityId' | translate" class="${FIELD_CLASS} w-full sm:w-72" />
+          <input formControlName="userId" [placeholder]="'auditLog.userId' | translate" class="${FIELD_CLASS} w-full sm:w-72" />
           <input type="date" formControlName="from" [attr.aria-label]="'auditLog.from' | translate" class="${FIELD_CLASS}" />
           <input type="date" formControlName="to" [attr.aria-label]="'auditLog.to' | translate" class="${FIELD_CLASS}" />
           <app-button type="submit" size="sm" class="ml-auto">{{ 'auditLog.search' | translate }}</app-button>
@@ -118,6 +118,7 @@ interface ValueRow {
           <div class="mb-3 flex justify-end">
             <app-button variant="secondary" size="sm" (clicked)="selected.set(null)">{{ 'auditLog.close' | translate }}</app-button>
           </div>
+          <div class="overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead class="text-xs uppercase tracking-wide text-gray-500">
               <tr>
@@ -138,6 +139,7 @@ interface ValueRow {
               }
             </tbody>
           </table>
+          </div>
           <details class="mt-4 text-sm">
             <summary class="cursor-pointer text-gray-600">{{ 'auditLog.rawJson' | translate }}</summary>
             <pre class="mt-2 overflow-x-auto rounded-xl bg-gray-50 p-3 text-xs">{{ entry.oldValue ?? '-' }}</pre>

@@ -50,6 +50,10 @@ export const appRoutes: Route[] = [
         loadComponent: () =>
           import('./pages/change-password/change-password').then((m) => m.ChangePasswordComponent),
       },
+      // The user menu opens /profile, /sessions and /login-history (the same links as in the admin app); here they live under Settings.
+      { path: 'profile', redirectTo: 'settings/profile', pathMatch: 'full' },
+      { path: 'sessions', redirectTo: 'settings/sessions', pathMatch: 'full' },
+      { path: 'login-history', redirectTo: 'settings/login-history', pathMatch: 'full' },
       {
         path: 'settings',
         loadComponent: () =>

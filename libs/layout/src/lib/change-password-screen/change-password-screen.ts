@@ -19,7 +19,7 @@ import { matchFieldValidator, strongPasswordValidator } from '@org/shared-utils'
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mx-auto w-full max-w-lg">
-      <div class="rounded-2xl border border-default bg-surface p-8 shadow-xl">
+      <div class="rounded-2xl border border-default bg-surface p-5 shadow-xl sm:p-8">
         <h2 class="mb-2 text-2xl font-bold text-primary-fg">{{ 'changePassword.title' | translate }}</h2>
         @if (auth.mustChangePassword()) {
           <p class="mb-5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-500" role="status">

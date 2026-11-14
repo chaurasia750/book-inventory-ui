@@ -20,7 +20,7 @@ const PAGE_SIZE = 20;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mx-auto w-full max-w-6xl">
-      <div class="rounded-2xl border border-default bg-surface p-8 shadow-xl">
+      <div class="rounded-2xl border border-default bg-surface p-5 shadow-xl sm:p-8">
         <h2 class="mb-6 text-2xl font-bold text-primary-fg">{{ 'account.history.title' | translate }}</h2>
         <div class="overflow-x-auto rounded-xl border border-default">
           <table class="w-full text-left text-sm">

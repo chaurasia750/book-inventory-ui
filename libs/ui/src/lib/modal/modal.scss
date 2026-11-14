@@ -25,6 +25,7 @@
   width: 100%;
   max-width: 32rem;
   max-height: 90vh;
+  max-height: 90dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -73,4 +74,17 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+
+@media (max-width: 575px) {
+  .app-modal-backdrop {
+    padding: 0.5rem;
+  }
+
+  .app-modal__header,
+  .app-modal__body,
+  .app-modal__footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }

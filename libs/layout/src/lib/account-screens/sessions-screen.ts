@@ -19,7 +19,7 @@ import { ToastService } from '@org/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mx-auto w-full max-w-4xl">
-      <div class="rounded-2xl border border-default bg-surface p-8 shadow-xl">
+      <div class="rounded-2xl border border-default bg-surface p-5 shadow-xl sm:p-8">
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 class="text-2xl font-bold text-primary-fg">{{ 'account.sessions.title' | translate }}</h2>
