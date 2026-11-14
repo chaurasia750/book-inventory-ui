@@ -13,4 +13,5 @@ export * from './lib/session.model';
 export * from './lib/user-info.model';
 export * from './lib/problem-details.model';
 export * from './lib/user-admin.model';
+export * from './lib/company.model';
 export * from './lib/login-history.model';

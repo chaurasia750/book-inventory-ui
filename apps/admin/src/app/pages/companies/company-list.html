@@ -1,0 +1,115 @@
+<div class="mx-auto max-w-7xl space-y-6 p-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'company.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'company.subtitle' | translate }}</p>
+    </div>
+    <app-button (clicked)="openCreate()">{{ 'company.create.button' | translate }}</app-button>
+  </div>
+
+  <app-card [padding]="false">
+    <div class="flex flex-wrap items-center gap-3 border-b border-gray-100 p-4">
+      <input type="search" [formControl]="search" [placeholder]="'company.filters.search' | translate" [attr.aria-label]="'company.filters.search' | translate"
+        class="h-10 min-w-[16rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+      <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'company.columns.status' | translate"
+        class="h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
+        <option value="">{{ 'company.filters.allStatuses' | translate }}</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ 'company.status.' + s | translate }}</option>
+        }
+      </select>
+    </div>
+
+    @if (loadError()) {
+      <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+        <span>{{ loadError() }}</span>
+        <app-button variant="secondary" (clicked)="applyFilters()">{{ 'users.retry' | translate }}</app-button>
+      </div>
+    }
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+          <tr>
+            <th class="px-4 py-3 font-semibold">{{ 'company.columns.name' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'company.columns.state' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'company.columns.status' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'company.columns.created' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @if (loading()) {
+            @for (i of skeletonRows; track i) {
+              <tr>
+                <td class="px-4 py-3"><app-skeleton-loader width="10rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+              </tr>
+            }
+          } @else {
+            @for (company of result()?.items ?? []; track company.id) {
+              <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="open(company)" (keydown.enter)="open(company)" tabindex="0">
+                <td class="px-4 py-3 font-medium text-primary-fg">{{ company.name }}</td>
+                <td class="px-4 py-3 text-gray-600">{{ company.state || '-' }}</td>
+                <td class="px-4 py-3">
+                  <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(company.status)">{{ 'company.status.' + company.status | translate }}</span>
+                </td>
+                <td class="px-4 py-3 text-gray-600">{{ company.createdAt | date: 'mediumDate' }}</td>
+              </tr>
+            } @empty {
+              @if (!loadError()) {
+                <tr>
+                  <td colspan="4" class="py-10 text-center text-sm text-gray-400">{{ 'company.empty' | translate }}</td>
+                </tr>
+              }
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+  </app-card>
+</div>
+
+<app-modal [open]="createOpen()" [title]="'company.create.title' | translate" (closed)="createOpen.set(false)">
+  <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="space-y-4">
+    @if (createError()) {
+      <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ createError() }}</p>
+    }
+    <div>
+      <label for="c-name" class="mb-1 block text-sm font-semibold">{{ 'company.fields.name' | translate }}</label>
+      <input id="c-name" formControlName="name" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+    </div>
+    <div>
+      <label for="c-owner" class="mb-1 block text-sm font-semibold">{{ 'company.fields.ownerName' | translate }}</label>
+      <input id="c-owner" formControlName="ownerName" autocomplete="off" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+    </div>
+    <div>
+      <label for="c-state" class="mb-1 block text-sm font-semibold">{{ 'company.fields.state' | translate }}</label>
+      <input id="c-state" formControlName="state" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+    </div>
+    <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+      <app-button variant="secondary" (clicked)="createOpen.set(false)">{{ 'users.cancel' | translate }}</app-button>
+      <app-button type="submit" [loading]="creating()">{{ 'company.create.submit' | translate }}</app-button>
+    </div>
+  </form>
+</app-modal>
+
+@if (created(); as c) {
+  <app-credentials-dialog
+    [open]="true"
+    [title]="'company.credentials.title' | translate"
+    [intro]="('company.credentials.intro' | translate) + ' ' + c.name + '.'"
+    [warning]="'company.credentials.once' | translate"
+    [userId]="c.owner.userName"
+    [userIdLabel]="'company.credentials.userId' | translate"
+    [password]="c.owner.temporaryPassword"
+    [passwordLabel]="'company.credentials.password' | translate"
+    [copyLabel]="'company.credentials.copy' | translate"
+    [copiedLabel]="'company.credentials.copied' | translate"
+    [doneLabel]="'company.credentials.done' | translate"
+    (closed)="closeCreated()"
+  />
+}

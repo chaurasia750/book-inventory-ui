@@ -1,0 +1,112 @@
+<div class="mx-auto max-w-5xl space-y-6 p-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'staff.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'staff.subtitle' | translate }}</p>
+    </div>
+    <app-button (clicked)="openAdd()">{{ 'staff.add.button' | translate }}</app-button>
+  </div>
+
+  <app-card [padding]="false">
+    <div class="flex flex-wrap items-center gap-3 border-b border-gray-100 p-4">
+      <input type="search" [formControl]="search" [placeholder]="'staff.filters.search' | translate" [attr.aria-label]="'staff.filters.search' | translate"
+        class="h-10 min-w-[16rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+      <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'staff.columns.status' | translate"
+        class="h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
+        <option value="">{{ 'staff.filters.allStatuses' | translate }}</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ 'users.status.' + s | translate }}</option>
+        }
+      </select>
+    </div>
+
+    @if (loadError()) {
+      <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+        <span>{{ loadError() }}</span>
+        <app-button variant="secondary" (clicked)="applyFilters()">{{ 'users.retry' | translate }}</app-button>
+      </div>
+    }
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+          <tr>
+            <th class="px-4 py-3 font-semibold">{{ 'staff.columns.name' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'staff.columns.userId' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'staff.columns.status' | translate }}</th>
+            <th class="px-4 py-3 font-semibold">{{ 'staff.columns.lastLogin' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @if (loading()) {
+            @for (i of skeletonRows; track i) {
+              <tr>
+                <td class="px-4 py-3"><app-skeleton-loader width="9rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="11rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
+              </tr>
+            }
+          } @else {
+            @for (user of result()?.items ?? []; track user.id) {
+              <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="open(user)" (keydown.enter)="open(user)" tabindex="0">
+                <td class="px-4 py-3 font-medium text-primary-fg">{{ user.fullName }}</td>
+                <td class="px-4 py-3 text-gray-600">{{ user.userName }}</td>
+                <td class="px-4 py-3">
+                  <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(user.status)">{{ 'users.status.' + user.status | translate }}</span>
+                </td>
+                <td class="px-4 py-3 text-gray-600">{{ user.lastLoginAt ? (user.lastLoginAt | date: 'medium') : '-' }}</td>
+              </tr>
+            } @empty {
+              @if (!loadError()) {
+                <tr>
+                  <td colspan="4" class="py-10 text-center text-sm text-gray-400">{{ 'staff.empty' | translate }}</td>
+                </tr>
+              }
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+  </app-card>
+</div>
+
+<app-modal [open]="addOpen()" [title]="'staff.add.title' | translate" (closed)="addOpen.set(false)">
+  <form [formGroup]="addForm" (ngSubmit)="submitAdd()" class="space-y-4">
+    @if (addError()) {
+      <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ addError() }}</p>
+    }
+    <div>
+      <label for="a-fullName" class="mb-1 block text-sm font-semibold">{{ 'staff.fields.fullName' | translate }}</label>
+      <input id="a-fullName" formControlName="fullName" autocomplete="off" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+    </div>
+    <div>
+      <label for="a-shortName" class="mb-1 block text-sm font-semibold">{{ 'staff.fields.shortName' | translate }}</label>
+      <input id="a-shortName" formControlName="shortName" autocomplete="off" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+      <p class="mt-1 text-xs text-gray-500">{{ 'staff.fields.shortNameHint' | translate }}</p>
+    </div>
+    <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+      <app-button variant="secondary" (clicked)="addOpen.set(false)">{{ 'users.cancel' | translate }}</app-button>
+      <app-button type="submit" [loading]="adding()">{{ 'staff.add.submit' | translate }}</app-button>
+    </div>
+  </form>
+</app-modal>
+
+@if (created(); as c) {
+  <app-credentials-dialog
+    [open]="true"
+    [title]="'staff.credentials.title' | translate"
+    [intro]="('staff.credentials.intro' | translate) + ' ' + c.fullName + '.'"
+    [warning]="'staff.credentials.once' | translate"
+    [userId]="c.userName"
+    [userIdLabel]="'staff.credentials.userId' | translate"
+    [password]="c.temporaryPassword"
+    [passwordLabel]="'staff.credentials.password' | translate"
+    [copyLabel]="'staff.credentials.copy' | translate"
+    [copiedLabel]="'staff.credentials.copied' | translate"
+    [doneLabel]="'staff.credentials.done' | translate"
+    (closed)="closeCreated()"
+  />
+}

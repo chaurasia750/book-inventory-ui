@@ -7,6 +7,7 @@ import { forkJoin, Observable } from 'rxjs';
 import { IamLoginLogService, IamUsersService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import {
+  COMPANY_ROLES,
   AccountStatus,
   AppRole,
   LoginLogItem,
@@ -311,7 +312,7 @@ export class UserDetailComponent {
     if (!user) return [];
 
     const list = [...STATUS_ACTIONS[user.status]];
-    if (user.role !== 'MEMBER' && user.status !== 'REJECTED') list.push(CHANGE_ROLE);
+    if (user.role !== 'MEMBER' && !COMPANY_ROLES.includes(user.role) && user.status !== 'REJECTED') list.push(CHANGE_ROLE);
     if (user.isLocked) list.push(UNLOCK);
     if (user.status === 'ACTIVE') list.push(FORCE_LOGOUT, FORCE_PASSWORD_CHANGE, RESET_LINK);
     return list;

@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
 import { AccessDeniedComponent } from '@org/ui';
-import { authGuard, mustChangePasswordGuard, roleGuard } from '@org/guards';
+import { appRoleGuard, authGuard, mustChangePasswordGuard, roleGuard } from '@org/guards';
 import { MemberLayoutComponent } from './member-layout';
 
 export const appRoutes: Route[] = [
@@ -17,6 +17,16 @@ export const appRoutes: Route[] = [
         path: '',
         pathMatch: 'full',
         loadComponent: () => import('@org/layout').then((m) => m.WelcomeComponent),
+      },
+      {
+        path: 'staff',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('./pages/staff/staff-list').then((m) => m.StaffListComponent),
+      },
+      {
+        path: 'staff/:id',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('./pages/staff/staff-detail').then((m) => m.StaffDetailComponent),
       },
       {
         path: 'settings',

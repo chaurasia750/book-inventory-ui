@@ -64,7 +64,7 @@ export class LoginLogsComponent {
   private readonly logs = inject(IamLoginLogService);
   private readonly translate = inject(TranslateService);
 
-  readonly roles: readonly AppRole[] = ['SUPER_ADMIN', 'SALES_CRM', 'ACCOUNTS', 'MEMBER'];
+  readonly roles: readonly AppRole[] = ['SUPER_ADMIN', 'SALES_CRM', 'ACCOUNTS', 'MEMBER', 'OWNER', 'STAFF'];
   readonly results = LOGIN_RESULTS;
   readonly pageSize = PAGE_SIZE;
 

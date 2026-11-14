@@ -1,0 +1,142 @@
+<div class="mx-auto max-w-5xl space-y-6 p-6">
+  <a routerLink="/companies" class="text-sm text-brand-600 hover:underline">{{ 'company.back' | translate }}</a>
+
+  @if (loading()) {
+    <app-card>
+      <div class="space-y-3">
+        <app-skeleton-loader width="14rem" />
+        <app-skeleton-loader width="22rem" />
+        <app-skeleton-loader width="18rem" />
+      </div>
+    </app-card>
+  } @else if (loadError()) {
+    <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+      <span>{{ loadError() }}</span>
+      <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+    </div>
+  } @else if (company(); as c) {
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold text-primary-fg">{{ c.name }}</h1>
+        <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(c.status)">{{ 'company.status.' + c.status | translate }}</span>
+      </div>
+      <div class="flex gap-2">
+        <app-button variant="secondary" (clicked)="openEdit(c)">{{ 'company.detail.edit' | translate }}</app-button>
+        @if (c.status === 'ACTIVE') {
+          <app-button variant="danger" (clicked)="openStatus('deactivate')">{{ 'company.detail.deactivate' | translate }}</app-button>
+        } @else {
+          <app-button (clicked)="openStatus('activate')">{{ 'company.detail.activate' | translate }}</app-button>
+        }
+      </div>
+    </div>
+    @if (c.status === 'INACTIVE' && c.statusReason) {
+      <p class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">{{ 'company.detail.statusReason' | translate }}: {{ c.statusReason }}</p>
+    }
+
+    <app-card>
+      <h2 class="mb-3 text-base font-semibold">{{ 'company.detail.profile' | translate }}</h2>
+      <dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+        <div><dt class="text-xs text-gray-500">{{ 'company.fields.address' | translate }}</dt><dd>{{ c.address || '-' }}</dd></div>
+        <div><dt class="text-xs text-gray-500">{{ 'company.fields.state' | translate }}</dt><dd>{{ c.state || '-' }}</dd></div>
+        <div><dt class="text-xs text-gray-500">{{ 'company.fields.mobile' | translate }}</dt><dd>{{ c.mobile || '-' }}</dd></div>
+        <div><dt class="text-xs text-gray-500">{{ 'company.fields.email' | translate }}</dt><dd>{{ c.email || '-' }}</dd></div>
+        <div><dt class="text-xs text-gray-500">{{ 'company.fields.gstin' | translate }}</dt><dd>{{ c.gstin || '-' }}</dd></div>
+        <div><dt class="text-xs text-gray-500">{{ 'company.fields.pan' | translate }}</dt><dd>{{ c.pan || '-' }}</dd></div>
+        <div class="sm:col-span-2"><dt class="text-xs text-gray-500">{{ 'company.fields.tagline' | translate }}</dt><dd>{{ c.tagline || '-' }}</dd></div>
+      </dl>
+    </app-card>
+
+    <app-card [padding]="false">
+      <h2 class="border-b border-gray-100 p-4 text-base font-semibold">{{ 'company.detail.accounts' | translate }}</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+            <tr>
+              <th class="px-4 py-3 font-semibold">{{ 'users.columns.name' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'company.detail.login' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'company.detail.role' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'users.columns.status' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (a of c.accounts; track a.id) {
+              <tr>
+                <td class="px-4 py-3"><a [routerLink]="['/users', a.id]" class="font-medium text-brand-600 hover:underline">{{ a.fullName }}</a></td>
+                <td class="px-4 py-3 text-gray-600">{{ a.userName }}</td>
+                <td class="px-4 py-3">{{ 'users.role.' + a.role | translate }}</td>
+                <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="accountStatusClass(a.status)">{{ 'users.status.' + a.status | translate }}</span></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="py-8 text-center text-sm text-gray-400">{{ 'company.detail.noAccounts' | translate }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+
+    <app-card [padding]="false">
+      <h2 class="border-b border-gray-100 p-4 text-base font-semibold">{{ 'company.detail.history' | translate }}</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+            <tr>
+              <th class="px-4 py-3 font-semibold">{{ 'company.history.when' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'company.history.from' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'company.history.to' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'company.history.reason' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (h of c.history; track h.changedAt + h.to) {
+              <tr>
+                <td class="px-4 py-3 text-gray-600">{{ h.changedAt | date: 'medium' }}</td>
+                <td class="px-4 py-3">{{ h.from ? ('company.status.' + h.from | translate) : ('company.history.created' | translate) }}</td>
+                <td class="px-4 py-3">{{ 'company.status.' + h.to | translate }}</td>
+                <td class="px-4 py-3 text-gray-600">{{ h.reason || '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  }
+</div>
+
+<app-modal [open]="editOpen()" [title]="'company.detail.edit' | translate" (closed)="editOpen.set(false)">
+  <form [formGroup]="editForm" (ngSubmit)="submitEdit()" class="space-y-4">
+    @if (editError()) {
+      <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ editError() }}</p>
+    }
+    <div class="grid gap-4 sm:grid-cols-2">
+      @for (f of ['name', 'address', 'mobile', 'email', 'gstin', 'pan', 'state', 'tagline']; track f) {
+        <div [class.sm:col-span-2]="f === 'name' || f === 'address' || f === 'tagline'">
+          <label [for]="'e-' + f" class="mb-1 block text-sm font-semibold">{{ 'company.fields.' + f | translate }}</label>
+          <input [id]="'e-' + f" [formControlName]="f" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+        </div>
+      }
+    </div>
+    <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+      <app-button variant="secondary" (clicked)="editOpen.set(false)">{{ 'users.cancel' | translate }}</app-button>
+      <app-button type="submit" [loading]="saving()">{{ 'company.detail.save' | translate }}</app-button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal [open]="dialog() !== null" [title]="dialog() === 'deactivate' ? ('company.detail.deactivate' | translate) : ('company.detail.confirmActivate' | translate)" (closed)="dialog.set(null)">
+  <form (ngSubmit)="submitStatus()" class="space-y-4">
+    @if (actionError()) {
+      <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ actionError() }}</p>
+    }
+    <div>
+      <label for="s-reason" class="mb-1 block text-sm font-semibold">{{ dialog() === 'deactivate' ? ('company.detail.reason' | translate) : ('company.detail.note' | translate) }}</label>
+      <textarea id="s-reason" rows="3" [formControl]="reasonControl" class="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100"></textarea>
+      @if (dialog() === 'deactivate') {
+        <p class="mt-1 text-xs text-gray-500">{{ 'company.detail.reasonHint' | translate }}</p>
+      }
+    </div>
+    <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+      <app-button variant="secondary" (clicked)="dialog.set(null)">{{ 'users.cancel' | translate }}</app-button>
+      <app-button type="submit" [loading]="acting()">{{ dialog() === 'deactivate' ? ('company.detail.deactivate' | translate) : ('company.detail.activate' | translate) }}</app-button>
+    </div>
+  </form>
+</app-modal>

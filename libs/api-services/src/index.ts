@@ -2,5 +2,7 @@ export * from './lib/api.service';
 export * from './lib/api-base-url.token';
 export * from './lib/http-context';
 export * from './lib/iam-users.service';
+export * from './lib/company.service';
+export * from './lib/staff.service';
 export * from './lib/iam-self.service';
 export * from './lib/core-audit.service';

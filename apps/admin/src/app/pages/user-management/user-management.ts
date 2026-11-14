@@ -11,6 +11,7 @@ import {
   ACCOUNT_STATUSES,
   AccountStatus,
   AppRole,
+  COMPANY_ROLES,
   CreatedStaff,
   PagedList,
   STAFF_ASSIGNABLE_ROLES,
@@ -48,7 +49,7 @@ export class UserManagementComponent {
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly roles: readonly AppRole[] = [...STAFF_ASSIGNABLE_ROLES, 'MEMBER'];
+  readonly roles: readonly AppRole[] = [...STAFF_ASSIGNABLE_ROLES, 'MEMBER', ...COMPANY_ROLES];
   readonly statuses = ACCOUNT_STATUSES;
   readonly staffRoles = STAFF_ASSIGNABLE_ROLES;
 
