@@ -197,6 +197,15 @@
       "barcode_taken": "A barcode is already used by another item.",
       "already_active": "The item is already active.",
       "already_inactive": "The item is already inactive."
+    },
+    "price": {
+      "item_not_found": "The item could not be found.",
+      "version_not_found": "The price version could not be found.",
+      "name_taken": "This item already has a price version with this name.",
+      "invalid_name": "The version name must be 2 to 30 characters.",
+      "invalid_amount": "A price must be zero or more, with at most two decimals.",
+      "invalid_change": "A price change needs a direction, a kind and a value of zero or more with at most two decimals.",
+      "nothing_selected": "No item matches the selection."
     }
   },
   "iam": {
@@ -873,6 +882,79 @@
       "button": "Activate",
       "title": "Activate item",
       "confirm": "The item can be chosen for new documents again."
+    }
+  },
+  "price": {
+    "title": "Prices",
+    "subtitle": "The price versions of every item. The default is the newest version that has started.",
+    "close": "Close",
+    "panelLabel": "Item prices",
+    "empty": "No items match these filters.",
+    "noVersions": "This item has no price version yet.",
+    "default": "Default",
+    "filters": {
+      "search": "Search item name, code, barcode, class, subject or vendor"
+    },
+    "selection": {
+      "vendor": "Vendor",
+      "anyVendor": "All vendors",
+      "category": "Category",
+      "anyCategory": "All categories",
+      "className": "Class (same text, any case)"
+    },
+    "columns": {
+      "item": "Item",
+      "itemCode": "Code",
+      "version": "Version",
+      "effectiveFrom": "Effective from",
+      "mrp": "MRP",
+      "sale": "Sale price",
+      "purchase": "Purchase price",
+      "actions": "Actions"
+    },
+    "fields": {
+      "versionName": "Version name",
+      "effectiveFrom": "Effective from",
+      "mrp": "MRP",
+      "sale": "Sale price",
+      "purchase": "Purchase price"
+    },
+    "add": {
+      "button": "Add version",
+      "title": "Add a price version",
+      "submit": "Add version"
+    },
+    "edit": {
+      "button": "Edit",
+      "title": "Edit price version",
+      "submit": "Save changes"
+    },
+    "copy": {
+      "button": "Copy version",
+      "title": "Copy a version to a new one",
+      "hint": "Every selected item that has the first version gets the second one with the same prices. Items that already have it are not changed.",
+      "from": "Copy from version",
+      "to": "Copy to version",
+      "submit": "Copy",
+      "done": "The copy is done.",
+      "selected": "Items selected",
+      "copied": "Copied",
+      "noSource": "Skipped: no such version",
+      "alreadyHas": "Skipped: already has the new version",
+      "close": "Close"
+    },
+    "history": {
+      "button": "History",
+      "title": "History of this version",
+      "empty": "No history yet.",
+      "system": "System",
+      "before": "Before",
+      "after": "After",
+      "action": {
+        "CREATED": "Created",
+        "UPDATED": "Changed",
+        "DELETED": "Deleted"
+      }
     }
   }
 }

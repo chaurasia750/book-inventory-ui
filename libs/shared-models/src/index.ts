@@ -17,4 +17,5 @@ export * from './lib/company.model';
 export * from './lib/school.model';
 export * from './lib/vendor.model';
 export * from './lib/item.model';
+export * from './lib/price.model';
 export * from './lib/login-history.model';

@@ -34,6 +34,13 @@ export const appRoutes: Route[] = [
         children: [{ path: ':id', children: [] }],
       },
       {
+        path: 'prices',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/prices/price-list').then((m) => m.PriceListComponent),
+        // An item's prices open beside the list (platform U10); the id is the item's.
+        children: [{ path: ':id', children: [] }],
+      },
+      {
         path: 'items',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/items/item-list').then((m) => m.ItemListComponent),
