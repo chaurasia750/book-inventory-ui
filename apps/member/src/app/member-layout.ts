@@ -39,9 +39,10 @@ export class MemberLayoutComponent {
     { name: 'Dashboard', icon: DASHBOARD_ICON, section: 'MAIN', path: '/' },
   ];
 
-  /** R66: the Owner manages the Staff of their own company. */
+  /** R66: the Owner manages the Staff of their own company and reads the audit log of it (core A7). */
   private readonly ownerNavItems: SidebarNavItem[] = [
     { name: 'Staff', icon: MEMBERS_ICON, section: 'MAIN', path: '/staff' },
+    { name: 'Audit log', icon: DASHBOARD_ICON, section: 'MAIN', path: '/audit' },
   ];
 
   readonly navItems: SidebarNavItem[] = [

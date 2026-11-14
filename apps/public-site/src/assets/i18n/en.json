@@ -455,7 +455,10 @@
     "oldValue": "Old value",
     "newValue": "New value",
     "changed": "changed",
-    "noValues": "This entry holds no values."
+    "noValues": "This entry holds no values.",
+    "company": "Company",
+    "anyCompany": "All companies",
+    "rawJson": "Raw values (old, then new)"
   },
   "company": {
     "title": "Companies",

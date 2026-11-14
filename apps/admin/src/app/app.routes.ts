@@ -48,7 +48,7 @@ export const appRoutes: Route[] = [
       {
         path: stripPrefix(ADMIN_ROUTES.AUDIT_LOGS),
         canActivate: [appRoleGuard(['SUPER_ADMIN'])],
-        loadComponent: () => import('./pages/audit-logs/audit-logs').then((m) => m.AuditLogsComponent),
+        loadComponent: () => import('@org/layout').then((m) => m.AuditLogScreenComponent),
       },
       {
         path: 'login-logs',
