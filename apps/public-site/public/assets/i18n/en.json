@@ -290,7 +290,22 @@
       "reason": "Reason",
       "until": "Suspended until"
     },
-    "detail": "User details",
+    "detail": {
+      "actions": "Actions",
+      "status": "Status",
+      "profile": "Profile",
+      "history": "Status history",
+      "sessions": "Active sessions",
+      "reason": "Reason",
+      "changedAt": "Changed at",
+      "suspendedUntil": "Suspended until",
+      "lock": "Lock (failed attempts)",
+      "notLocked": "Not locked",
+      "lastLogin": "Last login",
+      "mustChange": "Must change password",
+      "save": "Save",
+      "logins": "Login log"
+    },
     "history": {
       "when": "When",
       "change": "Change",
@@ -350,7 +365,8 @@
       "revoke": "Session ended."
     },
     "retry": "Retry",
-    "close": "Close"
+    "close": "Close",
+    "panelLabel": "User details"
   },
   "account": {
     "unknown": "Unknown",
@@ -500,7 +516,23 @@
       "ACTIVE": "Active",
       "INACTIVE": "Inactive"
     },
-    "detail": "Company details",
+    "detail": {
+      "profile": "Company details",
+      "accounts": "Accounts",
+      "noAccounts": "No accounts.",
+      "history": "Status history",
+      "edit": "Edit",
+      "save": "Save",
+      "deactivate": "Deactivate",
+      "activate": "Reactivate",
+      "reason": "Reason",
+      "reasonHint": "5 to 500 characters. Every login of this company stops working at once.",
+      "note": "Note (optional)",
+      "confirmActivate": "Reactivate this company?",
+      "login": "User ID",
+      "role": "Role",
+      "statusReason": "Reason"
+    },
     "history": {
       "when": "When",
       "from": "From",
@@ -525,7 +557,8 @@
       "empty": "No active company",
       "loadError": "Could not load the companies."
     },
-    "close": "Close"
+    "close": "Close",
+    "panelLabel": "Company details"
   },
   "staff": {
     "title": "Staff",
@@ -552,7 +585,15 @@
       "status": "Status",
       "lastLogin": "Last login"
     },
-    "detail": "Staff details",
+    "detail": {
+      "profile": "Details",
+      "sessions": "Active sessions",
+      "noSessions": "No active sessions.",
+      "reason": "Reason",
+      "reasonHint": "5 to 500 characters.",
+      "started": "Started",
+      "lastSeen": "Last seen"
+    },
     "actions": {
       "deactivate": "Deactivate",
       "activate": "Reactivate",
@@ -572,7 +613,8 @@
       "copied": "Copied",
       "done": "Done"
     },
-    "close": "Close"
+    "close": "Close",
+    "panelLabel": "Staff details"
   },
   "school": {
     "title": "Schools",

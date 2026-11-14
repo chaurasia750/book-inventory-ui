@@ -7,7 +7,7 @@
     <app-button (clicked)="openAdd()">{{ 'staff.add.button' | translate }}</app-button>
   </div>
 
-  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'staff.title' | translate" [detailLabel]="'staff.detail' | translate">
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'staff.title' | translate" [detailLabel]="'staff.panelLabel' | translate">
     <div list>
     <div class="flex flex-wrap items-center gap-3 border-b border-gray-100 p-4">
       <input type="search" [formControl]="search" [placeholder]="'staff.filters.search' | translate" [attr.aria-label]="'staff.filters.search' | translate"
