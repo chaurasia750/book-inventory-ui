@@ -44,6 +44,12 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('./pages/schools/school-detail').then((m) => m.SchoolDetailComponent),
       },
       {
+        // The screen the forced-change guard and the header's user menu open (`/change-password`); the Settings tab shows the same page.
+        path: 'change-password',
+        loadComponent: () =>
+          import('./pages/change-password/change-password').then((m) => m.ChangePasswordComponent),
+      },
+      {
         path: 'settings',
         loadComponent: () =>
           import('./pages/settings/settings').then((m) => m.SettingsComponent),
