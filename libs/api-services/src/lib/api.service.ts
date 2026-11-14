@@ -1,7 +1,8 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api-base-url.token';
+import { SKIP_ERROR_TOAST } from './http-context';
 
 export type QueryParams = Record<string, string | number | boolean | undefined>;
 
@@ -29,8 +30,10 @@ export class ApiService {
     return `${this.baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
   }
 
-  get<T>(url: string, params?: QueryParams): Observable<T> {
-    return this.http.get<T>(this.resolve(url), { params: toHttpParams(params) });
+  /** `quiet` leaves a failure to the caller: no error toast (the page shows its own inline state). */
+  get<T>(url: string, params?: QueryParams, options?: { quiet?: boolean }): Observable<T> {
+    const context = options?.quiet ? new HttpContext().set(SKIP_ERROR_TOAST, true) : undefined;
+    return this.http.get<T>(this.resolve(url), { params: toHttpParams(params), context });
   }
 
   post<T>(url: string, body: unknown, options?: { withCredentials?: boolean }): Observable<T> {
