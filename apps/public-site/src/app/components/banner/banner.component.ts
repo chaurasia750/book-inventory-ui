@@ -45,8 +45,6 @@ export class BannerComponent implements OnInit, OnDestroy {
   slides = [
     '/assets/book_inventory.png',
     '/assets/book_inventory.png',
-    '/assets/Rudraksham2.jpg',
-    '/assets/Rudraksham3.jpg',
   ];
 
   currentIndex = 0;
