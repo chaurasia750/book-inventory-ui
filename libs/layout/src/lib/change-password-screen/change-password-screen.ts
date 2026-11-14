@@ -35,12 +35,12 @@ import { matchFieldValidator, strongPasswordValidator } from '@org/shared-utils'
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
           <div>
-            <label for="currentPassword" class="mb-1.5 block text-sm font-semibold text-primary-fg">{{ 'changePassword.current' | translate }}</label>
+            <label for="currentPassword" class="mb-1.5 block text-sm font-semibold text-primary-fg">{{ 'changePassword.current' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
             <input id="currentPassword" type="password" formControlName="currentPassword" autocomplete="current-password"
               class="h-11 w-full rounded-xl border border-default bg-surface px-4 text-sm text-primary-fg focus:outline-none focus:ring-2 focus:ring-saffron-500/30" />
           </div>
           <div>
-            <label for="newPassword" class="mb-1.5 block text-sm font-semibold text-primary-fg">{{ 'changePassword.new' | translate }}</label>
+            <label for="newPassword" class="mb-1.5 block text-sm font-semibold text-primary-fg">{{ 'changePassword.new' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
             <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password"
               class="h-11 w-full rounded-xl border border-default bg-surface px-4 text-sm text-primary-fg focus:outline-none focus:ring-2 focus:ring-saffron-500/30" />
             <p class="mt-1 text-xs text-gray-500">{{ 'changePassword.hint' | translate }}</p>
@@ -49,7 +49,7 @@ import { matchFieldValidator, strongPasswordValidator } from '@org/shared-utils'
             }
           </div>
           <div>
-            <label for="confirmPassword" class="mb-1.5 block text-sm font-semibold text-primary-fg">{{ 'changePassword.confirm' | translate }}</label>
+            <label for="confirmPassword" class="mb-1.5 block text-sm font-semibold text-primary-fg">{{ 'changePassword.confirm' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
             <input id="confirmPassword" type="password" formControlName="confirmPassword" autocomplete="new-password"
               class="h-11 w-full rounded-xl border border-default bg-surface px-4 text-sm text-primary-fg focus:outline-none focus:ring-2 focus:ring-saffron-500/30" />
             @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.errors) {

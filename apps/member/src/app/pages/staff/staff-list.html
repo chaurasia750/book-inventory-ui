@@ -112,11 +112,11 @@
       <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ addError() }}</p>
     }
     <div>
-      <label for="a-fullName" class="mb-1 block text-sm font-semibold">{{ 'staff.fields.fullName' | translate }}</label>
+      <label for="a-fullName" class="mb-1 block text-sm font-semibold">{{ 'staff.fields.fullName' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
       <input id="a-fullName" formControlName="fullName" autocomplete="off" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
     </div>
     <div>
-      <label for="a-shortName" class="mb-1 block text-sm font-semibold">{{ 'staff.fields.shortName' | translate }}</label>
+      <label for="a-shortName" class="mb-1 block text-sm font-semibold">{{ 'staff.fields.shortName' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
       <input id="a-shortName" formControlName="shortName" autocomplete="off" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
       <p class="mt-1 text-xs text-gray-500">{{ 'staff.fields.shortNameHint' | translate }}</p>
     </div>

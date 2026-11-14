@@ -84,7 +84,7 @@
       <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ actionError() }}</p>
     }
     <div>
-      <label for="d-reason" class="mb-1 block text-sm font-semibold">{{ 'staff.detail.reason' | translate }}</label>
+      <label for="d-reason" class="mb-1 block text-sm font-semibold">{{ 'staff.detail.reason' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
       <textarea id="d-reason" rows="3" [formControl]="reasonControl" class="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100"></textarea>
       <p class="mt-1 text-xs text-gray-500">{{ 'staff.detail.reasonHint' | translate }}</p>
     </div>

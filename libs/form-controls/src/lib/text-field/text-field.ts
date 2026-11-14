@@ -21,4 +21,6 @@ export class TextFieldComponent {
   type = input<TextFieldType>('text');
   placeholder = input<string>('');
   hint = input<string>('');
+  /** Shows the red * after the label: the field cannot be left empty. */
+  required = input<boolean>(false);
 }

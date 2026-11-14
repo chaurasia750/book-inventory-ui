@@ -6,9 +6,9 @@
       <div class="profile__avatar">{{ initials() }}</div>
 
       <form [formGroup]="form" class="profile__form">
-        <app-text-field label="First name" [control]="form.controls.firstName" />
-        <app-text-field label="Last name" [control]="form.controls.lastName" />
-        <app-text-field label="Email" type="email" [control]="form.controls.email" />
+        <app-text-field label="First name" [required]="true" [control]="form.controls.firstName" />
+        <app-text-field label="Last name" [required]="true" [control]="form.controls.lastName" />
+        <app-text-field label="Email" type="email" [required]="true" [control]="form.controls.email" />
 
         <app-button (clicked)="onSave()">Save changes</app-button>
       </form>
