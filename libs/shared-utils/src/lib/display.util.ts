@@ -1,4 +1,4 @@
-import { AccountStatus, CompanyStatus, DeviceType, LoginResult } from '@org/shared-models';
+import { AccountStatus, CompanyStatus, DeviceType, LoginResult, SchoolStatus } from '@org/shared-models';
 
 // Avatar initials reuse the existing `initials` of ./string.util (exported from the same index) rather than a second
 // implementation of the same rule.
@@ -35,6 +35,11 @@ export function accountStatusBadgeClass(status: AccountStatus): string {
 /** The colour a company status is shown in (company R7: active or inactive). */
 export function companyStatusBadgeClass(status: CompanyStatus): string {
   return status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600';
+}
+
+/** The colour a school status is shown in (school spec R8): the same two states and colours as a company. */
+export function schoolStatusBadgeClass(status: SchoolStatus): string {
+  return companyStatusBadgeClass(status);
 }
 
 /** The colour a login attempt's result is shown in: green for a success, red for every refusal. */

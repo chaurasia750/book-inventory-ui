@@ -34,6 +34,16 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('./pages/staff/staff-detail').then((m) => m.StaffDetailComponent),
       },
       {
+        path: 'schools',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/schools/school-list').then((m) => m.SchoolListComponent),
+      },
+      {
+        path: 'schools/:id',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/schools/school-detail').then((m) => m.SchoolDetailComponent),
+      },
+      {
         path: 'settings',
         loadComponent: () =>
           import('./pages/settings/settings').then((m) => m.SettingsComponent),
