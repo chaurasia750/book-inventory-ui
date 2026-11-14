@@ -231,6 +231,21 @@
         "invalid_stock_type": "The stock type must be MAIN, DAMAGED or SAMPLE (empty means MAIN).",
         "duplicate_row": "This item and stock type is already in an earlier row of the file."
       }
+    },
+    "finance": {
+      "unbalanced": "The debits and credits of a ledger transaction must be equal.",
+      "too_few_lines": "A ledger transaction needs at least two lines.",
+      "invalid_amount": "Each ledger line has either a debit or a credit greater than zero, with at most two decimals.",
+      "invalid_party": "A party line must name its school, vendor or customer, and only a party account has a party.",
+      "invalid_document": "The document type, id and number are required.",
+      "invalid_date": "The transaction date is required.",
+      "invalid_text": "The narration (500) or the session (20) is too long.",
+      "already_posted": "This document is already posted in the ledger.",
+      "not_posted": "This document has no ledger posting to reverse.",
+      "already_reversed": "This document's ledger posting is already reversed.",
+      "party_not_found": "The school or vendor could not be found.",
+      "invalid_filter": "Give either a financial year (like 2026-27), a session, or a date range with from before to.",
+      "too_many_lines": "The statement has more than 5000 lines; narrow the filter."
     }
   },
   "iam": {
@@ -1137,6 +1152,53 @@
       "close": "Close",
       "again": "Upload another file",
       "templateError": "The template could not be downloaded."
+    }
+  },
+  "ledger": {
+    "title": "Ledger",
+    "subtitle": "What every school owes and what the company owes every vendor. Open a row for its statement.",
+    "tabs": "Ledger lists",
+    "schools": "Schools",
+    "vendors": "Vendors",
+    "search": "Search name or code",
+    "total": "Total outstanding",
+    "empty": "Nobody has an outstanding balance.",
+    "inactive": "Inactive",
+    "link": "Ledger",
+    "filter": {
+      "kind": "Show",
+      "all": "All entries",
+      "year": "Financial year",
+      "session": "Session",
+      "dates": "Date range",
+      "from": "From",
+      "to": "To",
+      "apply": "Show statement"
+    },
+    "statement": {
+      "title": "Statement",
+      "close": "Close statement",
+      "date": "Date",
+      "document": "Document",
+      "detail": "Detail",
+      "debit": "Debit",
+      "credit": "Credit",
+      "balance": "Balance",
+      "opening": "Opening balance",
+      "totals": "Totals and closing balance",
+      "empty": "No entries in this filter.",
+      "cancelled": "cancelled",
+      "schoolSign": "A school's balance is what it owes the company; a negative balance is an advance.",
+      "vendorSign": "A vendor's balance is what the company owes it; a negative balance is an advance paid."
+    },
+    "documentType": {
+      "OPENING_BALANCE": "Opening balance",
+      "SCHOOL_INVOICE": "School invoice",
+      "PAYMENT": "Payment",
+      "PURCHASE": "Purchase",
+      "SALES_RETURN": "Sales return",
+      "PURCHASE_RETURN": "Purchase return",
+      "SCRATCH": "Test posting"
     }
   }
 }

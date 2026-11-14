@@ -45,6 +45,9 @@ export class MemberLayoutComponent {
   /** Stock spec R10: the Owner and Staff both see the stock (Staff read-only), in their own menu group. */
   private readonly stockNavItems: SidebarNavItem[] = [{ name: 'Stock', icon: SETTINGS_ICON, section: 'STOCK', path: '/stock' }];
 
+  /** Finance spec R13: the ledger is the Owner's only, in its own menu group. */
+  private readonly ledgerNavItems: SidebarNavItem[] = [{ name: 'Ledger', icon: SETTINGS_ICON, section: 'LEDGER', path: '/ledger' }];
+
   /** Item spec R9: the Owner and Staff both see the company's items (Staff read-only), in their own menu group. */
   private readonly itemNavItems: SidebarNavItem[] = [{ name: 'Items', icon: SETTINGS_ICON, section: 'ITEMS', path: '/items' }];
 
@@ -67,6 +70,7 @@ export class MemberLayoutComponent {
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.priceNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.stockNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.vendorNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') ? this.ledgerNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];
 

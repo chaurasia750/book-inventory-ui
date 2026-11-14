@@ -53,6 +53,22 @@ export const appRoutes: Route[] = [
         // An item's stock opens beside the list (platform U10); the id is the item's. Writing is the Owner's (the panel shows no forms to Staff).
         children: [{ path: ':id', children: [] }],
       },
+      // Finance spec R11, R13: the Owner's ledger: outstanding schools and vendors (one route each); a party's statement opens beside the list (platform U10).
+      { path: 'ledger', pathMatch: 'full', redirectTo: 'ledger/schools' },
+      {
+        path: 'ledger/schools',
+        canActivate: [appRoleGuard(['OWNER'])],
+        data: { party: 'schools' },
+        loadComponent: () => import('./pages/ledger/outstanding-list').then((m) => m.OutstandingListComponent),
+        children: [{ path: ':id', children: [] }],
+      },
+      {
+        path: 'ledger/vendors',
+        canActivate: [appRoleGuard(['OWNER'])],
+        data: { party: 'vendors' },
+        loadComponent: () => import('./pages/ledger/outstanding-list').then((m) => m.OutstandingListComponent),
+        children: [{ path: ':id', children: [] }],
+      },
       {
         path: 'items',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
