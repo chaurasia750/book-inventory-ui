@@ -21,8 +21,4 @@ export const APP_URLS = {
 export const FEATURES = {
   /** Sign-in, password flows, profile, user management (the `iam` module). */
   iam: true,
-  /** Everything the previous product had (orders, members, genealogy, wallet, videos, master data, ...). */
-  legacyModules: false,
-  /** Notification bell in the header (legacy endpoint). */
-  notifications: false,
 } as const;

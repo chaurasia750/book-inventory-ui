@@ -21,21 +21,6 @@ export class AdminLayoutComponent {
   readonly appName = APP_NAME;
   private readonly auth = inject(AuthService);
 
-  /** Menu of the previous product: kept in code, linked only while FEATURES.legacyModules is on. */
-  private readonly legacyNavItems: SidebarNavItem[] = [
-    {
-      name: 'Settings',
-      icon: SETTINGS_ICON,
-      section: 'OTHER',
-      subItems: [
-        { name: 'Country', path: '/master/country' },
-        { name: 'State', path: '/master/state' },
-        { name: 'District', path: '/master/district' },
-        { name: 'City', path: '/master/city' },
-      ],
-    },
-  ];
-
   /** Menu shown today: the screens of modules whose new API exists. */
   private readonly iamNavItems: SidebarNavItem[] = [
     { name: 'Dashboard', icon: DASHBOARD_ICON, section: 'MAIN', path: '/dashboard' },
@@ -51,6 +36,5 @@ export class AdminLayoutComponent {
   readonly navItems: SidebarNavItem[] = [
     ...(FEATURES.iam ? this.iamNavItems : []),
     ...(FEATURES.iam && this.auth.hasAppRole('SUPER_ADMIN') ? this.superAdminNavItems : []),
-    ...(FEATURES.legacyModules ? this.legacyNavItems : []),
   ];
 }

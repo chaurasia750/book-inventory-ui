@@ -1,22 +1,14 @@
 {
-  "nav": {
-    "home": "Home",
-    "about": "About Us",
-    "contact": "Contact",
-    "franchise": "Franchise",
-    "videos": "Our Video",
-    "courses": "Course"
-  },
   "login": {
     "hero": {
-      "badge": "Property sales and agent management",
+      "badge": "Book inventory, billing and ledger",
       "title": "Welcome to Book Inventory",
-      "description": "Manage leads, bookings and commissions in one place.",
+      "description": "Manage stock, orders, billing and ledgers in one place.",
       "features": {
-        "earningsTitle": "Leads and bookings",
-        "earningsDescription": "Follow every enquiry from the first contact to the booking.",
-        "securityTitle": "Transparent commissions",
-        "securityDescription": "See what you earn and when it is paid, with a full statement.",
+        "earningsTitle": "Stock and orders",
+        "earningsDescription": "Follow books and stationery from purchase to sale.",
+        "securityTitle": "Clear ledgers",
+        "securityDescription": "See every school and vendor ledger with a full statement.",
         "supportTitle": "Dedicated support",
         "supportDescription": "The admin team is always one message away."
       },
@@ -28,7 +20,7 @@
     },
     "header": {
       "title": "Sign in to your account",
-      "subtitle": "Sign in to manage your leads, team and earnings."
+      "subtitle": "Sign in to manage your stock, billing and ledgers."
     },
     "security": "Your connection is encrypted and secure",
     "fields": {
@@ -40,10 +32,6 @@
     "submit": {
       "idle": "Sign In",
       "loading": "Signing in..."
-    },
-    "signup": {
-      "prompt": "Don't have an account?",
-      "link": "Sign up"
     },
     "forgotPassword": {
       "title": "Forgot Password?",
@@ -62,83 +50,6 @@
       "userIdRequired": "User ID, email or username is required",
       "passwordRequired": "Password is required"
     }
-  },
-  "signup": {
-    "hero": {
-      "badge": "Farm Fresh, Direct From Farmers",
-      "title": "Fresh Vegetables &amp; Fruits Straight From The Farm",
-      "description": "Discover farm-fresh vegetables and fruits, sourced directly from local farmers and delivered to your doorstep — quality you can trust, prices you will love.",
-      "benefits": {
-        "earningsTitle": "Farm-Direct Sourcing",
-        "earningsDescription": "Fresh produce sourced straight from local farmers — no middlemen, just farm freshness.",
-        "kycTitle": "Same-Day Delivery",
-        "kycDescription": "Handpicked in the morning and delivered to your door within hours.",
-        "supportTitle": "Quality Assured",
-        "supportDescription": "Every item is quality-checked before it reaches your kitchen.",
-        "dashboardTitle": "Honest Prices",
-        "dashboardDescription": "Fair weights and honest prices your whole family can trust."
-      },
-      "footer": {
-        "dpdp": "DPDP Compliant",
-        "iso": "ISO 27001 Certified",
-        "ssl": "SSL Secured"
-      }
-    },
-    "form": {
-      "title": "Register New Member",
-      "subtitle": "Fill in the details below to create a new member account.",
-      "sponsorId": "Sponsor ID",
-      "sponsorPlaceholder": "Enter Sponsor ID",
-      "verifyingSponsor": "Verifying sponsor...",
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "gender": "Gender",
-      "male": "Male",
-      "female": "Female",
-      "email": "Email",
-      "phone": "Phone",
-      "address": "Address",
-      "addressLine1": "Address Line 1",
-      "addressLine2": "Address Line 2",
-      "postalCode": "Postal Code",
-      "city": "City",
-      "country": "Country",
-      "state": "State",
-      "selectCity": "Select City",
-      "selectState": "Select State",
-      "fetchingLocation": "Fetching location...",
-      "required": "is required",
-      "submit": "Register Member",
-      "submitting": "Registering..."
-    },
-    "success": {
-      "title": "Registration Successful!",
-      "welcome": "Welcome to the Book Inventory family.",
-      "subtitle": "Your Membership ID",
-      "membershipId": "Membership ID",
-      "verificationDesc": "Your account is under verification. You will receive a confirmation within 24 hours.",
-      "assistanceDesc": "For any assistance, contact us at +91 94547 99616.",
-      "safeMsg": "Your information is secure and encrypted.",
-      "thankYou": "Thank you for choosing Book Inventory. We look forward to serving you."
-    },
-    "signin": {
-      "prompt": "Already have an account?",
-      "link": "Sign In"
-    }
-  },
-  "footer": {
-    "brand": "Book Inventory brings you the freshest vegetables and fruits, sourced directly from local farms and delivered to your doorstep the very same day. Farm-fresh quality, honest weights, and fair prices your whole family can trust.",
-    "quickLinks": "Quick Links",
-    "services": "Our Services",
-    "contactInfo": "Contact Info",
-    "copyright": "All rights reserved. | Fresh. Honest. Farm Direct.",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "refund": "Refund Policy"
-  },
-  "topBar": {
-    "login": "Login",
-    "register": "Register"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
