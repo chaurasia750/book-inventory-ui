@@ -1,0 +1,216 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center gap-3">
+    <app-back-button [label]="'price.bulk.back' | translate" (back)="back()" />
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'price.bulk.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'price.bulk.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" class="flex flex-col gap-4">
+    <app-card>
+      <h2 class="mb-4 text-lg font-semibold text-primary-fg">{{ 'price.bulk.step1' | translate }}</h2>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label for="pb-version" class="mb-1 block text-sm font-semibold">
+            {{ 'price.fields.versionName' | translate }}<span class="text-red-500" aria-hidden="true"> *</span>
+          </label>
+          <input id="pb-version" formControlName="versionName" [class]="field" />
+          <p class="mt-1 text-xs text-gray-500">{{ 'price.bulk.versionHint' | translate }}</p>
+        </div>
+        <div>
+          <label for="pb-vendor" class="mb-1 block text-sm font-semibold">{{ 'price.selection.vendor' | translate }}</label>
+          <select id="pb-vendor" formControlName="vendorId" [class]="field">
+            <option value="">{{ 'price.selection.anyVendor' | translate }}</option>
+            @for (v of vendorOptions(); track v.id) { <option [value]="v.id">{{ v.name }}</option> }
+          </select>
+        </div>
+        <div>
+          <label for="pb-category" class="mb-1 block text-sm font-semibold">{{ 'price.selection.category' | translate }}</label>
+          <select id="pb-category" formControlName="category" [class]="field">
+            <option value="">{{ 'price.selection.anyCategory' | translate }}</option>
+            @for (c of categories; track c) { <option [value]="c">{{ 'item.category.' + c | translate }}</option> }
+          </select>
+        </div>
+        <div>
+          <label for="pb-class" class="mb-1 block text-sm font-semibold">{{ 'price.selection.className' | translate }}</label>
+          <input id="pb-class" formControlName="className" [class]="field" />
+        </div>
+      </div>
+      <label class="mt-4 inline-flex items-center gap-2 text-sm text-gray-600">
+        <input type="checkbox" formControlName="onlyActive" class="h-4 w-4 rounded border-gray-300" />
+        {{ 'price.bulk.onlyActive' | translate }}
+      </label>
+    </app-card>
+
+    <app-card>
+      <h2 class="text-lg font-semibold text-primary-fg">{{ 'price.bulk.step2' | translate }}</h2>
+      <p class="mb-4 mt-1 text-xs text-gray-500">{{ 'price.bulk.changesHint' | translate }}</p>
+
+      <div class="flex flex-col divide-y divide-gray-100">
+        <div class="grid items-end gap-3 py-3 first:pt-0 last:pb-0 sm:grid-cols-[9rem_8rem_8rem_1fr]">
+          <label class="flex h-10 items-center gap-2 text-sm font-semibold text-primary-fg">
+            <input type="checkbox" formControlName="mrpEnabled" class="h-4 w-4 rounded border-gray-300" />
+            {{ 'price.fields.mrp' | translate }}
+          </label>
+          <select formControlName="mrpKind" [attr.aria-label]="'price.bulk.kind' | translate" [class]="field">
+            @for (k of kinds; track k) { <option [value]="k">{{ 'price.bulk.kindValue.' + k | translate }}</option> }
+          </select>
+          <select formControlName="mrpDirection" [attr.aria-label]="'price.bulk.direction' | translate" [class]="field">
+            @for (d of directions; track d) { <option [value]="d">{{ 'price.bulk.directionValue.' + d | translate }}</option> }
+          </select>
+          <div>
+            <input formControlName="mrpValue" inputmode="decimal" [placeholder]="'price.bulk.value' | translate"
+              [attr.aria-label]="('price.fields.mrp' | translate) + ' ' + ('price.bulk.value' | translate)" [class]="field" />
+          </div>
+        </div>
+
+        <div class="grid items-end gap-3 py-3 first:pt-0 last:pb-0 sm:grid-cols-[9rem_8rem_8rem_1fr]">
+          <label class="flex h-10 items-center gap-2 text-sm font-semibold text-primary-fg">
+            <input type="checkbox" formControlName="saleEnabled" class="h-4 w-4 rounded border-gray-300" />
+            {{ 'price.fields.sale' | translate }}
+          </label>
+          <select formControlName="saleKind" [attr.aria-label]="'price.bulk.kind' | translate" [class]="field">
+            @for (k of kinds; track k) { <option [value]="k">{{ 'price.bulk.kindValue.' + k | translate }}</option> }
+          </select>
+          <select formControlName="saleDirection" [attr.aria-label]="'price.bulk.direction' | translate" [class]="field">
+            @for (d of directions; track d) { <option [value]="d">{{ 'price.bulk.directionValue.' + d | translate }}</option> }
+          </select>
+          <div>
+            <input formControlName="saleValue" inputmode="decimal" [placeholder]="'price.bulk.value' | translate"
+              [attr.aria-label]="('price.fields.sale' | translate) + ' ' + ('price.bulk.value' | translate)" [class]="field" />
+          </div>
+        </div>
+
+        <div class="grid items-end gap-3 py-3 first:pt-0 last:pb-0 sm:grid-cols-[9rem_8rem_8rem_1fr]">
+          <label class="flex h-10 items-center gap-2 text-sm font-semibold text-primary-fg">
+            <input type="checkbox" formControlName="purchaseEnabled" class="h-4 w-4 rounded border-gray-300" />
+            {{ 'price.fields.purchase' | translate }}
+          </label>
+          <select formControlName="purchaseKind" [attr.aria-label]="'price.bulk.kind' | translate" [class]="field">
+            @for (k of kinds; track k) { <option [value]="k">{{ 'price.bulk.kindValue.' + k | translate }}</option> }
+          </select>
+          <select formControlName="purchaseDirection" [attr.aria-label]="'price.bulk.direction' | translate" [class]="field">
+            @for (d of directions; track d) { <option [value]="d">{{ 'price.bulk.directionValue.' + d | translate }}</option> }
+          </select>
+          <div>
+            <input formControlName="purchaseValue" inputmode="decimal" [placeholder]="'price.bulk.value' | translate"
+              [attr.aria-label]="('price.fields.purchase' | translate) + ' ' + ('price.bulk.value' | translate)" [class]="field" />
+          </div>
+        </div>
+      </div>
+
+      @if (formError()) {
+        <p class="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ formError() }}</p>
+      }
+
+      <div class="mt-4 flex justify-end">
+        <app-button [loading]="previewLoading()" (clicked)="runPreview()">{{ 'price.bulk.preview' | translate }}</app-button>
+      </div>
+    </app-card>
+  </form>
+
+  @if (applied(); as totals) {
+    <div class="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800" role="status">
+      <p class="font-semibold">{{ 'price.bulk.applied' | translate }}</p>
+      <ul class="mt-1 list-disc pl-5">
+        <li>{{ 'price.bulk.totals.selected' | translate }}: {{ totals.itemsSelected }}</li>
+        <li>{{ 'price.bulk.totals.changed' | translate }}: {{ totals.changed }}</li>
+        <li>{{ 'price.bulk.totals.noVersion' | translate }}: {{ totals.skippedNoVersion }}</li>
+        <li>{{ 'price.bulk.totals.belowZero' | translate }}: {{ totals.skippedBelowZero }}</li>
+        <li>{{ 'price.bulk.totals.overflow' | translate }}: {{ totals.skippedOverflow }}</li>
+      </ul>
+    </div>
+  }
+
+  <app-card>
+    <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-semibold text-primary-fg">{{ 'price.bulk.step3' | translate }}</h2>
+        <p class="mt-1 text-xs text-gray-500">{{ 'price.bulk.previewHint' | translate }}</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <app-button variant="secondary" [disabled]="!preview() || applying()" (clicked)="askApply()">
+          {{ 'price.bulk.apply' | translate }}
+        </app-button>
+      </div>
+    </div>
+
+    @if (previewError()) {
+      <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+        <span>{{ previewError() }}</span>
+        <app-button variant="secondary" (clicked)="goToPreviewPage(previewPage())">{{ 'users.retry' | translate }}</app-button>
+      </div>
+    } @else if (previewLoading()) {
+      <div class="space-y-3">
+        <app-skeleton-loader width="40%" />
+        <app-skeleton-loader width="100%" />
+        <app-skeleton-loader width="90%" />
+      </div>
+    } @else if (preview(); as result) {
+      <div class="mb-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-600">
+        <span>{{ 'price.bulk.totals.selected' | translate }}: <strong>{{ result.totals.itemsSelected }}</strong></span>
+        <span>{{ 'price.bulk.totals.changed' | translate }}: <strong>{{ result.totals.changed }}</strong></span>
+        <span>{{ 'price.bulk.totals.noVersion' | translate }}: <strong>{{ result.totals.skippedNoVersion }}</strong></span>
+        <span>{{ 'price.bulk.totals.belowZero' | translate }}: <strong>{{ result.totals.skippedBelowZero }}</strong></span>
+        <span>{{ 'price.bulk.totals.overflow' | translate }}: <strong>{{ result.totals.skippedOverflow }}</strong></span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+            <tr>
+              <th class="px-3 py-3 font-semibold">{{ 'price.columns.itemCode' | translate }}</th>
+              <th class="px-3 py-3 font-semibold">{{ 'price.columns.item' | translate }}</th>
+              <th class="px-3 py-3 text-right font-semibold">{{ 'price.bulk.old' | translate }} {{ 'price.columns.mrp' | translate }}</th>
+              <th class="px-3 py-3 text-right font-semibold">{{ 'price.bulk.new' | translate }} {{ 'price.columns.mrp' | translate }}</th>
+              <th class="px-3 py-3 text-right font-semibold">{{ 'price.bulk.old' | translate }} {{ 'price.columns.sale' | translate }}</th>
+              <th class="px-3 py-3 text-right font-semibold">{{ 'price.bulk.new' | translate }} {{ 'price.columns.sale' | translate }}</th>
+              <th class="px-3 py-3 text-right font-semibold">{{ 'price.bulk.old' | translate }} {{ 'price.columns.purchase' | translate }}</th>
+              <th class="px-3 py-3 text-right font-semibold">{{ 'price.bulk.new' | translate }} {{ 'price.columns.purchase' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (row of result.rows; track row.itemId) {
+              <tr [class.bg-amber-50]="row.skipped">
+                <td class="px-3 py-3 font-mono text-xs text-gray-600">{{ row.itemCode }}</td>
+                <td class="px-3 py-3 font-medium text-primary-fg">{{ row.itemName }}</td>
+                @if (row.skipped) {
+                  <td [attr.colspan]="6" class="px-3 py-3 text-xs text-amber-700">
+                    {{ 'price.bulk.skip.' + row.skipped | translate }}
+                  </td>
+                } @else if (row.old; as old) {
+                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.mrpAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.mrpAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.saleAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.saleAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.purchaseAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.purchaseAmount | number: '1.2-2' }}</td>
+                }
+              </tr>
+            } @empty {
+              <tr><td [attr.colspan]="8" class="py-8 text-center text-sm text-gray-400">{{ 'price.bulk.empty' | translate }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination [page]="previewPage()" [pageSize]="previewPageSize" [total]="result.rowCount" (pageChange)="goToPreviewPage($event)" />
+    } @else {
+      <p class="py-8 text-center text-sm text-gray-400">{{ 'price.bulk.noPreview' | translate }}</p>
+    }
+  </app-card>
+</div>
+
+<app-modal [open]="confirmOpen()" [title]="'price.bulk.confirm.title' | translate" (closed)="confirmOpen.set(false)">
+  <div class="space-y-4 text-sm">
+    <p class="text-gray-600">{{ 'price.bulk.confirm.body' | translate: { count: preview()?.totals?.changed ?? 0 } }}</p>
+    @if (applyError()) {
+      <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ applyError() }}</p>
+    }
+    <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+      <app-button variant="secondary" [disabled]="applying()" (clicked)="confirmOpen.set(false)">{{ 'users.cancel' | translate }}</app-button>
+      <app-button [loading]="applying()" (clicked)="confirmApply()">{{ 'price.bulk.confirm.submit' | translate }}</app-button>
+    </div>
+  </div>
+</app-modal>

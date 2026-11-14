@@ -34,6 +34,12 @@ export const appRoutes: Route[] = [
         children: [{ path: ':id', children: [] }],
       },
       {
+        // The bulk price change is the Owner's only; it sits before `prices` so `bulk` is not read as an item id (price#04).
+        path: 'prices/bulk',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('./pages/prices/price-bulk').then((m) => m.PriceBulkComponent),
+      },
+      {
         path: 'prices',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/prices/price-list').then((m) => m.PriceListComponent),

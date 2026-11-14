@@ -97,6 +97,11 @@ export class PriceListComponent {
     void this.router.navigate(['/prices']);
   }
 
+  /** R10: the bulk change is a page of its own (the Owner's only; the route guards it). */
+  openBulk(): void {
+    void this.router.navigate(['/prices', 'bulk']);
+  }
+
   load(): void {
     this.loading.set(true);
     this.loadError.set('');

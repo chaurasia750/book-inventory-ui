@@ -943,6 +943,59 @@
       "alreadyHas": "Skipped: already has the new version",
       "close": "Close"
     },
+    "bulk": {
+      "button": "Bulk change",
+      "back": "Back to prices",
+      "title": "Bulk price change",
+      "subtitle": "Raise or lower the price of many items at once, after a preview that saves nothing.",
+      "step1": "1. Items and version",
+      "step2": "2. Changes",
+      "step3": "3. Preview",
+      "onlyActive": "Only active items",
+      "versionHint": "The version name exactly as the items have it.",
+      "changesHint": "Tick a price to change it; leave it unticked to keep it as it is.",
+      "kind": "Kind",
+      "direction": "Direction",
+      "value": "Value",
+      "kindValue": {
+        "PERCENT": "Percent",
+        "AMOUNT": "Amount (rupees)"
+      },
+      "directionValue": {
+        "INCREASE": "Increase",
+        "DECREASE": "Decrease"
+      },
+      "preview": "Preview",
+      "previewHint": "The preview saves nothing. Apply is available only for the inputs of the last preview.",
+      "apply": "Apply",
+      "applied": "The change is applied.",
+      "noPreview": "Choose the items and the changes, then press Preview.",
+      "empty": "No item matches the selection.",
+      "old": "Old",
+      "new": "New",
+      "totals": {
+        "selected": "Items selected",
+        "changed": "Changed",
+        "noVersion": "Skipped: no such version",
+        "belowZero": "Skipped: would go below zero",
+        "overflow": "Skipped: would overflow"
+      },
+      "skip": {
+        "NO_VERSION": "Skipped: this item has no such version.",
+        "BELOW_ZERO": "Skipped: a result would go below zero.",
+        "OVERFLOW": "Skipped: a result would be too large."
+      },
+      "invalid": {
+        "version": "Type the version name (2 to 30 characters) and then preview.",
+        "change": "A value needs zero or more, with at most two decimals.",
+        "none": "Tick at least one price to change."
+      },
+      "confirm": {
+        "title": "Apply the change",
+        "body": "Apply the change to {{count}} items? The old prices stay in each version's history; this cannot be undone.",
+        "submit": "Apply the change"
+      }
+    },
     "history": {
       "button": "History",
       "title": "History of this version",
