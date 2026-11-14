@@ -24,7 +24,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
       }
       <div class="grid gap-4 sm:grid-cols-2">
         <div class="sm:col-span-2">
-          <label for="vf-name" class="mb-1 block text-sm font-semibold">{{ 'vendor.fields.name' | translate }}</label>
+          <label for="vf-name" class="mb-1 block text-sm font-semibold">{{ 'vendor.fields.name' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           <input id="vf-name" formControlName="name" class="${FIELD}" />
         </div>
         <div>
@@ -35,7 +35,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
           </select>
         </div>
         <div>
-          <label for="vf-balance" class="mb-1 block text-sm font-semibold">{{ 'vendor.fields.openingBalance' | translate }}</label>
+          <label for="vf-balance" class="mb-1 block text-sm font-semibold">{{ 'vendor.fields.openingBalance' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           <input id="vf-balance" type="number" step="0.01" min="0" formControlName="openingBalanceAmount" class="${FIELD}" />
           <p class="mt-1 text-xs text-gray-500">{{ 'vendor.fields.openingBalanceHint' | translate }}</p>
         </div>

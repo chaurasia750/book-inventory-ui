@@ -159,7 +159,7 @@ const INPUT_CLASS =
         <app-card [title]="'users.detail.profile' | translate">
           <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="grid gap-4 sm:grid-cols-3">
             <div>
-              <label for="p-fullName" class="mb-1 block text-sm font-semibold">{{ 'users.fields.fullName' | translate }}</label>
+              <label for="p-fullName" class="mb-1 block text-sm font-semibold">{{ 'users.fields.fullName' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
               <input id="p-fullName" formControlName="fullName" class="${INPUT_CLASS}" />
             </div>
             <div>

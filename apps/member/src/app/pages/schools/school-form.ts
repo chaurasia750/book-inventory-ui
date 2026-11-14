@@ -24,17 +24,17 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
       }
       <div class="grid gap-4 sm:grid-cols-2">
         <div class="sm:col-span-2">
-          <label for="sf-name" class="mb-1 block text-sm font-semibold">{{ 'school.fields.name' | translate }}</label>
+          <label for="sf-name" class="mb-1 block text-sm font-semibold">{{ 'school.fields.name' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           <input id="sf-name" formControlName="name" class="${FIELD}" />
         </div>
         <div>
-          <label for="sf-session" class="mb-1 block text-sm font-semibold">{{ 'school.fields.sessionType' | translate }}</label>
+          <label for="sf-session" class="mb-1 block text-sm font-semibold">{{ 'school.fields.sessionType' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           <select id="sf-session" formControlName="sessionType" class="${FIELD}">
             @for (t of sessionTypes; track t) { <option [value]="t">{{ 'school.sessionType.' + t | translate }}</option> }
           </select>
         </div>
         <div>
-          <label for="sf-sale" class="mb-1 block text-sm font-semibold">{{ 'school.fields.saleType' | translate }}</label>
+          <label for="sf-sale" class="mb-1 block text-sm font-semibold">{{ 'school.fields.saleType' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           <select id="sf-sale" formControlName="saleType" class="${FIELD}">
             @for (t of saleTypes; track t) { <option [value]="t">{{ 'school.saleType.' + t | translate }}</option> }
           </select>
@@ -46,7 +46,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
           </select>
         </div>
         <div>
-          <label for="sf-balance" class="mb-1 block text-sm font-semibold">{{ 'school.fields.openingBalance' | translate }}</label>
+          <label for="sf-balance" class="mb-1 block text-sm font-semibold">{{ 'school.fields.openingBalance' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           <input id="sf-balance" type="number" step="0.01" min="0" formControlName="openingBalanceAmount" class="${FIELD}" />
         </div>
         <div>

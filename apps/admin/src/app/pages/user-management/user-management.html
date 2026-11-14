@@ -152,15 +152,15 @@
     }
     <div class="grid gap-4 sm:grid-cols-2">
       <div class="sm:col-span-2">
-        <label for="c-fullName" class="mb-1 block text-sm font-semibold">{{ 'users.fields.fullName' | translate }}</label>
+        <label for="c-fullName" class="mb-1 block text-sm font-semibold">{{ 'users.fields.fullName' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
         <input id="c-fullName" formControlName="fullName" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
       </div>
       <div>
-        <label for="c-userName" class="mb-1 block text-sm font-semibold">{{ 'users.fields.userName' | translate }}</label>
+        <label for="c-userName" class="mb-1 block text-sm font-semibold">{{ 'users.fields.userName' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
         <input id="c-userName" formControlName="userName" autocomplete="off" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
       </div>
       <div>
-        <label for="c-role" class="mb-1 block text-sm font-semibold">{{ 'users.fields.role' | translate }}</label>
+        <label for="c-role" class="mb-1 block text-sm font-semibold">{{ 'users.fields.role' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
         <select id="c-role" formControlName="role" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100">
           @for (r of staffRoles; track r) {
             <option [value]="r">{{ 'users.role.' + r | translate }}</option>
@@ -168,7 +168,7 @@
         </select>
       </div>
       <div>
-        <label for="c-email" class="mb-1 block text-sm font-semibold">{{ 'users.fields.email' | translate }}</label>
+        <label for="c-email" class="mb-1 block text-sm font-semibold">{{ 'users.fields.email' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
         <input id="c-email" type="email" formControlName="email" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
       </div>
       <div>

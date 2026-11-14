@@ -35,7 +35,7 @@ import { ToastService } from '@org/ui';
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
           <div>
-            <label for="fullName" class="mb-1.5 block text-sm font-semibold text-primary-fg">{{ 'account.profile.fullName' | translate }}</label>
+            <label for="fullName" class="mb-1.5 block text-sm font-semibold text-primary-fg">{{ 'account.profile.fullName' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
             <input id="fullName" formControlName="fullName" class="h-11 w-full rounded-xl border border-default bg-surface px-4 text-sm text-primary-fg" />
           </div>
           <div>

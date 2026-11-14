@@ -1,6 +1,6 @@
 <div class="app-field">
   @if (label()) {
-    <label class="app-field-label" [for]="fieldId">{{ label() }}</label>
+    <label class="app-field-label" [for]="fieldId">{{ label() }}@if (required()) {<span class="text-red-500" aria-hidden="true"> *</span>}</label>
   }
   <input
     [id]="fieldId"
