@@ -11,8 +11,8 @@ An Nx monorepo containing three Angular 21 applications (standalone components, 
 | App           | Purpose                                                              | Auth                        |
 | ------------- | --------------------------------------------------------------------- | ---------------------------- |
 | `public-site` | Public marketing website (home, about, pricing, blog, careers, etc.) — **also hosts the single login page** for all apps | None (login page itself is public) |
-| `admin`       | Admin portal — member/pool oversight, level & payout config, withdrawal approvals, audit logs, reports | JWT, role `admin`             |
-| `member`      | Member portal — own binary-tree placement/genealogy view, level progress, Upgrade/Main wallet balances, withdrawal requests | JWT, roles `member` / `admin` |
+| `admin`       | Admin portal — users, login log, audit log, account pages (Book Inventory screens arrive per module) | JWT, role `admin`             |
+| `member`      | Member portal — welcome page and own account pages (profile, sessions, login history, change password) | JWT, roles `member` / `admin` |
 
 ### 🔐 Unified login
 

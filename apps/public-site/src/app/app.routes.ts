@@ -9,10 +9,6 @@ export const appRoutes: Route[] = [
     loadComponent: () => import('./pages/auth/login/login').then((m) => m.LoginComponent),
   },
   {
-    path: 'signup',
-    loadComponent: () => import('./pages/auth/signup/signup').then((m) => m.SignupComponent),
-  },
-  {
     path: PUBLIC_ROUTES.WELCOME,
     component: AuthLayoutComponent,
     children: [
@@ -59,11 +55,6 @@ export const appRoutes: Route[] = [
         path: PUBLIC_ROUTES.CONTACT,
         loadComponent: () =>
           import('./pages/contact-us/contact-us').then((m) => m.ContactUsComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.VIDEOS,
-        loadComponent: () =>
-          import('./pages/videos/videos').then((m) => m.VideosComponent),
       },
       
       {
@@ -113,11 +104,6 @@ export const appRoutes: Route[] = [
         path: PUBLIC_ROUTES.CAREERS,
         loadComponent: () =>
           import('./pages/careers/careers').then((m) => m.CareersComponent),
-      },
-      {
-        path: 'shop',
-        loadComponent: () =>
-          import('./pages/shop/shop').then((m) => m.ShopComponent),
       },
     ],
   },

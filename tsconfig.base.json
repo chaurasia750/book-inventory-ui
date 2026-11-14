@@ -26,13 +26,7 @@
       "@org/pipes": ["./libs/pipes/src/index.ts"],
       "@org/constants": ["./libs/constants/src/index.ts"],
       "@org/guards": ["./libs/guards/src/index.ts"],
-      "@org/interceptors": ["./libs/interceptors/src/index.ts"],
-      "@org/leads": ["./libs/leads/src/index.ts"],
-      "@org/inventory": ["./libs/inventory/src/index.ts"],
-      "@org/member-detail": ["./libs/member-detail/src/index.ts"],
-      "@org/member-data-access": ["./libs/member/data-access/src/index.ts"],
-      "@org/member-ui-sidebar": ["./libs/member/ui-sidebar/src/index.ts"],
-      "@org/member-feature-dashboard": ["./libs/member/feature-dashboard/src/index.ts"]
+      "@org/interceptors": ["./libs/interceptors/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

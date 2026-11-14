@@ -24,33 +24,6 @@ export class AdminLayoutComponent {
   /** Menu of the previous product: kept in code, linked only while FEATURES.legacyModules is on. */
   private readonly legacyNavItems: SidebarNavItem[] = [
     {
-      name: 'Dashboard',
-      icon: DASHBOARD_ICON,
-      section: 'MAIN',
-      subItems: [
-        { name: 'Overview', path: '/dashboard' },
-        { name: 'All Orders', path: '/orders' },
-        { name: 'Withdrawals', path: '/withdrawals' },
-      ],
-    },
-    {
-      name: 'Members',
-      icon: MEMBERS_ICON,
-      section: 'MANAGEMENT',
-      subItems: [
-        { name: 'List', path: '/members/list' },
-        { name: 'Sponsor New', path: '/sponsor-new' },
-      ],
-    },
-    {
-      name: 'Network Manager',
-      icon: TREE_ICON,
-      section: 'MANAGEMENT',
-      subItems: [
-        { name: 'Binary Tree', path: '/tree/genealogy' },
-      ],
-    },
-    {
       name: 'Settings',
       icon: SETTINGS_ICON,
       section: 'OTHER',
