@@ -40,16 +40,16 @@ export class MemberLayoutComponent {
   ];
 
   /** Vendor spec R8: vendors are the Owner's; Staff have no access. */
-  private readonly vendorNavItems: SidebarNavItem[] = [{ name: 'Vendors', icon: TREE_ICON, section: 'MANAGEMENT', path: '/vendors' }];
+  private readonly vendorNavItems: SidebarNavItem[] = [{ name: 'Vendors', icon: TREE_ICON, section: 'VENDORS', path: '/vendors' }];
 
   /** R66: the Owner manages the Staff of their own company and reads the audit log of it (core A7). */
   private readonly ownerNavItems: SidebarNavItem[] = [
-    { name: 'Staff', icon: MEMBERS_ICON, section: 'MANAGEMENT', path: '/staff' },
+    { name: 'Staff', icon: MEMBERS_ICON, section: 'TEAM', path: '/staff' },
     { name: 'Audit log', icon: SETTINGS_ICON, section: 'LOGS', path: '/audit' },
   ];
 
-  /** School spec R9, R11: the Owner and Staff both see the company's schools (Staff read-only). */
-  private readonly schoolNavItems: SidebarNavItem[] = [{ name: 'Schools', icon: TREE_ICON, section: 'MANAGEMENT', path: '/schools' }];
+  /** School spec R9, R11: the Owner and Staff both see the company's schools (Staff read-only). Schools and vendors each have their own menu group (their ledgers join them later). */
+  private readonly schoolNavItems: SidebarNavItem[] = [{ name: 'Schools', icon: TREE_ICON, section: 'SCHOOLS', path: '/schools' }];
 
   readonly navItems: SidebarNavItem[] = [
     ...(FEATURES.iam ? this.iamNavItems : []),
