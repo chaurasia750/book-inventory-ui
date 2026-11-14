@@ -186,7 +186,7 @@ npm run deploy
 
 # 2. Copy dist/deploy/ contents to your IIS site root
 npm run deploy:copy                                    # default: D:\inetpub\bookinventory
-npm run deploy:copy "C:\Inetpub\vhosts\bookinventory.in\httpdocs"  # custom path
+npm run deploy:copy "C:\Inetpub\vhosts\example.com\httpdocs"  # custom path
 ```
 
 The merged `dist/deploy/` structure:
@@ -235,7 +235,7 @@ This is more work and isn't wired up out of the box — prefer the single-domain
 **Using the deploy script:**
 
 ```bash
-npm run deploy:copy "C:\Inetpub\vhosts\bookinventory.in\httpdocs"
+npm run deploy:copy "C:\Inetpub\vhosts\example.com\httpdocs"
 ```
 
 This rebuilds everything and copies fresh files to the IIS site root in one step.
