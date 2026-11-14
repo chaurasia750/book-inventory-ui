@@ -1,17 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AuthService } from '@org/auth';
-import { APP_NAME, FEATURES } from '@org/constants';
+import { APP_NAME } from '@org/constants';
 import { SidebarService } from '../services/sidebar.service';
 import { UserDropdownComponent } from '../user-dropdown/user-dropdown';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle';
-import { NotificationDropdownComponent } from '../notification-dropdown/notification-dropdown.component';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, UserDropdownComponent, ThemeToggleComponent, NotificationDropdownComponent],
+  imports: [CommonModule, RouterModule, UserDropdownComponent, ThemeToggleComponent],
   templateUrl: './app-header.html',
   styleUrl: './app-header.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +20,6 @@ export class AppHeaderComponent {
   readonly sidebarService = inject(SidebarService);
 
   readonly appName = APP_NAME;
-  readonly features = FEATURES;
 
   readonly isMobileOpen$ = this.sidebarService.isMobileOpen$;
 

@@ -10,7 +10,7 @@ An Nx monorepo containing three Angular 21 applications (standalone components, 
 
 | App           | Purpose                                                              | Auth                        |
 | ------------- | --------------------------------------------------------------------- | ---------------------------- |
-| `public-site` | Public marketing website (home, about, pricing, blog, careers, etc.) — **also hosts the single login page** for all apps | None (login page itself is public) |
+| `public-site` | Hosts the **single login page** (and forgot/reset password) for all apps; the old marketing pages were removed | None (login page itself is public) |
 | `admin`       | Admin portal — users, login log, audit log, account pages (Book Inventory screens arrive per module) | JWT, role `admin`             |
 | `member`      | Member portal — welcome page and own account pages (profile, sessions, login history, change password) | JWT, roles `member` / `admin` |
 

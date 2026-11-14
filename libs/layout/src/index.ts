@@ -1,6 +1,3 @@
-export * from './lib/public-header/public-header';
-export * from './lib/public-footer/public-footer';
-export * from './lib/public-layout/public-layout';
 export * from './lib/app-sidebar/app-sidebar';
 export * from './lib/app-header/app-header';
 export * from './lib/app-layout/app-layout';
@@ -9,7 +6,6 @@ export * from './lib/auth-layout/auth-layout';
 export * from './lib/services/sidebar.service';
 export * from './lib/backdrop/backdrop';
 export * from './lib/theme-toggle/theme-toggle';
-export * from './lib/notification-dropdown/notification-dropdown.component';
 export * from './lib/user-dropdown/user-dropdown';
 export * from './lib/pipes/safe-html.pipe';
 export * from './lib/menu-icons';

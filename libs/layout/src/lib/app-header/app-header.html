@@ -30,9 +30,6 @@
 
     <div class="flex items-center gap-1 sm:gap-1.5">
       <app-theme-toggle />
-      @if (features.notifications) {
-        <app-notification-dropdown />
-      }
       <app-user-dropdown
         [userName]="userName"
         [userRole]="userRole"

@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { AuthLayoutComponent, PublicLayoutComponent } from '@org/layout';
+import { AuthLayoutComponent } from '@org/layout';
 import { AUTH_ROUTES, PUBLIC_ROUTES } from '@org/constants';
 import { stripAppRoutePrefix as stripAuthPrefix } from '@org/shared-utils';
 
@@ -38,75 +38,7 @@ export const appRoutes: Route[] = [
       },
     ],
   },
-  {
-    path: PUBLIC_ROUTES.HOME,
-    component: PublicLayoutComponent,
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./pages/home/home').then((m) => m.HomeComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.ABOUT,
-        loadComponent: () =>
-          import('./pages/about-us/about-us').then((m) => m.AboutUsComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.CONTACT,
-        loadComponent: () =>
-          import('./pages/contact-us/contact-us').then((m) => m.ContactUsComponent),
-      },
-      
-      {
-        path: PUBLIC_ROUTES.SERVICES,
-        loadComponent: () =>
-          import('./pages/services/services').then((m) => m.ServicesComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.FEATURES,
-        loadComponent: () =>
-          import('./pages/features/features').then((m) => m.FeaturesComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.PRICING,
-        loadComponent: () =>
-          import('./pages/pricing/pricing').then((m) => m.PricingComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.FAQ,
-        loadComponent: () => import('./pages/faq/faq').then((m) => m.FaqComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.PRIVACY,
-        loadComponent: () =>
-          import('./pages/privacy-policy/privacy-policy').then(
-            (m) => m.PrivacyPolicyComponent,
-          ),
-      },
-      {
-        path: PUBLIC_ROUTES.TERMS,
-        loadComponent: () =>
-          import('./pages/terms-conditions/terms-conditions').then(
-            (m) => m.TermsConditionsComponent,
-          ),
-      },
-      {
-        path: PUBLIC_ROUTES.BLOG,
-        loadComponent: () =>
-          import('./pages/blog-listing/blog-listing').then((m) => m.BlogListingComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.BLOG_DETAIL,
-        loadComponent: () =>
-          import('./pages/blog-details/blog-details').then((m) => m.BlogDetailsComponent),
-      },
-      {
-        path: PUBLIC_ROUTES.CAREERS,
-        loadComponent: () =>
-          import('./pages/careers/careers').then((m) => m.CareersComponent),
-      },
-    ],
-  },
+  { path: PUBLIC_ROUTES.HOME, pathMatch: 'full', redirectTo: 'login' },
   {
     path: 'error/unauthorized',
     loadComponent: () =>
