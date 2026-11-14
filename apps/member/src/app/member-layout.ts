@@ -45,8 +45,12 @@ export class MemberLayoutComponent {
     { name: 'Audit log', icon: DASHBOARD_ICON, section: 'MAIN', path: '/audit' },
   ];
 
+  /** School spec R9, R11: the Owner and Staff both see the company's schools (Staff read-only). */
+  private readonly schoolNavItems: SidebarNavItem[] = [{ name: 'Schools', icon: MEMBERS_ICON, section: 'MAIN', path: '/schools' }];
+
   readonly navItems: SidebarNavItem[] = [
     ...(FEATURES.iam ? this.iamNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.schoolNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];
 

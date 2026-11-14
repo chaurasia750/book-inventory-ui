@@ -155,6 +155,23 @@
       "already_active": "The company is already active.",
       "already_inactive": "The company is already inactive.",
       "not_active": "The company is not active."
+    },
+    "school": {
+      "not_found": "The school could not be found.",
+      "code_taken": "The school code is already in use. Please try again.",
+      "duplicate_class": "Two classes of this school have the same name.",
+      "invalid_class_name": "A class name must be 1 to 50 characters.",
+      "invalid_email": "The email address is not valid.",
+      "invalid_field": "A school detail is too long.",
+      "invalid_mobile": "The mobile number is not valid.",
+      "invalid_name": "The school name must be 2 to 150 characters.",
+      "invalid_opening_balance": "The opening balance must be 0 or more with at most two decimals.",
+      "invalid_state": "The business runs only in Bihar for now.",
+      "already_active": "The school is already active.",
+      "already_inactive": "The school is already inactive."
+    },
+    "core": {
+      "company_required": "Choose a company first."
     }
   },
   "iam": {
@@ -591,6 +608,90 @@
       "copy": "Copy password",
       "copied": "Copied",
       "done": "Done"
+    }
+  },
+  "school": {
+    "title": "Schools",
+    "subtitle": "The schools your company sells to.",
+    "back": "Back to schools",
+    "empty": "No schools match these filters.",
+    "yes": "Yes",
+    "no": "No",
+    "filters": {
+      "search": "Search name, code, contact or mobile",
+      "allStatuses": "All statuses",
+      "allSaleTypes": "All sale types",
+      "allSessionTypes": "All sessions",
+      "allStates": "All states"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "School",
+      "contact": "Contact",
+      "sale": "Sale type",
+      "session": "Session",
+      "status": "Status"
+    },
+    "fields": {
+      "code": "School code",
+      "name": "School name",
+      "sessionType": "Session",
+      "saleType": "Sale type",
+      "state": "State",
+      "openingBalance": "Opening balance",
+      "contactPerson": "Contact person",
+      "mobile": "Mobile",
+      "email": "Email",
+      "gstin": "GSTIN",
+      "address": "Address",
+      "gstDefault": "GST applies by default"
+    },
+    "sessionType": {
+      "APR_MAR": "April to March",
+      "JAN_DEC": "January to December"
+    },
+    "saleType": {
+      "SCHOOL_ORDER": "School order",
+      "COUNTER_SALE": "Counter sale",
+      "BOTH": "Both"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "add": {
+      "button": "Add school",
+      "title": "Add school",
+      "submit": "Add school"
+    },
+    "edit": {
+      "button": "Edit",
+      "title": "Edit school",
+      "submit": "Save changes"
+    },
+    "deactivate": {
+      "button": "Deactivate",
+      "title": "Deactivate school",
+      "confirm": "An inactive school is hidden from Staff and cannot get new orders. You can activate it again."
+    },
+    "activate": {
+      "button": "Activate",
+      "title": "Activate school",
+      "confirm": "The school will be visible to Staff again."
+    },
+    "classes": {
+      "title": "Classes",
+      "empty": "This school has no classes.",
+      "name": "Class name",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "remove": "Remove class",
+      "add": "Add",
+      "addPlaceholder": "New class name",
+      "save": "Save classes",
+      "discard": "Discard changes",
+      "blank": "A class name cannot be empty.",
+      "duplicate": "Two classes have the same name."
     }
   }
 }
