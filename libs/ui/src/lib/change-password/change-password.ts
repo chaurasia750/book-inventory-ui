@@ -10,7 +10,7 @@ import { finalize } from 'rxjs';
   imports: [FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mx-auto max-w-md p-6">
+    <div class="mx-auto max-w-md">
       <h2 class="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
 
       @if (successMessage()) {

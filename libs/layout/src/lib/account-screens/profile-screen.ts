@@ -19,7 +19,7 @@ import { ToastService } from '@org/ui';
   imports: [ReactiveFormsModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mx-auto w-full max-w-2xl p-6">
+    <div class="mx-auto w-full max-w-2xl">
       <div class="rounded-2xl border border-default bg-surface p-8 shadow-xl">
         <div class="mb-6 flex items-center gap-4">
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-lg font-bold" [class]="avatarClass()">{{ avatarInitials() }}</div>

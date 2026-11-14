@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
 import { SchoolService } from '@org/api-services';
@@ -23,8 +23,9 @@ import { SchoolFormComponent } from './school-form';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SchoolDetailComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   /** The route parameter `:id`. */
-  readonly id = input.required<string>();
+  private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
 
   private readonly schools = inject(SchoolService);
   private readonly router = inject(Router);
@@ -59,7 +60,7 @@ export class SchoolDetailComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.loadError.set('');
-    this.schools.get(this.id()).subscribe({
+    this.schools.get(this.id).subscribe({
       next: (school) => {
         this.loading.set(false);
         this.school.set(school);
@@ -84,7 +85,7 @@ export class SchoolDetailComponent implements OnInit {
   edit(fields: SchoolFields): void {
     this.saving.set(true);
     this.editError.set('');
-    this.schools.edit(this.id(), fields).subscribe({
+    this.schools.edit(this.id, fields).subscribe({
       next: () => {
         this.saving.set(false);
         this.editOpen.set(false);
@@ -158,7 +159,7 @@ export class SchoolDetailComponent implements OnInit {
 
     this.classesSaving.set(true);
     this.classesError.set('');
-    this.schools.replaceClasses(this.id(), names).subscribe({
+    this.schools.replaceClasses(this.id, names).subscribe({
       next: () => {
         this.classesSaving.set(false);
         this.load();
@@ -183,7 +184,7 @@ export class SchoolDetailComponent implements OnInit {
 
     this.statusSaving.set(true);
     this.statusError.set('');
-    const call = school.status === 'ACTIVE' ? this.schools.deactivate(this.id()) : this.schools.activate(this.id());
+    const call = school.status === 'ACTIVE' ? this.schools.deactivate(this.id) : this.schools.activate(this.id);
     call.subscribe({
       next: () => {
         this.statusSaving.set(false);

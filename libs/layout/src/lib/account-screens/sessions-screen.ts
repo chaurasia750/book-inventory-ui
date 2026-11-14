@@ -18,7 +18,7 @@ import { ToastService } from '@org/ui';
   imports: [DatePipe, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mx-auto w-full max-w-4xl p-6">
+    <div class="mx-auto w-full max-w-4xl">
       <div class="rounded-2xl border border-default bg-surface p-8 shadow-xl">
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>

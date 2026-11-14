@@ -88,7 +88,7 @@ const INPUT_CLASS =
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mx-auto max-w-5xl space-y-6 p-6">
+    <div class="space-y-6">
       <a routerLink="/users" class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-brand-600">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
         {{ 'users.back' | translate }}

@@ -21,7 +21,7 @@ const SELECT_CLASS = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 tex
   imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, PaginationComponent, LoginLogTableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mx-auto max-w-7xl space-y-6 p-6">
+    <div class="space-y-6">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 class="text-2xl font-bold text-primary-fg">{{ 'loginLogs.title' | translate }}</h1>

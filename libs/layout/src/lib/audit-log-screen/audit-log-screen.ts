@@ -32,7 +32,7 @@ interface ValueRow {
   imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, PaginationComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mx-auto max-w-7xl space-y-6 p-6">
+    <div class="space-y-6">
       <div>
         <h1 class="text-2xl font-bold text-primary-fg">{{ 'auditLog.title' | translate }}</h1>
         <p class="mt-0.5 text-sm text-gray-500">{{ 'auditLog.subtitle' | translate }}</p>

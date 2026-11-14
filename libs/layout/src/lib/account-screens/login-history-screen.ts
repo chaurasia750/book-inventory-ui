@@ -19,7 +19,7 @@ const PAGE_SIZE = 20;
   imports: [DatePipe, TranslatePipe, PaginationComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mx-auto w-full max-w-6xl p-6">
+    <div class="mx-auto w-full max-w-6xl">
       <div class="rounded-2xl border border-default bg-surface p-8 shadow-xl">
         <h2 class="mb-6 text-2xl font-bold text-primary-fg">{{ 'account.history.title' | translate }}</h2>
         <div class="overflow-x-auto rounded-xl border border-default">

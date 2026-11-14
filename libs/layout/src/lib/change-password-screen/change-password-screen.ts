@@ -18,7 +18,7 @@ import { matchFieldValidator, strongPasswordValidator } from '@org/shared-utils'
   imports: [ReactiveFormsModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mx-auto w-full max-w-lg p-6">
+    <div class="mx-auto w-full max-w-lg">
       <div class="rounded-2xl border border-default bg-surface p-8 shadow-xl">
         <h2 class="mb-2 text-2xl font-bold text-primary-fg">{{ 'changePassword.title' | translate }}</h2>
         @if (auth.mustChangePassword()) {
