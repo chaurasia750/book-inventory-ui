@@ -73,6 +73,9 @@ export interface ReceiptAllocationDetail {
 export interface ReceiptDetail {
   summary: ReceiptSummary;
   remark: string | null;
+  /** Payment R14: why a cancelled receipt was cancelled, and on which business date (`yyyy-MM-dd`). */
+  cancelReason: string | null;
+  cancelledOn: string | null;
   allocatedAmount: number;
   advanceAmount: number;
   modes: ReceiptModeDetail[];

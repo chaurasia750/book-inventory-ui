@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { InvoiceDue, PagedList, ReceiptDetail, ReceiptSearchParams, ReceiptSummary, RecordReceiptRequest, SchoolDues } from '@org/shared-models';
+import { InvoiceDue, PagedList, ReceiptAllocationRequest, ReceiptDetail, ReceiptSearchParams, ReceiptSummary, RecordReceiptRequest, SchoolDues } from '@org/shared-models';
 import { API_BASE_URL } from './api-base-url.token';
 import { ApiService, QueryParams } from './api.service';
 
@@ -42,6 +42,16 @@ export class PaymentService {
   /** R10, R11: the cheque bounced on this date, with a reason (5-500 characters). */
   bounceCheque(receiptId: string, modeId: string, date: string, reason: string): Observable<void> {
     return this.api.post<void>(`/receipts/${receiptId}/cheques/${modeId}/bounce`, { date, reason });
+  }
+
+  /** R13: applies the receipt's advance to open invoices (oldest first when no allocations are given). */
+  adjustAdvance(receiptId: string, allocations?: ReceiptAllocationRequest[]): Observable<void> {
+    return this.api.post<void>(`/receipts/${receiptId}/adjust-advance`, { allocations });
+  }
+
+  /** R14: cancels a recorded receipt with a reason (5-500 characters). */
+  cancelReceipt(receiptId: string, reason: string): Observable<void> {
+    return this.api.post<void>(`/receipts/${receiptId}/cancel`, { reason });
   }
 
   /** R4-R9: records a payment; the same `clientRequestId` returns the receipt already recorded. */
