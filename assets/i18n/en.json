@@ -1382,7 +1382,7 @@
       "gstApplied": "GST applied",
       "remark": "Remark",
       "addItem": "Add item",
-      "scanHint": "Scan a barcode or type a name or code, then Enter",
+      "scanHint": "Type a book name, code or barcode, or scan",
       "noLines": "No lines yet: scan or search an item above.",
       "remove": "Remove",
       "lowStock": "Low stock ({{n}})",
@@ -1448,6 +1448,9 @@
       "search": "Type the school's name or code",
       "empty": "No active school matches.",
       "hint": "The order opens with today's date and the school's session and GST choice."
+    },
+    "entry": {
+      "stock": "Stock"
     },
     "ways": {
       "title": "Add books in the way that suits this order",

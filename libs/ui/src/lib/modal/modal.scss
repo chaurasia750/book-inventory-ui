@@ -31,6 +31,10 @@
   overflow: hidden;
 }
 
+.app-modal--wide {
+  max-width: 60rem;
+}
+
 .app-modal__header {
   display: flex;
   align-items: center;

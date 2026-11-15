@@ -71,31 +71,22 @@
     <div class="grid gap-3 lg:grid-cols-[1fr_300px]">
       <section class="flex flex-col gap-3 rounded-[10px] border border-neutral-200 bg-white p-3 dark:border-charcoal-700 dark:bg-charcoal-800">
         @if (editable()) {
+          <!-- R27: the search sits first and wide; class sets and bulk add are beside it -->
+          <div class="flex flex-wrap items-end gap-2">
+            <div class="min-w-[18rem] flex-1"><app-item-entry (picked)="addItem($event)" /></div>
+            <app-button size="lg" variant="secondary" [loading]="saving()" (clicked)="openSets()">{{ 'sales.classSets.button' | translate }}</app-button>
+            <app-button size="lg" variant="secondary" [loading]="saving()" (clicked)="openBulk()">{{ 'sales.bulk.button' | translate }}</app-button>
+          </div>
           @if (lines().length === 0) {
-            <!-- R27: the three ways to add books, side by side, on an empty order -->
-            <div>
-              <h2 class="mb-2 text-sm font-semibold text-primary-fg">{{ 'sales.ways.title' | translate }}</h2>
-              <div class="grid gap-3 sm:grid-cols-3">
-                <div class="rounded-lg border border-neutral-200 p-3 dark:border-charcoal-700">
-                  <h3 class="m-0 text-sm font-semibold">{{ 'sales.ways.scan' | translate }}</h3>
-                  <p class="mb-2 mt-0.5 text-xs text-gray-500">{{ 'sales.ways.scanHint' | translate }}</p>
-                  <app-item-entry (picked)="addItem($event)" />
-                </div>
-                <button type="button" (click)="openSets()" class="rounded-lg border border-neutral-200 p-3 text-left hover:border-brand-500 hover:bg-neutral-50 dark:border-charcoal-700">
-                  <h3 class="m-0 text-sm font-semibold">{{ 'sales.ways.classSets' | translate }}</h3>
-                  <p class="mt-0.5 text-xs text-gray-500">{{ 'sales.ways.classSetsHint' | translate }}</p>
-                </button>
-                <button type="button" (click)="openBulk()" class="rounded-lg border border-neutral-200 p-3 text-left hover:border-brand-500 hover:bg-neutral-50 dark:border-charcoal-700">
-                  <h3 class="m-0 text-sm font-semibold">{{ 'sales.ways.bulk' | translate }}</h3>
-                  <p class="mt-0.5 text-xs text-gray-500">{{ 'sales.ways.bulkHint' | translate }}</p>
-                </button>
-              </div>
-            </div>
-          } @else {
-            <div class="flex flex-wrap items-end gap-2">
-              <div class="min-w-[14rem] flex-1"><app-item-entry (picked)="addItem($event)" /></div>
-              <app-button size="sm" variant="secondary" [loading]="saving()" (clicked)="openSets()">{{ 'sales.classSets.button' | translate }}</app-button>
-              <app-button size="sm" variant="secondary" [loading]="saving()" (clicked)="openBulk()">{{ 'sales.bulk.button' | translate }}</app-button>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <button type="button" (click)="openSets()" class="rounded-lg border border-neutral-200 p-3 text-left hover:border-brand-500 hover:bg-neutral-50 dark:border-charcoal-700">
+                <h3 class="m-0 text-sm font-semibold">{{ 'sales.ways.classSets' | translate }}</h3>
+                <p class="mt-0.5 text-xs text-gray-500">{{ 'sales.ways.classSetsHint' | translate }}</p>
+              </button>
+              <button type="button" (click)="openBulk()" class="rounded-lg border border-neutral-200 p-3 text-left hover:border-brand-500 hover:bg-neutral-50 dark:border-charcoal-700">
+                <h3 class="m-0 text-sm font-semibold">{{ 'sales.ways.bulk' | translate }}</h3>
+                <p class="mt-0.5 text-xs text-gray-500">{{ 'sales.ways.bulkHint' | translate }}</p>
+              </button>
             </div>
           }
         }
