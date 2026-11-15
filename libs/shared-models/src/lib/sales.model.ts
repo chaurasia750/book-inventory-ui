@@ -83,6 +83,8 @@ export interface SchoolOrderLineView {
   remainingQuantity: number;
   mainStock: number | null;
   isLowStock: boolean;
+  /** Sales R21: the class this line is for, or null for the school's general need. */
+  className: string | null;
 }
 
 export interface InvoiceSummary {
@@ -120,6 +122,10 @@ export interface SchoolOrderLineRequest {
   priceVersionId?: string;
   quantity: number;
   itemDiscount?: Discount;
+  /** R21. */
+  className?: string | null;
+  /** R20: the line of a confirmed order this edits; empty adds a line. */
+  lineId?: string;
 }
 
 export interface SaveSchoolOrderRequest {
@@ -176,6 +182,52 @@ export interface InvoiceLineView {
   quantity: number;
   itemDiscount: Discount;
   amounts: SaleLineAmounts;
+  className: string | null;
+}
+
+/** Sales R26: an invoice is shown as a plain book list (same book merged) or grouped by class. */
+export type InvoiceLayout = 'BOOK_LIST' | 'BY_CLASS';
+
+export interface InvoiceGroupView {
+  className: string | null;
+  lines: InvoiceLineView[];
+  subtotal: number;
+}
+
+export interface InvoiceLayoutResponse {
+  schoolId: string;
+  layout: InvoiceLayout;
+}
+
+/** Sales R22: one class of a class set with its number of students. */
+export interface ClassSetRequest {
+  className: string;
+  students: number;
+}
+
+export interface AddClassSetsRequest {
+  classes: ClassSetRequest[];
+}
+
+/** Sales R23: many items with one quantity and an optional class. */
+export interface AddBulkLinesRequest {
+  itemIds: string[];
+  quantity: number;
+  className?: string | null;
+  itemDiscount?: Discount;
+}
+
+export interface LeftOutLine {
+  itemId: string | null;
+  itemCode: string | null;
+  className: string | null;
+  /** A message code of the errors catalogue. */
+  reason: string;
+}
+
+export interface AddLinesResponse {
+  linesAdded: number;
+  leftOut: LeftOutLine[];
 }
 
 export interface InvoiceDetail {
@@ -192,6 +244,8 @@ export interface InvoiceDetail {
   cancelReason: string | null;
   cancelledOn: string | null;
   lines: InvoiceLineView[];
+  layout: InvoiceLayout;
+  groups: InvoiceGroupView[];
 }
 
 /** School spec R19: the two session cut-offs. */

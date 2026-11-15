@@ -9,18 +9,19 @@
         <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-2">
             <h1 class="m-0 font-mono text-xl font-semibold text-primary-fg">{{ order()?.number || ('sales.editor.newOrder' | translate) }}</h1>
-            <span class="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">{{ 'sales.status.' + (order()?.status || 'DRAFT') | translate }}</span>
+            <span class="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">{{ 'sales.status.' + status() | translate }}</span>
           </div>
           <p class="mt-1 text-xs text-gray-500">{{ schoolName() }}@if (order()?.closeReason) { · {{ order()?.closeReason }} }</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          @if (editable()) {
+          @if (isDraft()) {
             <app-button size="sm" variant="secondary" [loading]="saving()" (clicked)="save()">{{ 'sales.editor.saveDraft' | translate }}</app-button>
             <app-button size="sm" [loading]="saving()" (clicked)="confirm()">{{ 'sales.editor.confirm' | translate }}</app-button>
             <app-button size="sm" variant="secondary" (clicked)="deleteDraft()">{{ 'sales.editor.delete' | translate }}</app-button>
           }
-          @if (order()?.status === 'CONFIRMED') {
-            <app-button size="sm" (clicked)="invoiceOpen.set(true)">{{ 'sales.invoices.make' | translate }}</app-button>
+          @if (status() === 'CONFIRMED') {
+            @if (dirty()) { <app-button size="sm" [loading]="saving()" (clicked)="save()">{{ 'sales.editor2.saveChanges' | translate }}</app-button> }
+            <app-button size="sm" [disabled]="dirty()" (clicked)="invoiceOpen.set(true)">{{ 'sales.invoices.make' | translate }}</app-button>
             @if (isOwner) { <app-button size="sm" variant="secondary" (clicked)="closeOpen.set(true)">{{ 'sales.editor.close' | translate }}</app-button> }
           }
         </div>
@@ -29,11 +30,11 @@
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div>
           <label for="oe-date" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.editor.orderDate' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          @if (editable()) { <app-date-picker inputId="oe-date" [formControl]="orderDate" (valueChange)="dateChanged()" /> } @else { <p class="text-sm">{{ orderDate.value }}</p> }
+          @if (isDraft()) { <app-date-picker inputId="oe-date" [formControl]="orderDate" (valueChange)="dateChanged()" /> } @else { <p class="text-sm">{{ orderDate.value }}</p> }
         </div>
         <div>
           <label for="oe-session" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.editor.session' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          @if (editable()) {
+          @if (isDraft()) {
             <select id="oe-session" [value]="session()" (change)="session.set($any($event.target).value); dirty.set(true)" [class]="field">
               @for (s of sessions(); track s) { <option [value]="s">{{ s }}</option> }
             </select>
@@ -42,7 +43,7 @@
         <div>
           <span class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">GST</span>
           <label class="flex h-10 items-center gap-2 text-sm">
-            <input type="checkbox" [checked]="isGst()" [disabled]="!editable()" (change)="isGst.set($any($event.target).checked); dirty.set(true)" class="h-4 w-4" />
+            <input type="checkbox" [checked]="isGst()" [disabled]="!totalsEditable()" (change)="isGst.set($any($event.target).checked); dirty.set(true)" class="h-4 w-4" />
             {{ 'sales.editor.gstApplied' | translate }}
           </label>
         </div>
@@ -51,39 +52,81 @@
           <input id="oe-remark" [formControl]="remark" [readonly]="!editable()" (input)="dirty.set(true)" [class]="field" />
         </div>
       </div>
+      @if (status() === 'CONFIRMED') { <p class="m-0 text-xs text-gray-500">{{ 'sales.editor2.editConfirmed' | translate }}</p> }
     </section>
 
     @if (error()) {
       <p class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">{{ error() }}</p>
     }
+    @if (notice()) {
+      <p class="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800" role="status">{{ notice() }}</p>
+    }
 
     <div class="grid gap-3 lg:grid-cols-[1fr_300px]">
       <section class="flex flex-col gap-3 rounded-[10px] border border-neutral-200 bg-white p-3 dark:border-charcoal-700 dark:bg-charcoal-800">
-        @if (editable()) { <app-item-entry (picked)="addItem($event)" /> }
+        @if (editable()) {
+          @if (lines().length === 0) {
+            <!-- R27: the three ways to add books, side by side, on an empty order -->
+            <div>
+              <h2 class="mb-2 text-sm font-semibold text-primary-fg">{{ 'sales.ways.title' | translate }}</h2>
+              <div class="grid gap-3 sm:grid-cols-3">
+                <div class="rounded-lg border border-neutral-200 p-3 dark:border-charcoal-700">
+                  <h3 class="m-0 text-sm font-semibold">{{ 'sales.ways.scan' | translate }}</h3>
+                  <p class="mb-2 mt-0.5 text-xs text-gray-500">{{ 'sales.ways.scanHint' | translate }}</p>
+                  <app-item-entry (picked)="addItem($event)" />
+                </div>
+                <button type="button" (click)="openSets()" class="rounded-lg border border-neutral-200 p-3 text-left hover:border-brand-500 hover:bg-neutral-50 dark:border-charcoal-700">
+                  <h3 class="m-0 text-sm font-semibold">{{ 'sales.ways.classSets' | translate }}</h3>
+                  <p class="mt-0.5 text-xs text-gray-500">{{ 'sales.ways.classSetsHint' | translate }}</p>
+                </button>
+                <button type="button" (click)="openBulk()" class="rounded-lg border border-neutral-200 p-3 text-left hover:border-brand-500 hover:bg-neutral-50 dark:border-charcoal-700">
+                  <h3 class="m-0 text-sm font-semibold">{{ 'sales.ways.bulk' | translate }}</h3>
+                  <p class="mt-0.5 text-xs text-gray-500">{{ 'sales.ways.bulkHint' | translate }}</p>
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="flex flex-wrap items-end gap-2">
+              <div class="min-w-[14rem] flex-1"><app-item-entry (picked)="addItem($event)" /></div>
+              <app-button size="sm" variant="secondary" [loading]="saving()" (clicked)="openSets()">{{ 'sales.classSets.button' | translate }}</app-button>
+              <app-button size="sm" variant="secondary" [loading]="saving()" (clicked)="openBulk()">{{ 'sales.bulk.button' | translate }}</app-button>
+            </div>
+          }
+        }
         <div class="overflow-x-auto rounded-lg border border-neutral-200 dark:border-charcoal-700">
-          <table class="w-full min-w-[820px] text-left text-xs">
+          <table class="w-full min-w-[900px] text-left text-xs">
             <thead class="bg-neutral-50 text-[11px] uppercase tracking-[0.05em] text-gray-500 dark:bg-charcoal-900">
               <tr>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
+                <th class="px-3 py-2 font-semibold">{{ 'sales.columns2.className' | translate }}</th>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.version' | translate }}</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }}</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.discount' | translate }}</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
-                @if (!editable()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.remaining' | translate }}</th> }
+                @if (!isDraft()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns2.invoiced' | translate }}</th> }
                 @if (editable()) { <th class="px-3 py-2"><span class="sr-only">{{ 'sales.editor.remove' | translate }}</span></th> }
               </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
-              @for (l of lines(); track l.itemId + l.versionId; let i = $index) {
+              @for (l of lines(); track l.lineId ?? (l.itemId + l.versionId + (l.className ?? '')); let i = $index) {
                 @let s = saved(l);
-                <tr [class.bg-yellow-50]="s?.isLowStock">
+                @let lock = locked(l);
+                <tr [class.bg-yellow-50]="s?.isLowStock" [title]="lock ? ('sales.editor2.locked' | translate) : ''">
                   <td class="px-3 py-2"><span class="font-medium text-primary-fg">{{ l.name }}</span> <span class="font-mono text-gray-500">{{ l.code }}</span>
                     @if (s?.isLowStock) { <span class="ml-1 rounded bg-yellow-100 px-1.5 py-0.5 text-[10px] font-semibold text-yellow-800">{{ 'sales.editor.lowStock' | translate: { n: s?.mainStock ?? 0 } }}</span> }
                   </td>
                   <td class="px-3 py-2">
-                    @if (editable()) {
-                      <select [value]="l.versionId" (change)="setLine(i, { versionId: $any($event.target).value })" class="h-8 rounded border border-gray-300 px-2 text-xs">
+                    @if (editable() && !lock) {
+                      <select [value]="l.className ?? ''" (change)="setLine(i, { className: $any($event.target).value || null })" class="h-8 rounded border border-gray-300 px-1 text-xs" [attr.aria-label]="'sales.columns2.className' | translate">
+                        <option value="">-</option>
+                        @for (c of classes(); track c) { <option [value]="c">{{ c }}</option> }
+                      </select>
+                    } @else { {{ l.className || '-' }} }
+                  </td>
+                  <td class="px-3 py-2">
+                    @if (editable() && !lock) {
+                      <select [value]="l.versionId" (change)="setLine(i, { versionId: $any($event.target).value })" class="h-8 rounded border border-gray-300 px-2 text-xs" [attr.aria-label]="'sales.columns.version' | translate">
                         @for (v of l.versions; track v.id) { <option [value]="v.id">{{ v.versionName }}</option> }
                       </select>
                     } @else { {{ s?.price?.versionName }} }
@@ -91,11 +134,11 @@
                   <td class="px-3 py-2 text-right font-mono">{{ s ? (s.price.rate | number: '1.2-2') : '' }}</td>
                   <td class="px-3 py-2 text-right">
                     @if (editable()) {
-                      <input type="number" min="1" step="1" [value]="l.quantity" (change)="setLine(i, { quantity: +$any($event.target).value })" class="h-8 w-20 rounded border border-gray-300 px-2 text-right text-xs" [attr.aria-label]="'sales.columns.qty' | translate" />
+                      <input type="number" [min]="l.invoiced || 1" step="1" [value]="l.quantity" (change)="setLine(i, { quantity: +$any($event.target).value })" class="h-8 w-20 rounded border border-gray-300 px-2 text-right text-xs" [attr.aria-label]="'sales.columns.qty' | translate" />
                     } @else { {{ l.quantity }} }
                   </td>
                   <td class="px-3 py-2">
-                    @if (editable()) {
+                    @if (editable() && !lock) {
                       <div class="flex gap-1">
                         <select [value]="l.discKind" (change)="setLine(i, { discKind: $any($event.target).value })" class="h-8 rounded border border-gray-300 px-1 text-xs" [attr.aria-label]="'sales.columns.discount' | translate">
                           @for (k of discountKinds; track k) { <option [value]="k">{{ 'sales.discount.' + k | translate }}</option> }
@@ -107,11 +150,16 @@
                     } @else { {{ l.discKind === 'NONE' ? '-' : (l.discValue | number: '1.2-2') + (l.discKind === 'PERCENT' ? ' %' : '') }} }
                   </td>
                   <td class="px-3 py-2 text-right font-mono">{{ s ? (s.amounts.lineAmount | number: '1.2-2') : '' }}</td>
-                  @if (!editable()) { <td class="px-3 py-2 text-right">{{ s?.remainingQuantity }}</td> }
-                  @if (editable()) { <td class="px-3 py-2 text-right"><button type="button" (click)="removeLine(i)" class="text-red-600 hover:underline">&times;</button></td> }
+                  @if (!isDraft()) { <td class="px-3 py-2 text-right">{{ l.invoiced }} / {{ l.quantity }}</td> }
+                  @if (editable()) {
+                    <td class="px-3 py-2 text-right">
+                      @if (!lock) { <button type="button" (click)="removeLine(i)" class="text-red-600 hover:underline" [attr.aria-label]="'sales.editor.remove' | translate">&times;</button> }
+                      @else { <span class="text-gray-300" aria-hidden="true">&#128274;</span> }
+                    </td>
+                  }
                 </tr>
               } @empty {
-                <tr><td colspan="8" class="py-6 text-center text-sm text-gray-400">{{ 'sales.editor.noLines' | translate }}</td></tr>
+                <tr><td colspan="9" class="py-6 text-center text-sm text-gray-400">{{ 'sales.editor.noLines' | translate }}</td></tr>
               }
             </tbody>
           </table>
@@ -123,13 +171,14 @@
         <div>
           <span class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.totals.totalDiscount' | translate }}</span>
           <div class="flex gap-2">
-            <select [value]="totalKind()" [disabled]="!editable()" (change)="totalKind.set($any($event.target).value); dirty.set(true)" class="h-10 rounded-lg border border-gray-300 px-2 text-sm" [attr.aria-label]="'sales.totals.totalDiscount' | translate">
+            <select [value]="totalKind()" [disabled]="!totalsEditable()" (change)="totalKind.set($any($event.target).value); dirty.set(true)" class="h-10 rounded-lg border border-gray-300 px-2 text-sm" [attr.aria-label]="'sales.totals.totalDiscount' | translate">
               @for (k of discountKinds; track k) { <option [value]="k">{{ 'sales.discount.' + k | translate }}</option> }
             </select>
             @if (totalKind() !== 'NONE') {
-              <input type="number" min="0" step="0.01" [value]="totalValue()" [readonly]="!editable()" (change)="totalValue.set(+$any($event.target).value); dirty.set(true)" class="h-10 w-28 rounded-lg border border-gray-300 px-2 text-right text-sm" [attr.aria-label]="'sales.totals.totalDiscount' | translate" />
+              <input type="number" min="0" step="0.01" [value]="totalValue()" [readonly]="!totalsEditable()" (change)="totalValue.set(+$any($event.target).value); dirty.set(true)" class="h-10 w-28 rounded-lg border border-gray-300 px-2 text-right text-sm" [attr.aria-label]="'sales.totals.totalDiscount' | translate" />
             }
           </div>
+          @if (editable() && anyInvoiced()) { <p class="mt-1 text-xs text-gray-500">{{ 'sales.editor2.totalsLocked' | translate }}</p> }
         </div>
         @if (dirty()) {
           <p class="text-xs text-gray-500">{{ 'sales.editor.saveToSeeTotals' | translate }}</p>
@@ -153,7 +202,9 @@
       @if (o.status === 'CONFIRMED') {
         <app-make-invoice [open]="invoiceOpen()" [order]="o" (closed)="invoiceOpen.set(false)" (made)="invoiceMade($event)" />
       }
+      <app-class-set-dialog [open]="setsOpen()" [orderId]="o.id" [schoolId]="o.school.id" [session]="o.session" (closed)="setsOpen.set(false)" (added)="linesAdded($event)" />
     }
+    <app-bulk-item-picker [open]="bulkOpen()" [classes]="classes()" (closed)="bulkOpen.set(false)" (picked)="bulkPicked($event)" />
     <app-modal [open]="closeOpen()" [title]="'sales.editor.closeTitle' | translate" (closed)="closeOpen.set(false)">
       <div class="space-y-3">
         <label for="oe-close" class="block text-sm font-semibold">{{ 'sales.editor.reason' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
