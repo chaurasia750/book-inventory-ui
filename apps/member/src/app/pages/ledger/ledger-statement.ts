@@ -1,13 +1,13 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal, untracked } from '@angular/core';
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LedgerService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { LedgerStatement, LedgerStatementParams } from '@org/shared-models';
-import { ButtonComponent, CardComponent, DatePickerComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent, SkeletonLoaderComponent } from '@org/ui';
 
-const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
+const FIELD = 'h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 
 type FilterKind = 'ALL' | 'YEAR' | 'SESSION' | 'DATES';
 
@@ -20,7 +20,7 @@ type FilterKind = 'ALL' | 'YEAR' | 'SESSION' | 'DATES';
 @Component({
   selector: 'app-ledger-statement',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, SkeletonLoaderComponent, DatePickerComponent],
+  imports: [DatePipe, DecimalPipe, NgClass, ReactiveFormsModule, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, DatePickerComponent],
   templateUrl: './ledger-statement.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,6 +33,9 @@ export class LedgerStatementComponent {
   private readonly translate = inject(TranslateService);
 
   readonly field = FIELD;
+
+  /** The filter chips; the session filter is the schools' only (R9). */
+  readonly kinds = computed<FilterKind[]>(() => (this.party() === 'schools' ? ['ALL', 'YEAR', 'SESSION', 'DATES'] : ['ALL', 'YEAR', 'DATES']));
 
   readonly filters = new FormGroup({
     kind: new FormControl<FilterKind>('ALL', { nonNullable: true }),
@@ -55,6 +58,18 @@ export class LedgerStatementComponent {
         this.load();
       });
     });
+  }
+
+  kindKey(kind: FilterKind): string {
+    return { ALL: 'all', YEAR: 'year', SESSION: 'session', DATES: 'dates' }[kind];
+  }
+
+  /** "All entries" loads at once; the other chips show their inputs first. */
+  choose(kind: FilterKind): void {
+    this.filters.controls.kind.setValue(kind);
+    if (kind === 'ALL') {
+      this.load();
+    }
   }
 
   load(): void {

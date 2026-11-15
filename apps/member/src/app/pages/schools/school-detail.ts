@@ -8,7 +8,7 @@ import { SchoolDetail } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
-import { PartyBalanceComponent } from '../ledger/party-balance';
+import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 
 /**
  * One school's profile (school spec R6-R8, R10, R12; finance section 6): tabs Profile, Classes and, for the Owner, Ledger, and
@@ -29,7 +29,7 @@ import { PartyBalanceComponent } from '../ledger/party-balance';
     ModalComponent,
     SkeletonLoaderComponent,
     LedgerStatementComponent,
-    PartyBalanceComponent,
+    PartyLedgerSummaryComponent,
   ],
   templateUrl: './school-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,6 +51,8 @@ export class SchoolDetailComponent {
 
   /** Finance section 6: the profile tabs; the later school documents become further tabs. */
   readonly tab = signal<'profile' | 'classes' | 'ledger'>('profile');
+  /** The tabs this account sees: the ledger is the Owner's only (finance R13). */
+  readonly tabs: readonly ('profile' | 'classes' | 'ledger')[] = this.canEdit ? ['profile', 'classes', 'ledger'] : ['profile', 'classes'];
 
   readonly school = signal<SchoolDetail | null>(null);
   readonly loading = signal(true);

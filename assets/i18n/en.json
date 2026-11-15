@@ -1208,8 +1208,14 @@
     "withBalanceOnly": "With a balance only",
     "balanceColumn": "Balance",
     "balance": {
-      "school": "Owes",
+      "school": "Balance due",
       "vendor": "To pay"
+    },
+    "tiles": {
+      "opening": "Opening balance",
+      "debit": "Total debit",
+      "credit": "Total credit",
+      "advance": "Advance (paid ahead)"
     }
   }
 }

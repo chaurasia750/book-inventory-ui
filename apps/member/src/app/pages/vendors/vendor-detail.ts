@@ -7,7 +7,7 @@ import { VendorDetail } from '@org/shared-models';
 import { vendorStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
-import { PartyBalanceComponent } from '../ledger/party-balance';
+import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 
 /**
  * One vendor's profile (vendor spec R2-R7; finance section 6): tabs Profile and Ledger and the balance in the header. The master data with the generated code read-only, the bank details in full (the Owner's
@@ -27,7 +27,7 @@ import { PartyBalanceComponent } from '../ledger/party-balance';
     ModalComponent,
     SkeletonLoaderComponent,
     LedgerStatementComponent,
-    PartyBalanceComponent,
+    PartyLedgerSummaryComponent,
   ],
   templateUrl: './vendor-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,6 +47,7 @@ export class VendorDetailComponent {
 
   /** Finance section 6: the profile tabs; the later vendor documents become further tabs. */
   readonly tab = signal<'profile' | 'ledger'>('profile');
+  readonly tabs: readonly ('profile' | 'ledger')[] = ['profile', 'ledger'];
 
   readonly vendor = signal<VendorDetail | null>(null);
   readonly loading = signal(true);
