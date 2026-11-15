@@ -5,7 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ReceiptDetail } from '@org/shared-models';
-import { ButtonComponent, ModalComponent } from '@org/ui';
+import { ButtonComponent, SidePanelComponent } from '@org/ui';
 import { AdjustAdvancePanelComponent } from './adjust-advance-panel';
 import { CancelReceiptPanelComponent } from './cancel-receipt-panel';
 import { ReceiptProofsComponent } from './receipt-proofs';
@@ -23,10 +23,10 @@ function todayIso(): string {
 @Component({
   selector: 'app-receipt-detail-dialog',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent, ReceiptProofsComponent],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, SidePanelComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent, ReceiptProofsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <app-modal size="wide" [open]="receiptId() !== null" [title]="'payment.detail.title' | translate" (closed)="closed.emit()">
+    <app-side-panel [isOpen]="receiptId() !== null" panelWidth="min(760px, 100vw)" [title]="'payment.detail.title' | translate" (closed)="closed.emit()">
       @if (loading()) {
         <p class="m-0 py-6 text-center text-sm text-gray-500">{{ 'payment.receive.loading' | translate }}</p>
       } @else if (error()) {
@@ -132,7 +132,7 @@ function todayIso(): string {
           }
         </div>
       }
-    </app-modal>
+    </app-side-panel>
   `,
 })
 export class ReceiptDetailDialogComponent {

@@ -18,7 +18,7 @@ import { CommonModule } from '@angular/common';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const CALENDAR_WIDTH = 288;
-const CALENDAR_HEIGHT = 340;
+const CALENDAR_HEIGHT = 300;
 const GAP = 4;
 
 @Component({
@@ -283,11 +283,13 @@ export class DatePickerComponent implements ControlValueAccessor, OnDestroy {
     window.removeEventListener('resize', this.replace);
   }
 
-  /** Below the field, or above it when the room below is smaller than the calendar; kept inside the window sideways. */
+  /** Below the field when the calendar fits there, else above it; when it fits neither, kept fully inside the window (over the field). Sideways it is kept inside the window too. */
   private place(): void {
     const rect = this.host.nativeElement.getBoundingClientRect();
-    const below = window.innerHeight - rect.bottom;
-    this.popupTop.set(below >= CALENDAR_HEIGHT + GAP ? rect.bottom + GAP : Math.max(GAP, rect.top - CALENDAR_HEIGHT - GAP));
+    const below = rect.bottom + GAP;
+    const above = rect.top - CALENDAR_HEIGHT - GAP;
+    const top = below + CALENDAR_HEIGHT <= window.innerHeight ? below : above >= GAP ? above : window.innerHeight - CALENDAR_HEIGHT - GAP;
+    this.popupTop.set(Math.max(GAP, top));
     this.popupLeft.set(Math.max(GAP, Math.min(rect.left, window.innerWidth - CALENDAR_WIDTH - GAP)));
     this.cdr.markForCheck();
   }
