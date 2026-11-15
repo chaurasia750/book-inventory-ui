@@ -771,7 +771,8 @@
       "email": "Email",
       "gstin": "GSTIN",
       "address": "Address",
-      "gstDefault": "GST applies by default"
+      "gstDefault": "GST applies by default",
+      "paymentType": "Payment"
     },
     "sessionType": {
       "APR_MAR": "April to March",
@@ -829,6 +830,10 @@
       "orders": "Orders",
       "invoices": "Invoices",
       "bookLists": "Book lists"
+    },
+    "paymentType": {
+      "CASH": "Cash",
+      "CREDIT": "Credit"
     }
   },
   "vendor": {
@@ -1329,7 +1334,8 @@
       "lowStock": "Low stock ({{n}})",
       "unsaved": "Unsaved changes: save the draft to see the amounts.",
       "saveToSeeTotals": "Save the draft to see the totals.",
-      "back": "Back"
+      "back": "Back",
+      "paymentType": "Payment"
     },
     "totals": {
       "subtotal": "Subtotal",
@@ -1443,6 +1449,20 @@
       "totalsLocked": "The total discount and GST are fixed once something is invoiced.",
       "saveChanges": "Save changes",
       "editConfirmed": "A confirmed order can still change above what is invoiced."
+    },
+    "invoice": {
+      "title": {
+        "TAX_INVOICE": "TAX INVOICE",
+        "CASH_MEMO": "CASH MEMO",
+        "CREDIT_MEMO": "CREDIT MEMO"
+      },
+      "gstExempted": "GST Exempted",
+      "gstSummary": "GST summary",
+      "gstRate": "GST rate",
+      "totalGst": "Total GST",
+      "amountInWords": "Amount in words",
+      "downloadPdf": "Download PDF",
+      "print": "Print"
     }
   },
   "planning": {

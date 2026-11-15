@@ -6,6 +6,10 @@ export type SessionType = (typeof SESSION_TYPES)[number];
 export const SALE_TYPES = ['SCHOOL_ORDER', 'COUNTER_SALE', 'BOTH'] as const;
 export type SaleType = (typeof SALE_TYPES)[number];
 
+/** How a school pays (school spec R20): the default of its orders (sales R34). */
+export const PAYMENT_TYPES = ['CASH', 'CREDIT'] as const;
+export type PaymentType = (typeof PAYMENT_TYPES)[number];
+
 export const SCHOOL_STATUSES = ['ACTIVE', 'INACTIVE'] as const;
 export type SchoolStatus = (typeof SCHOOL_STATUSES)[number];
 
@@ -45,6 +49,7 @@ export interface SchoolDetail {
   state: string;
   sessionType: SessionType;
   saleType: SaleType;
+  paymentType: PaymentType;
   isGstDefault: boolean;
   openingBalanceAmount: number;
   status: SchoolStatus;
@@ -69,6 +74,7 @@ export interface SchoolFields {
   name: string;
   sessionType: SessionType;
   saleType: SaleType;
+  paymentType: PaymentType;
   isGstDefault: boolean;
   openingBalanceAmount: number;
   state?: string;

@@ -33,6 +33,11 @@ export class ApiService {
     return this.http.get<T>(this.resolve(url), { params: toHttpParams(params) });
   }
 
+  /** A binary answer (a PDF): the file as a Blob. */
+  getBlob(url: string, params?: QueryParams): Observable<Blob> {
+    return this.http.get(this.resolve(url), { params: toHttpParams(params), responseType: 'blob' });
+  }
+
   post<T>(url: string, body: unknown, options?: { withCredentials?: boolean }): Observable<T> {
     return this.http.post<T>(this.resolve(url), body, options);
   }

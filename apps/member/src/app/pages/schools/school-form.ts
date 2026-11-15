@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { SALE_TYPES, SCHOOL_STATES, SESSION_TYPES, SaleType, SchoolDetail, SchoolFields, SessionType } from '@org/shared-models';
+import { PAYMENT_TYPES, PaymentType, SALE_TYPES, SCHOOL_STATES, SESSION_TYPES, SaleType, SchoolDetail, SchoolFields, SessionType } from '@org/shared-models';
 import { ButtonComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -37,6 +37,12 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
           <label for="sf-sale" class="mb-1 block text-sm font-semibold">{{ 'school.fields.saleType' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           <select id="sf-sale" formControlName="saleType" class="${FIELD}">
             @for (t of saleTypes; track t) { <option [value]="t">{{ 'school.saleType.' + t | translate }}</option> }
+          </select>
+        </div>
+        <div>
+          <label for="sf-payment" class="mb-1 block text-sm font-semibold">{{ 'school.fields.paymentType' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
+          <select id="sf-payment" formControlName="paymentType" class="${FIELD}">
+            @for (t of paymentTypes; track t) { <option [value]="t">{{ 'school.paymentType.' + t | translate }}</option> }
           </select>
         </div>
         <div>
@@ -93,12 +99,14 @@ export class SchoolFormComponent {
 
   readonly sessionTypes = SESSION_TYPES;
   readonly saleTypes = SALE_TYPES;
+  readonly paymentTypes = PAYMENT_TYPES;
   readonly states = SCHOOL_STATES;
 
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2), Validators.maxLength(150)] }),
     sessionType: new FormControl<SessionType>('APR_MAR', { nonNullable: true }),
     saleType: new FormControl<SaleType>('BOTH', { nonNullable: true }),
+    paymentType: new FormControl<PaymentType>('CREDIT', { nonNullable: true }),
     state: new FormControl(SCHOOL_STATES[0], { nonNullable: true }),
     openingBalanceAmount: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
     isGstDefault: new FormControl(false, { nonNullable: true }),
@@ -118,6 +126,7 @@ export class SchoolFormComponent {
               name: s.name,
               sessionType: s.sessionType,
               saleType: s.saleType,
+              paymentType: s.paymentType,
               state: s.state,
               openingBalanceAmount: s.openingBalanceAmount,
               isGstDefault: s.isGstDefault,
@@ -127,7 +136,7 @@ export class SchoolFormComponent {
               gstin: s.gstin ?? '',
               address: s.address ?? '',
             }
-          : { name: '', sessionType: 'APR_MAR', saleType: 'BOTH', state: SCHOOL_STATES[0], openingBalanceAmount: 0, isGstDefault: false },
+          : { name: '', sessionType: 'APR_MAR', saleType: 'BOTH', paymentType: 'CREDIT', state: SCHOOL_STATES[0], openingBalanceAmount: 0, isGstDefault: false },
       );
     });
   }
@@ -143,6 +152,7 @@ export class SchoolFormComponent {
       name: v.name.trim(),
       sessionType: v.sessionType,
       saleType: v.saleType,
+      paymentType: v.paymentType,
       state: v.state,
       openingBalanceAmount: Math.round(v.openingBalanceAmount * 100) / 100,
       isGstDefault: v.isGstDefault,

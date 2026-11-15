@@ -6,7 +6,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
 import { SalesService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
-import { InvoiceDetail, InvoiceLayout } from '@org/shared-models';
+import { InvoiceDetail, InvoiceGroupView, InvoiceLayout } from '@org/shared-models';
 import { ButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { SaleTotalsComponent } from './sale-totals';
 
@@ -31,6 +31,7 @@ import { SaleTotalsComponent } from './sale-totals';
                 <h1 class="m-0 font-mono text-xl font-semibold text-primary-fg" [class.line-through]="inv.summary.status === 'CANCELLED'">{{ inv.summary.number }}</h1>
                 <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold" [class]="inv.summary.status === 'CANCELLED' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'">{{ 'sales.status.' + inv.summary.status | translate }}</span>
               </div>
+              <p class="mb-0 mt-1 text-xs font-semibold tracking-[0.1em] text-gray-600">{{ titleKey(inv) | translate }}@if (!inv.isGstApplied) { · {{ 'sales.invoice.gstExempted' | translate }} } · {{ 'school.paymentType.' + inv.paymentType | translate }}</p>
               <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
                 <span>{{ inv.summary.invoiceDate | date: 'dd MMM yyyy' }}</span>
                 <span>FY {{ inv.financialYear }}</span>
@@ -46,6 +47,8 @@ import { SaleTotalsComponent } from './sale-totals';
                   <button type="button" (click)="switchTo(l)" class="rounded-md px-2.5 py-1 font-semibold" [ngClass]="inv.layout === l ? 'bg-primary-fg text-white' : 'text-gray-600 hover:text-primary-fg'">{{ 'sales.layout.' + l | translate }}</button>
                 }
               </div>
+              <app-button size="sm" variant="secondary" [loading]="busy()" (clicked)="print(inv)">{{ 'sales.invoice.print' | translate }}</app-button>
+              <app-button size="sm" [loading]="busy()" (clicked)="download(inv)">{{ 'sales.invoice.downloadPdf' | translate }}</app-button>
               @if (isOwner && inv.summary.status === 'ISSUED') {
                 <app-button size="sm" variant="secondary" (clicked)="cancelOpen.set(true)">{{ 'sales.invoices.cancel' | translate }}</app-button>
               }
@@ -72,15 +75,14 @@ import { SaleTotalsComponent } from './sale-totals';
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }}</th>
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }}</th>
-                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.totals.taxable' | translate }}</th>
-                  @if (inv.isGstApplied) { <th class="px-3 py-2 text-right font-semibold">GST %</th><th class="px-3 py-2 text-right font-semibold">GST</th> }
+                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
                 @for (g of inv.groups; track g.className ?? '') {
                   @if (inv.layout === 'BY_CLASS') {
                     <tr class="bg-neutral-50/60 dark:bg-charcoal-900/40">
-                      <td [attr.colspan]="inv.isGstApplied ? 9 : 7" class="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] text-primary-fg">{{ g.className ?? ('sales.layout.general' | translate) }}</td>
+                      <td colspan="7" class="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] text-primary-fg">{{ g.className ?? ('sales.layout.general' | translate) }}</td>
                     </tr>
                   }
                   @for (l of g.lines; track l.id) {
@@ -90,18 +92,14 @@ import { SaleTotalsComponent } from './sale-totals';
                       <td class="px-3 py-2 text-right font-mono">{{ l.price.mrp | number: '1.2-2' }}</td>
                       <td class="px-3 py-2 text-right font-mono">{{ l.price.rate | number: '1.2-2' }}</td>
                       <td class="px-3 py-2 text-right">{{ l.quantity }}</td>
-                      <td class="px-3 py-2 text-right font-mono">{{ (l.amounts.itemDiscount + l.amounts.totalDiscountShare) | number: '1.2-2' }}</td>
-                      <td class="px-3 py-2 text-right font-mono">{{ l.amounts.taxable | number: '1.2-2' }}</td>
-                      @if (inv.isGstApplied) {
-                        <td class="px-3 py-2 text-right">{{ l.item.gstRatePercent }}</td>
-                        <td class="px-3 py-2 text-right font-mono">{{ (l.amounts.cgst + l.amounts.sgst + l.amounts.igst) | number: '1.2-2' }}</td>
-                      }
+                      <td class="px-3 py-2 text-right font-mono">{{ l.amounts.itemDiscount | number: '1.2-2' }}</td>
+                      <td class="px-3 py-2 text-right font-mono">{{ l.amounts.lineAmount | number: '1.2-2' }}</td>
                     </tr>
                   }
                   @if (inv.layout === 'BY_CLASS') {
                     <tr>
-                      <td [attr.colspan]="inv.isGstApplied ? 8 : 6" class="px-3 py-1.5 text-right text-[11px] font-semibold text-gray-500">{{ 'sales.layout.subtotal' | translate }}</td>
-                      <td class="px-3 py-1.5 text-right font-mono font-semibold">{{ g.subtotal | number: '1.2-2' }}</td>
+                      <td colspan="6" class="px-3 py-1.5 text-right text-[11px] font-semibold text-gray-500">{{ 'sales.layout.subtotal' | translate }}</td>
+                      <td class="px-3 py-1.5 text-right font-mono font-semibold">{{ groupAmount(g) | number: '1.2-2' }}</td>
                     </tr>
                   }
                 }
@@ -112,6 +110,46 @@ import { SaleTotalsComponent } from './sale-totals';
             <app-sale-totals [totals]="inv.totals" [gstMode]="inv.gstMode" />
           </aside>
         </div>
+
+        @if (inv.gstSummary.length) {
+          <section class="overflow-x-auto rounded-[10px] border border-neutral-200 bg-white dark:border-charcoal-700 dark:bg-charcoal-800" [attr.aria-label]="'sales.invoice.gstSummary' | translate">
+            <table class="w-full min-w-[520px] text-left text-xs">
+              <thead class="bg-neutral-50 text-[11px] uppercase tracking-[0.05em] text-gray-500 dark:bg-charcoal-900">
+                <tr>
+                  <th class="px-3 py-2 font-semibold">HSN</th>
+                  <th class="px-3 py-2 font-semibold">{{ 'sales.invoice.gstRate' | translate }}</th>
+                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.totals.taxable' | translate }}</th>
+                  @if (inv.gstMode === 'SAME_STATE') {
+                    <th class="px-3 py-2 text-right font-semibold">CGST</th><th class="px-3 py-2 text-right font-semibold">SGST</th>
+                  } @else {
+                    <th class="px-3 py-2 text-right font-semibold">IGST</th>
+                  }
+                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.invoice.totalGst' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
+                @for (r of inv.gstSummary; track r.hsnCode + '|' + r.ratePercent) {
+                  <tr>
+                    <td class="px-3 py-2 font-mono">{{ r.hsnCode || '-' }}</td>
+                    <td class="px-3 py-2">{{ r.ratePercent }} %</td>
+                    <td class="px-3 py-2 text-right font-mono">{{ r.taxable | number: '1.2-2' }}</td>
+                    @if (inv.gstMode === 'SAME_STATE') {
+                      <td class="px-3 py-2 text-right font-mono">{{ r.cgst | number: '1.2-2' }}</td><td class="px-3 py-2 text-right font-mono">{{ r.sgst | number: '1.2-2' }}</td>
+                    } @else {
+                      <td class="px-3 py-2 text-right font-mono">{{ r.igst | number: '1.2-2' }}</td>
+                    }
+                    <td class="px-3 py-2 text-right font-mono">{{ r.tax | number: '1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </section>
+        }
+        <p class="m-0 rounded-[10px] border border-neutral-200 bg-white px-4 py-2.5 text-sm dark:border-charcoal-700 dark:bg-charcoal-800">
+          <span class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.invoice.amountInWords' | translate }}</span><br>
+          <b>{{ inv.amountInWords }}</b>
+        </p>
+        @if (actionError()) { <p class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">{{ actionError() }}</p> }
 
         <app-modal [open]="cancelOpen()" [title]="'sales.invoices.cancelTitle' | translate" (closed)="cancelOpen.set(false)">
           <div class="space-y-3">
@@ -148,6 +186,8 @@ export class InvoiceViewComponent {
   readonly cancelOpen = signal(false);
   readonly cancelError = signal('');
   readonly reason = new FormControl('', { nonNullable: true });
+  readonly busy = signal(false);
+  readonly actionError = signal('');
 
   /** R26: the layout chosen on this screen; empty opens in the school's default. */
   private layout: InvoiceLayout | undefined;
@@ -167,6 +207,54 @@ export class InvoiceViewComponent {
 
   load(): void {
     this.sales.invoice(this.id, this.layout).subscribe({ next: (i) => this.invoice.set(i), error: (e: unknown) => this.error.set(messageForError(e, this.translate)) });
+  }
+
+  /** R31: the title of the document (the same rule as the PDF): TAX INVOICE with GST; without it CASH MEMO or CREDIT MEMO. */
+  titleKey(inv: InvoiceDetail): string {
+    return 'sales.invoice.title.' + (inv.isGstApplied ? 'TAX_INVOICE' : inv.paymentType === 'CASH' ? 'CASH_MEMO' : 'CREDIT_MEMO');
+  }
+
+  /** R32: a class group's amount is the sum of its lines' amounts (the column the lines show). */
+  groupAmount(group: InvoiceGroupView): number {
+    return group.lines.reduce((sum, l) => sum + l.amounts.lineAmount, 0);
+  }
+
+  /** R33: the PDF in the layout on screen, saved as a file named after the invoice. */
+  download(inv: InvoiceDetail): void {
+    this.withPdf(inv, (url) => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = inv.summary.number.split('/').join('-') + '.pdf';
+      link.click();
+    });
+  }
+
+  /** R33: the PDF opens in a new tab for the browser's print dialog; the tab is opened first so a pop-up blocker allows it. */
+  print(inv: InvoiceDetail): void {
+    const tab = window.open('', '_blank');
+    this.withPdf(inv, (url) => {
+      if (tab) {
+        tab.location.href = url;
+      }
+    }, () => tab?.close());
+  }
+
+  private withPdf(inv: InvoiceDetail, use: (objectUrl: string) => void, onError?: () => void): void {
+    this.busy.set(true);
+    this.actionError.set('');
+    this.sales.invoicePdf(this.id, inv.layout).subscribe({
+      next: (blob) => {
+        this.busy.set(false);
+        const url = URL.createObjectURL(blob);
+        use(url);
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      },
+      error: (e: unknown) => {
+        this.busy.set(false);
+        this.actionError.set(messageForError(e, this.translate));
+        onError?.();
+      },
+    });
   }
 
   switchTo(layout: InvoiceLayout): void {

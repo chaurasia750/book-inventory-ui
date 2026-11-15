@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
         <div>
           <label for="oe-date" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.editor.orderDate' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           @if (isDraft()) { <app-date-picker inputId="oe-date" [formControl]="orderDate" (valueChange)="dateChanged()" /> } @else { <p class="text-sm">{{ orderDate.value }}</p> }
@@ -47,7 +47,13 @@
             {{ 'sales.editor.gstApplied' | translate }}
           </label>
         </div>
-        <div class="lg:col-span-2">
+        <div>
+          <label for="oe-payment" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.editor.paymentType' | translate }}</label>
+          <select id="oe-payment" [value]="paymentType()" [disabled]="!totalsEditable()" (change)="paymentType.set($any($event.target).value); dirty.set(true)" [class]="field">
+            @for (t of paymentTypes; track t) { <option [value]="t">{{ 'school.paymentType.' + t | translate }}</option> }
+          </select>
+        </div>
+        <div class="lg:col-span-1">
           <label for="oe-remark" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.editor.remark' | translate }}</label>
           <input id="oe-remark" [formControl]="remark" [readonly]="!editable()" (input)="dirty.set(true)" [class]="field" />
         </div>

@@ -71,6 +71,11 @@ export class SalesService {
     return this.api.get<InvoiceDetail>(`/invoices/${id}`, layout ? { layout } : undefined);
   }
 
+  /** Sales R28: the invoice as a PDF in the given layout (the school's default when none is given). */
+  invoicePdf(id: string, layout?: InvoiceLayout): Observable<Blob> {
+    return this.api.getBlob(`/invoices/${id}/pdf`, layout ? { layout } : undefined);
+  }
+
   invoiceLayout(schoolId: string): Observable<InvoiceLayoutResponse> {
     return this.api.get<InvoiceLayoutResponse>(`/schools/${schoolId}/invoice-layout`);
   }

@@ -7,7 +7,7 @@ import { forkJoin, Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '@org/auth';
 import { PriceService, SalesService, SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
-import { AddLinesResponse, DiscountKind, ItemSummary, PriceVersion, SaveSchoolOrderRequest, SchoolOrderDetail, SessionChoice } from '@org/shared-models';
+import { AddLinesResponse, DiscountKind, ItemSummary, PAYMENT_TYPES, PaymentType, PriceVersion, SaveSchoolOrderRequest, SchoolOrderDetail, SessionChoice } from '@org/shared-models';
 import { ButtonComponent, DatePickerComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { BulkItemPickerComponent, BulkPick } from './bulk-item-picker';
 import { ClassSetDialogComponent } from './class-set-dialog';
@@ -68,6 +68,7 @@ export class OrderEditorComponent {
   }
   readonly field = FIELD;
   readonly discountKinds: DiscountKind[] = ['NONE', 'PERCENT', 'AMOUNT'];
+  readonly paymentTypes = PAYMENT_TYPES;
 
   readonly order = signal<SchoolOrderDetail | null>(null);
   readonly schoolId = signal('');
@@ -77,6 +78,7 @@ export class OrderEditorComponent {
   readonly choice = signal<SessionChoice | null>(null);
   readonly session = signal('');
   readonly isGst = signal(false);
+  readonly paymentType = signal<PaymentType>('CREDIT');
   readonly totalKind = signal<DiscountKind>('NONE');
   readonly totalValue = signal(0);
   readonly orderDate = new FormControl('', { nonNullable: true });
@@ -118,19 +120,20 @@ export class OrderEditorComponent {
   private startNew(schoolId: string): void {
     this.schoolId.set(schoolId);
     this.orderDate.setValue(new Date().toISOString().slice(0, 10));
-    this.loadSchool(schoolId, (gst) => {
+    this.loadSchool(schoolId, (gst, payment) => {
       this.isGst.set(gst);
+      this.paymentType.set(payment);
       this.loading.set(false);
       this.loadChoice(true);
     });
   }
 
-  private loadSchool(schoolId: string, then: (isGstDefault: boolean) => void): void {
+  private loadSchool(schoolId: string, then: (isGstDefault: boolean, paymentType: PaymentType) => void): void {
     this.schools.get(schoolId).subscribe({
       next: (s) => {
         this.schoolName.set(s.name);
         this.classes.set(s.classes.map((c) => c.name));
-        then(s.isGstDefault);
+        then(s.isGstDefault, s.paymentType);
       },
       error: (e: unknown) => this.fail(e),
     });
@@ -152,6 +155,7 @@ export class OrderEditorComponent {
     this.remark.setValue(o.remark ?? '');
     this.session.set(o.session);
     this.isGst.set(o.isGstApplied);
+    this.paymentType.set(o.paymentType);
     this.totalKind.set(o.totalDiscount.kind);
     this.totalValue.set(o.totalDiscount.value);
     if (this.classes().length === 0) {
@@ -317,6 +321,7 @@ export class OrderEditorComponent {
       orderDate: this.orderDate.value || undefined,
       session: this.session() || undefined,
       isGstApplied: this.isGst(),
+      paymentType: this.paymentType(),
       totalDiscount: { kind: this.totalKind(), value: this.totalKind() === 'NONE' ? 0 : Number(this.totalValue()) },
       remark: this.remark.value.trim() || undefined,
       lines: this.lines().map((l) => ({

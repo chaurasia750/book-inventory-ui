@@ -1,3 +1,5 @@
+import { PaymentType } from './school.model';
+
 /** Sales spec R3, R7: a discount is none, a percentage or a rupee amount. */
 export type DiscountKind = 'NONE' | 'PERCENT' | 'AMOUNT';
 
@@ -108,6 +110,8 @@ export interface SchoolOrderDetail {
   session: string;
   isGstApplied: boolean;
   gstMode: GstMode;
+  /** Sales R34. */
+  paymentType: PaymentType;
   totalDiscount: Discount;
   remark: string | null;
   status: SchoolOrderStatus;
@@ -133,6 +137,7 @@ export interface SaveSchoolOrderRequest {
   orderDate?: string;
   session?: string;
   isGstApplied?: boolean;
+  paymentType?: PaymentType;
   totalDiscount?: Discount;
   remark?: string;
   lines: SchoolOrderLineRequest[];
@@ -239,6 +244,7 @@ export interface InvoiceDetail {
   session: string;
   isGstApplied: boolean;
   gstMode: GstMode;
+  paymentType: PaymentType;
   totalDiscount: Discount;
   totals: SaleTotals;
   cancelReason: string | null;
@@ -246,6 +252,20 @@ export interface InvoiceDetail {
   lines: InvoiceLineView[];
   layout: InvoiceLayout;
   groups: InvoiceGroupView[];
+  /** Sales R32: the GST summed by HSN and rate (empty when GST is off). */
+  gstSummary: GstSummaryRow[];
+  /** Sales R32: the grand total in words (Indian numbering). */
+  amountInWords: string;
+}
+
+export interface GstSummaryRow {
+  hsnCode: string | null;
+  ratePercent: number;
+  taxable: number;
+  cgst: number;
+  sgst: number;
+  igst: number;
+  tax: number;
 }
 
 /** School spec R19: the two session cut-offs. */
