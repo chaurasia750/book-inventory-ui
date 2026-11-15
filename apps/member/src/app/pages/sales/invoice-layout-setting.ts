@@ -21,7 +21,7 @@ import { InvoiceLayout } from '@org/shared-models';
       </div>
       <select id="ils-layout" [value]="layout()" [disabled]="!canEdit()" (change)="change($any($event.target).value)"
         class="h-10 rounded-lg border border-gray-300 bg-white px-2 text-sm focus:border-brand-500 focus:outline-none disabled:bg-gray-50">
-        @for (l of layouts; track l) { <option [value]="l">{{ 'sales.layout.' + l | translate }}</option> }
+        @for (l of layouts; track l) { <option [value]="l" [selected]="l === layout()">{{ 'sales.layout.' + l | translate }}</option> }
       </select>
       @if (message()) { <span class="text-xs" [class.text-red-600]="isError()" [class.text-green-700]="!isError()" role="status">{{ message() }}</span> }
     </div>

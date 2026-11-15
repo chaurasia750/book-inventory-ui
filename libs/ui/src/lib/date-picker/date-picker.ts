@@ -74,13 +74,13 @@ const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
               <select [value]="viewMonth()" (change)="onMonthChange($event)"
                 class="text-sm font-semibold text-gray-800 dark:text-white bg-transparent border-0 cursor-pointer focus:outline-none">
                 @for (m of months; track $index) {
-                  <option [value]="$index">{{ m }}</option>
+                  <option [value]="$index" [selected]="$index === viewMonth()">{{ m }}</option>
                 }
               </select>
               <select [value]="viewYear()" (change)="onYearChange($event)"
                 class="text-sm font-semibold text-gray-800 dark:text-white bg-transparent border-0 cursor-pointer focus:outline-none">
                 @for (y of yearRange; track y) {
-                  <option [value]="y">{{ y }}</option>
+                  <option [value]="y" [selected]="y === viewYear()">{{ y }}</option>
                 }
               </select>
             </div>

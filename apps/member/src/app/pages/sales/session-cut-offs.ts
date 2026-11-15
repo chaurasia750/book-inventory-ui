@@ -26,10 +26,10 @@ const SELECT = 'h-10 rounded-lg border border-gray-300 bg-white px-2 text-sm foc
               <span class="mb-1 block text-sm font-semibold">{{ 'sales.cutOffs.' + row.key | translate }}<span class="text-red-500" aria-hidden="true"> *</span></span>
               <div class="flex gap-2">
                 <select [value]="day(row.key)" (change)="set(row.key, 'day', +$any($event.target).value)" [class]="select" [attr.aria-label]="'sales.cutOffs.day' | translate">
-                  @for (d of days; track d) { <option [value]="d">{{ d }}</option> }
+                  @for (d of days; track d) { <option [value]="d" [selected]="d === day(row.key)">{{ d }}</option> }
                 </select>
                 <select [value]="month(row.key)" (change)="set(row.key, 'month', +$any($event.target).value)" [class]="select" [attr.aria-label]="'sales.cutOffs.month' | translate">
-                  @for (m of row.months; track m) { <option [value]="m">{{ 'sales.months.' + m | translate }}</option> }
+                  @for (m of row.months; track m) { <option [value]="m" [selected]="m === month(row.key)">{{ 'sales.months.' + m | translate }}</option> }
                 </select>
               </div>
               <p class="mt-1 text-xs text-gray-500">{{ 'sales.cutOffs.' + row.key + 'Hint' | translate }}</p>
