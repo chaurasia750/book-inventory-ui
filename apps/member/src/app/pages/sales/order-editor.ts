@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin, Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '@org/auth';
-import { PriceService, SalesService, SchoolService } from '@org/api-services';
+import { CompanyService, PriceService, SalesService, SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { AddLinesResponse, DiscountKind, ItemSummary, PAYMENT_TYPES, PaymentType, PriceVersion, SaveSchoolOrderRequest, SchoolOrderDetail, SessionChoice } from '@org/shared-models';
 import { ButtonComponent, DatePickerComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
@@ -51,6 +51,7 @@ export class OrderEditorComponent {
   private readonly sales = inject(SalesService);
   private readonly schools = inject(SchoolService);
   private readonly prices = inject(PriceService);
+  private readonly companies = inject(CompanyService);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly translate = inject(TranslateService);
@@ -98,6 +99,9 @@ export class OrderEditorComponent {
   readonly status = computed(() => this.order()?.status ?? 'DRAFT');
   readonly isDraft = computed(() => this.status() === 'DRAFT');
   /** R20: lines change on a draft and on a confirmed order. */
+  /** Sales R36: the company's item-wise discount setting (company R23); the Discount column and its inputs are there only when it is on or a line already has a discount. */
+  readonly usesItemDiscount = signal(false);
+  readonly showDiscount = computed(() => this.usesItemDiscount() || this.lines().some((l) => l.discKind !== 'NONE'));
   readonly editable = computed(() => this.status() === 'DRAFT' || this.status() === 'CONFIRMED');
   readonly anyInvoiced = computed(() => this.lines().some((l) => l.invoiced > 0));
   /** R20: the total discount and the GST choice are fixed once something is invoiced. */
@@ -108,6 +112,7 @@ export class OrderEditorComponent {
   });
 
   constructor() {
+    this.companies.invoiceIdentity().subscribe({ next: (i) => this.usesItemDiscount.set(i.invoice.usesItemDiscount), error: () => this.usesItemDiscount.set(false) });
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') {
       this.loadOrder(id);
