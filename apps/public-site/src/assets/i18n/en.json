@@ -270,7 +270,28 @@
       "nothing_to_invoice": "Choose at least one line with a quantity to invoice.",
       "quantity_above_remaining": "A quantity is more than what remains to deliver on that line.",
       "total_not_positive": "An invoice total must be above zero.",
-      "invoice_already_cancelled": "This invoice is already cancelled."
+      "invoice_already_cancelled": "This invoice is already cancelled.",
+      "invalid_class": "Choose one of the school's classes ({{subject}}).",
+      "line_not_found": "That line is not on this order ({{subject}}).",
+      "line_invoiced": "Part of {{subject}} is already invoiced: it cannot be deleted, and its price version, discount and class cannot change.",
+      "quantity_below_invoiced": "The quantity of {{subject}} cannot be below what is already invoiced.",
+      "totals_locked": "The total discount and the GST choice cannot change once something is invoiced.",
+      "duplicate_line": "The same item, price version and class is on two lines ({{subject}}); keep one.",
+      "school_fixed": "The school of an order cannot be changed.",
+      "order_not_open": "Lines can be added only to a draft or a confirmed order.",
+      "no_book_list": "This class has no book list for the order's session."
+    },
+    "planning": {
+      "school_not_found": "The school could not be found.",
+      "list_not_found": "This class has no book list for the session.",
+      "invalid_class": "Choose one of the school's classes.",
+      "invalid_session": "Write a session the way the school counts them (2026-27 or 2027).",
+      "item_not_found": "Item not found.",
+      "item_inactive": "The item is inactive.",
+      "invalid_quantity": "A quantity per student is a whole number from 1 to 50.",
+      "invalid_estimate": "The number of students is a whole number from 0 to 5000.",
+      "too_many_lines": "A class book list has at most 200 books.",
+      "copy_same_source": "Copy from another session or another school."
     }
   },
   "iam": {
@@ -804,7 +825,8 @@
       "classes": "Classes",
       "ledger": "Ledger",
       "orders": "Orders",
-      "invoices": "Invoices"
+      "invoices": "Invoices",
+      "bookLists": "Book lists"
     }
   },
   "vendor": {
@@ -1343,6 +1365,118 @@
       "10": "October",
       "11": "November",
       "12": "December"
+    },
+    "ordersPage": {
+      "title": "Orders",
+      "subtitle": "Every school's orders: draft, confirm, invoice.",
+      "allStatuses": "All statuses",
+      "search": "Search order number, school",
+      "school": "School",
+      "empty": "No orders match."
+    },
+    "invoicesPage": {
+      "title": "Invoices",
+      "subtitle": "Every school's invoices, newest first.",
+      "search": "Search invoice, order or school",
+      "empty": "No invoices match."
+    },
+    "chooser": {
+      "title": "New order: choose the school",
+      "search": "Type the school's name or code",
+      "empty": "No active school matches.",
+      "hint": "The order opens with today's date and the school's session and GST choice."
+    },
+    "ways": {
+      "title": "Add books in the way that suits this order",
+      "scan": "Scan or search",
+      "scanHint": "One book at a time, Enter adds it.",
+      "classSets": "Class sets",
+      "classSetsHint": "Whole classes from the school's book list, students x copies.",
+      "bulk": "Bulk add",
+      "bulkHint": "Tick many books, one quantity and class for all."
+    },
+    "classSets": {
+      "button": "Add class sets",
+      "title": "Add class sets",
+      "hint": "Tick the classes and write how many students buy the set; every book of the class list is added, students x copies per student.",
+      "students": "Students",
+      "books": "books",
+      "noList": "no book list for {{session}}",
+      "add": "Add to order",
+      "added": "{{n}} lines added.",
+      "leftOut": "Left out:"
+    },
+    "bulk": {
+      "button": "Bulk add",
+      "title": "Bulk add",
+      "search": "Search name, code, class, subject",
+      "allClasses": "Any class",
+      "allVendors": "Any vendor",
+      "qty": "Quantity for all",
+      "className": "Class for all (optional)",
+      "noClass": "No class",
+      "selected": "{{n}} selected",
+      "add": "Add {{n}} books",
+      "pick": "Use {{n}} books",
+      "empty": "No items match these filters.",
+      "more": "Showing the first {{n}}; narrow the filters to see others."
+    },
+    "layout": {
+      "label": "Invoice layout",
+      "BOOK_LIST": "Book list",
+      "BY_CLASS": "By class",
+      "hint": "How this school's invoices open; the invoice itself does not change.",
+      "general": "General",
+      "subtotal": "Subtotal",
+      "saved": "Saved."
+    },
+    "columns2": {
+      "className": "Class",
+      "school": "School",
+      "invoiced": "Invoiced"
+    },
+    "editor2": {
+      "locked": "Invoiced; only the quantity can rise or fall to what is invoiced.",
+      "totalsLocked": "The total discount and GST are fixed once something is invoiced.",
+      "saveChanges": "Save changes",
+      "editConfirmed": "A confirmed order can still change above what is invoiced."
     }
+  },
+  "planning": {
+    "tab": "Book lists",
+    "subtitle": "Which books each class uses in a session, and roughly how many students. Orders take whole class sets from here.",
+    "session": "Session",
+    "class": "Class",
+    "books": "Books",
+    "students": "Students (approx.)",
+    "noList": "No list yet",
+    "open": "Open",
+    "start": "Add list",
+    "copyLast": "Copy from last session",
+    "copyOther": "Copy from another school",
+    "copyTitle": "Copy book lists",
+    "fromSession": "From session",
+    "fromSchool": "From school",
+    "replace": "Replace classes that already have a list",
+    "copy": "Copy",
+    "copied": "Copied: {{copied}}. Skipped: {{skipped}}.",
+    "none": "none",
+    "editorTitle": "Book list of {{className}}, {{session}}",
+    "qtyPerStudent": "Per student",
+    "estimate": "Students (approx.)",
+    "addBook": "Add a book",
+    "bulk": "Pick many",
+    "remove": "Remove",
+    "save": "Save list",
+    "delete": "Delete list",
+    "deleteConfirm": "Delete the whole list of this class for this session?",
+    "saved": "Saved.",
+    "empty": "No books yet: scan, search or pick many.",
+    "changes": {
+      "ADDED": "added",
+      "CHANGED": "was {{n}}",
+      "removed": "Removed since {{session}}:"
+    },
+    "diffHint": "Marks compare with {{session}}."
   }
 }

@@ -66,6 +66,11 @@
         <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.mobile' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ s.mobile || '-' }}</dd></div>
         <div class="sm:col-span-2 lg:col-span-3"><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.address' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ s.address || '-' }}</dd></div>
       </dl>
+      <app-invoice-layout-setting [schoolId]="s.id" [canEdit]="canEdit" />
+    }
+
+    @if (tab() === 'bookLists') {
+      <app-book-lists-tab [schoolId]="s.id" [classes]="s.classes" [canEdit]="canEdit" />
     }
 
     @if (tab() === 'orders') {

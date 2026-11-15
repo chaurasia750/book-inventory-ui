@@ -1,7 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
+  AddBulkLinesRequest,
+  AddClassSetsRequest,
+  AddLinesResponse,
   InvoiceDetail,
+  InvoiceLayout,
+  InvoiceLayoutResponse,
   InvoiceMade,
   InvoiceParams,
   InvoiceSummary,
@@ -61,8 +66,27 @@ export class SalesService {
     return this.api.get<PagedList<InvoiceSummary>>('/invoices', { ...params } as QueryParams);
   }
 
-  invoice(id: string): Observable<InvoiceDetail> {
-    return this.api.get<InvoiceDetail>(`/invoices/${id}`);
+  /** R26: the invoice in the given layout, or in the school's default when none is given. */
+  invoice(id: string, layout?: InvoiceLayout): Observable<InvoiceDetail> {
+    return this.api.get<InvoiceDetail>(`/invoices/${id}`, layout ? { layout } : undefined);
+  }
+
+  invoiceLayout(schoolId: string): Observable<InvoiceLayoutResponse> {
+    return this.api.get<InvoiceLayoutResponse>(`/schools/${schoolId}/invoice-layout`);
+  }
+
+  changeInvoiceLayout(schoolId: string, layout: InvoiceLayout): Observable<InvoiceLayoutResponse> {
+    return this.api.put<InvoiceLayoutResponse>(`/schools/${schoolId}/invoice-layout`, { layout });
+  }
+
+  /** R22: the books of whole classes, students x quantity per student. */
+  addClassSets(orderId: string, request: AddClassSetsRequest): Observable<AddLinesResponse> {
+    return this.api.post<AddLinesResponse>(`/school-orders/${orderId}/class-sets`, request);
+  }
+
+  /** R23: many items with one quantity and class. */
+  addBulkLines(orderId: string, request: AddBulkLinesRequest): Observable<AddLinesResponse> {
+    return this.api.post<AddLinesResponse>(`/school-orders/${orderId}/bulk-lines`, request);
   }
 
   cancelInvoice(id: string, reason: string): Observable<void> {

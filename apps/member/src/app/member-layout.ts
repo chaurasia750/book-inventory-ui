@@ -66,6 +66,19 @@ export class MemberLayoutComponent {
     },
   ];
 
+  /** Sales R19, platform U14: the Owner and Staff place and follow orders from one Orders menu (the school profile keeps its tabs). */
+  private readonly ordersNavItems: SidebarNavItem[] = [
+    {
+      name: 'Orders',
+      icon: SETTINGS_ICON,
+      section: 'BUSINESS',
+      subItems: [
+        { name: 'Order list', path: '/orders' },
+        { name: 'Invoices', path: '/invoices' },
+      ],
+    },
+  ];
+
   /** R66: the Owner manages the Staff of their own company and reads the audit log of it (core A7). */
   private readonly ownerNavItems: SidebarNavItem[] = [
     { name: 'Staff', icon: MEMBERS_ICON, section: 'SETTINGS', path: '/staff' },
@@ -82,6 +95,7 @@ export class MemberLayoutComponent {
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.schoolNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.vendorNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.itemNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.ordersNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];
 

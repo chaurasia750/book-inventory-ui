@@ -54,6 +54,20 @@ export const appRoutes: Route[] = [
         children: [{ path: ':id', children: [] }],
       },
       // Sales spec Q11: the order editor and the invoice open full width from the school's profile (not a menu entry, platform U14).
+      // Sales R19: the Orders menu: every school's orders and invoices.
+      {
+        path: 'orders',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/sales/documents-page').then((m) => m.DocumentsPageComponent),
+        data: { kind: 'orders' },
+      },
+      {
+        path: 'invoices',
+        pathMatch: 'full',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/sales/documents-page').then((m) => m.DocumentsPageComponent),
+        data: { kind: 'invoices' },
+      },
       {
         path: 'school-orders/:id',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
