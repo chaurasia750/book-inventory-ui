@@ -2,7 +2,7 @@
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
-import { SidebarNavItem, AppSidebarComponent } from '../app-sidebar/app-sidebar';
+import { SidebarNavItem, AppSidebarComponent, menuEntryOf } from '../app-sidebar/app-sidebar';
 import { AppHeaderComponent } from '../app-header/app-header';
 import { BackdropComponent } from '../backdrop/backdrop';
 import { MemberFooterComponent } from '../member-footer/member-footer';
@@ -40,14 +40,5 @@ export class AppLayoutComponent {
   );
 
   /** The header's page title: the name of the menu entry of the open page (longest matching path), else `title`. */
-  readonly pageTitle = computed(() => {
-    const path = this.url().split(/[?#]/)[0];
-    const entries = this.navItems().flatMap((item) => [
-      { name: item.name, path: item.path },
-      ...(item.subItems ?? []).map((sub) => ({ name: sub.name, path: sub.path })),
-    ]);
-    const matches = entries.filter((e) => !!e.path && (e.path === '/' ? path === '/' : path === e.path || path.startsWith(`${e.path}/`)));
-    const best = matches.reduce<(typeof entries)[number] | null>((a, e) => (a === null || (e.path ?? '').length > (a.path ?? '').length ? e : a), null);
-    return best?.name ?? this.title();
-  });
+  readonly pageTitle = computed(() => menuEntryOf(this.url(), this.navItems())?.name ?? this.title());
 }

@@ -73,7 +73,8 @@ export class MemberLayoutComponent {
       icon: SETTINGS_ICON,
       section: 'BUSINESS',
       subItems: [
-        { name: 'Order list', path: '/orders' },
+        // The order editor (`/school-orders/new`, `/school-orders/:id`) belongs to the order list: it stays highlighted and titled there.
+        { name: 'Order list', path: '/orders', aliases: ['/school-orders'] },
         { name: 'Invoices', path: '/invoices' },
       ],
     },

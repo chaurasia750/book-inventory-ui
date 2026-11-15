@@ -15,6 +15,8 @@ import { APP_NAME } from '@org/constants';
 export interface SidebarNavSubItem {
   name: string;
   path: string;
+  /** Other path prefixes that belong to this entry (a document page opened from a list), so it stays highlighted and titled there. */
+  aliases?: string[];
 }
 
 export interface SidebarNavItem {
@@ -25,6 +27,32 @@ export interface SidebarNavItem {
   subItems?: SidebarNavSubItem[];
   /** A count shown beside the entry (platform.md U11); null or empty shows none. */
   badge?: () => string | null;
+  /** See {@link SidebarNavSubItem.aliases}. */
+  aliases?: string[];
+}
+
+/** One menu entry and one of its paths (its own or an alias). */
+export interface MenuMatch {
+  name: string;
+  path: string;
+  /** The entry's own path, used to highlight it. */
+  entryPath: string;
+}
+
+/**
+ * The menu entry of a URL (platform U11, U14): the entry whose path or alias is the URL's path or one of its parents, the longest
+ * match winning; the query is ignored. The home entry `/` matches only the home page, so a page outside the menu highlights and
+ * titles nothing. Written once for the sidebar (highlight) and the header (title).
+ */
+export function menuEntryOf(url: string, items: SidebarNavItem[]): MenuMatch | null {
+  const current = url.split(/[?#]/)[0];
+  const candidates = items.flatMap((item) => [
+    ...(item.path ? [item.path, ...(item.aliases ?? [])].map((p) => ({ name: item.name, path: p, entryPath: item.path as string })) : []),
+    ...(item.subItems ?? []).flatMap((sub) => [sub.path, ...(sub.aliases ?? [])].map((p) => ({ name: sub.name, path: p, entryPath: sub.path }))),
+  ]);
+  return candidates
+    .filter((c) => (c.path === '/' ? current === '/' : current === c.path || current.startsWith(c.path.endsWith('/') ? c.path : c.path + '/')))
+    .reduce<MenuMatch | null>((best, c) => (best === null || c.path.length > best.path.length ? c : best), null);
 }
 
 /**
@@ -131,11 +159,7 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
   }
 
   private activePath(): string | null {
-    const url = this.router.url.split(/[?#]/)[0];
-    const paths = this.navItems().flatMap((item) => [item.path, ...(item.subItems ?? []).map((sub) => sub.path)]);
-    return paths
-      .filter((p): p is string => !!p && (url === p || url.startsWith(p.endsWith('/') ? p : p + '/')))
-      .reduce<string | null>((best, p) => (best === null || p.length > best.length ? p : best), null);
+    return menuEntryOf(this.router.url, this.navItems())?.entryPath ?? null;
   }
 
   isChildActive(path: string): boolean {
@@ -197,17 +221,10 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
   }
 
   private setActiveMenuFromRoute(currentUrl: string): void {
-    let matchedKey: string | null = null;
-
-    this.navItems().forEach((nav, i) => {
-      if (nav.subItems) {
-        nav.subItems.forEach((subItem) => {
-          if (currentUrl === subItem.path || this.isChildActive(subItem.path)) {
-            matchedKey = `main-${i}`;
-          }
-        });
-      }
-    });
+    // The open group is the one that holds the page's menu entry (the same rule as the highlight, aliases included).
+    const entryPath = menuEntryOf(currentUrl, this.navItems())?.entryPath ?? null;
+    const index = entryPath === null ? -1 : this.navItems().findIndex((nav) => nav.subItems?.some((sub) => sub.path === entryPath));
+    const matchedKey: string | null = index < 0 ? null : `main-${index}`;
 
     this.openSubmenu = matchedKey;
 
