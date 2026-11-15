@@ -7,7 +7,7 @@ import { CompanyProfile } from '@org/shared-models';
 import { ButtonComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20';
-const CARD = 'flex flex-col gap-3 rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800';
+const CARD = 'flex flex-col gap-3';
 const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500';
 
 /**
@@ -21,7 +21,6 @@ const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] 
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section [class]="card">
-      <h2 class="m-0 text-base font-semibold text-primary-fg">{{ 'companyProfile.details.title' | translate }}</h2>
       <dl class="m-0 grid gap-3 sm:grid-cols-2">
         <div><dt [class]="label">{{ 'companyProfile.details.name' | translate }}</dt><dd class="m-0 text-sm font-medium text-primary-fg">{{ profile().name }}</dd></div>
         <div><dt [class]="label">{{ 'companyProfile.details.state' | translate }}</dt><dd class="m-0 text-sm font-medium text-primary-fg">{{ profile().state || '-' }}</dd></div>

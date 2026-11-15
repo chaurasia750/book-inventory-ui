@@ -83,11 +83,8 @@ export const appRoutes: Route[] = [
         canActivate: [appRoleGuard(['OWNER'])],
         loadComponent: () => import('./pages/company/company-profile').then((m) => m.CompanyProfileComponent),
       },
-      {
-        path: 'session-cut-offs',
-        canActivate: [appRoleGuard(['OWNER'])],
-        loadComponent: () => import('./pages/sales/session-cut-offs').then((m) => m.SessionCutOffsComponent),
-      },
+      // The session cut-offs are a tab of the Company profile now (platform U14b); the old address still works.
+      { path: 'session-cut-offs', redirectTo: 'company-profile', pathMatch: 'full' },
       {
         path: 'items',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],

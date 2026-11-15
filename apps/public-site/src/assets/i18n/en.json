@@ -1552,7 +1552,8 @@
       "details": "Company details",
       "images": "Logo and signature",
       "bank": "Bank account",
-      "settings": "Invoice settings"
+      "settings": "Invoice settings",
+      "cutoffs": "Session cut-offs"
     }
   }
 }
