@@ -215,7 +215,7 @@ export class ReceivePaymentDialogComponent {
   readonly loadError = signal('');
   readonly modes = signal<ModeRow[]>([blankMode()]);
   readonly manual = signal(false);
-  readonly manualAmounts = signal<Record<string, string>>({});
+  readonly manualAmounts = signal<Partial<Record<string, string>>>({});
   readonly recorded = signal<ReceiptDetail | null>(null);
   readonly saving = signal(false);
   readonly error = signal('');
@@ -232,8 +232,8 @@ export class ReceivePaymentDialogComponent {
   readonly total = computed(() => money(this.modes().reduce((sum, m) => sum + (Number(m.amount) || 0), 0)));
 
   /** R6: the oldest-first plan the server will make (a preview; the server decides). */
-  readonly preview = computed<Record<string, number>>(() => {
-    const plan: Record<string, number> = {};
+  readonly preview = computed<Partial<Record<string, number>>>(() => {
+    const plan: Partial<Record<string, number>> = {};
     let left = this.total();
     for (const o of this.dues()?.openInvoices ?? []) {
       const take = money(Math.min(left, o.due));
@@ -246,7 +246,7 @@ export class ReceivePaymentDialogComponent {
   });
 
   readonly applied = computed(() =>
-    this.manual() ? money(Object.values(this.manualAmounts()).reduce((sum, v) => sum + (Number(v) || 0), 0)) : money(Object.values(this.preview()).reduce((sum, v) => sum + v, 0)),
+    this.manual() ? money(Object.values(this.manualAmounts()).reduce<number>((sum, v) => sum + (Number(v) || 0), 0)) : money(Object.values(this.preview()).reduce<number>((sum, v) => sum + (Number(v) || 0), 0)),
   );
   readonly advance = computed(() => money(this.total() - this.applied()));
 
