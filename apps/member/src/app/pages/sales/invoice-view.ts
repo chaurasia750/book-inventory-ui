@@ -1,7 +1,7 @@
-import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { DatePipe, DecimalPipe, Location, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
 import { SalesService } from '@org/api-services';
@@ -23,7 +23,7 @@ import { SaleTotalsComponent } from './sale-totals';
   template: `
     <div class="flex flex-col gap-3">
       @if (invoice(); as inv) {
-        <a [routerLink]="['/schools', inv.school.id]" class="text-sm text-gray-500 hover:text-primary-fg">&larr; {{ inv.school.name }}</a>
+        <button type="button" (click)="back(inv.school.id)" class="self-start text-sm text-gray-500 hover:text-primary-fg">&larr; {{ 'sales.editor.back' | translate }}</button>
         <section class="flex flex-col gap-3 rounded-[10px] border border-neutral-200 bg-white px-4 py-3.5 dark:border-charcoal-700 dark:bg-charcoal-800">
           <div class="flex flex-wrap items-start justify-between gap-2.5">
             <div class="min-w-0">
@@ -137,6 +137,8 @@ import { SaleTotalsComponent } from './sale-totals';
 export class InvoiceViewComponent {
   private readonly sales = inject(SalesService);
   private readonly translate = inject(TranslateService);
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly id = inject(ActivatedRoute).snapshot.paramMap.get('id') ?? '';
 
   readonly isOwner = inject(AuthService).hasAppRole('OWNER');
@@ -152,6 +154,15 @@ export class InvoiceViewComponent {
 
   constructor() {
     this.load();
+  }
+
+  /** Back to where the invoice was opened from (the invoice list, the order or the school's tab); the school when there is no history. */
+  back(schoolId: string): void {
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      void this.router.navigate(['/schools', schoolId]);
+    }
   }
 
   load(): void {

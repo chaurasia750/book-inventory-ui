@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -52,10 +52,20 @@ export class OrderEditorComponent {
   private readonly schools = inject(SchoolService);
   private readonly prices = inject(PriceService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly translate = inject(TranslateService);
   private readonly route = inject(ActivatedRoute);
 
   readonly isOwner = inject(AuthService).hasAppRole('OWNER');
+
+  /** Back to where the order was opened from (the order list or the school's tab); the school's profile when there is no history. */
+  back(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      void this.router.navigate(['/schools', this.schoolId()]);
+    }
+  }
   readonly field = FIELD;
   readonly discountKinds: DiscountKind[] = ['NONE', 'PERCENT', 'AMOUNT'];
 

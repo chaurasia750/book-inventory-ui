@@ -221,17 +221,10 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
   }
 
   private setActiveMenuFromRoute(currentUrl: string): void {
-    let matchedKey: string | null = null;
-
-    this.navItems().forEach((nav, i) => {
-      if (nav.subItems) {
-        nav.subItems.forEach((subItem) => {
-          if (currentUrl === subItem.path || this.isChildActive(subItem.path)) {
-            matchedKey = `main-${i}`;
-          }
-        });
-      }
-    });
+    // The open group is the one that holds the page's menu entry (the same rule as the highlight, aliases included).
+    const entryPath = menuEntryOf(currentUrl, this.navItems())?.entryPath ?? null;
+    const index = entryPath === null ? -1 : this.navItems().findIndex((nav) => nav.subItems?.some((sub) => sub.path === entryPath));
+    const matchedKey: string | null = index < 0 ? null : `main-${index}`;
 
     this.openSubmenu = matchedKey;
 

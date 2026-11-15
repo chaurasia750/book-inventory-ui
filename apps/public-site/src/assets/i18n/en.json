@@ -1326,7 +1326,8 @@
       "remove": "Remove",
       "lowStock": "Low stock ({{n}})",
       "unsaved": "Unsaved changes: save the draft to see the amounts.",
-      "saveToSeeTotals": "Save the draft to see the totals."
+      "saveToSeeTotals": "Save the draft to see the totals.",
+      "back": "Back"
     },
     "totals": {
       "subtotal": "Subtotal",
