@@ -1,11 +1,12 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
 import { CompanyService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { CompanyInvoiceIdentity, CompanyProfile } from '@org/shared-models';
-import { ButtonComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
 import { SessionCutOffsComponent } from '../sales/session-cut-offs';
 import { CompanyBankFormComponent } from './company-bank-form';
 import { CompanyDetailsFormComponent } from './company-details-form';
@@ -22,7 +23,7 @@ type CompanyTab = 'details' | 'images' | 'bank' | 'settings' | 'cutoffs';
 @Component({
   selector: 'app-company-profile',
   standalone: true,
-  imports: [NgClass, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, CompanyDetailsFormComponent, CompanyImagesComponent, CompanyBankFormComponent, CompanyInvoiceSettingsComponent, SessionCutOffsComponent],
+  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, CompanyDetailsFormComponent, CompanyImagesComponent, CompanyBankFormComponent, CompanyInvoiceSettingsComponent, SessionCutOffsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
@@ -41,9 +42,9 @@ type CompanyTab = 'details' | 'images' | 'bank' | 'settings' | 'cutoffs';
         <section class="overflow-hidden rounded-[10px] border border-neutral-200 bg-white dark:border-charcoal-700 dark:bg-charcoal-800">
           <div class="flex gap-6 overflow-x-auto border-b border-neutral-200 px-4 dark:border-charcoal-700" role="tablist">
             @for (t of tabs; track t) {
-              <button type="button" role="tab" (click)="tab.set(t)" [attr.aria-selected]="tab() === t"
+              <a role="tab" [routerLink]="tabLink(t)" [attr.aria-selected]="tab() === t"
                 class="-mb-px whitespace-nowrap border-b-2 py-3 text-sm font-semibold transition-colors"
-                [ngClass]="tab() === t ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'companyProfile.tabs.' + t | translate }}</button>
+                [ngClass]="tab() === t ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'companyProfile.tabs.' + t | translate }}</a>
             }
           </div>
           <div class="p-4">
@@ -66,7 +67,14 @@ export class CompanyProfileComponent {
 
   /** One section at a time (the owner: the last two cards were far below the first two). */
   readonly tabs: readonly CompanyTab[] = ['details', 'images', 'bank', 'settings', 'cutoffs'];
-  readonly tab = signal<CompanyTab>('details');
+  /** Platform U14c: the section is the `tab` of the address (`/company-profile/bank`), so it can be linked; no section in the address is the details. */
+  private readonly routeTab = injectRouteParam('tab');
+  readonly tab = computed<CompanyTab>(() => this.tabs.find((t) => t === this.routeTab()) ?? 'details');
+  /** The address of a section of the Company profile (the details are the profile's own address). */
+  tabLink(tab: CompanyTab): string[] {
+    return tab === 'details' ? ['/company-profile'] : ['/company-profile', tab];
+  }
+
   readonly id = signal('');
   readonly profile = signal<CompanyProfile | null>(null);
   readonly identity = signal<CompanyInvoiceIdentity | null>(null);

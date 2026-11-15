@@ -1,11 +1,12 @@
 import { DecimalPipe, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { VendorService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { VendorDetail } from '@org/shared-models';
 import { vendorStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
 import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 
@@ -20,6 +21,7 @@ import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
   imports: [
     DecimalPipe,
     NgClass,
+    RouterLink,
     TranslatePipe,
     ButtonComponent,
     CardComponent,
@@ -45,9 +47,15 @@ export class VendorDetailComponent {
   private readonly vendors = inject(VendorService);
   private readonly translate = inject(TranslateService);
 
-  /** Finance section 6: the profile tabs; the later vendor documents become further tabs. */
-  readonly tab = signal<'profile' | 'ledger'>('profile');
+  /** Platform U14c: the tab is the `tab` of the address (`/vendors/:id/ledger`), so it can be linked; no tab in the address is the profile. */
+  private readonly routeTab = injectRouteParam('tab');
   readonly tabs: readonly ('profile' | 'ledger')[] = ['profile', 'ledger'];
+  readonly tab = computed<'profile' | 'ledger'>(() => this.tabs.find((t) => t === this.routeTab()) ?? 'profile');
+
+  /** The address of a tab of this vendor (the profile is the vendor's own address). */
+  tabLink(tab: 'profile' | 'ledger'): string[] {
+    return tab === 'profile' ? ['/vendors', this.id()] : ['/vendors', this.id(), tab];
+  }
 
   readonly vendor = signal<VendorDetail | null>(null);
   readonly loading = signal(true);
@@ -62,10 +70,7 @@ export class VendorDetailComponent {
   constructor() {
     effect(() => {
       this.id();
-      untracked(() => {
-        this.tab.set('profile');
-        this.load();
-      });
+      untracked(() => this.load());
     });
   }
 

@@ -1,6 +1,6 @@
 import { inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 
 /**
@@ -12,6 +12,34 @@ export function injectSelectedId(): Signal<string | null> {
   const router = inject(Router);
   const route = inject(ActivatedRoute);
   const read = (): string | null => route.snapshot.firstChild?.paramMap.get('id') ?? null;
+  return toSignal(
+    router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      startWith(null),
+      map(read),
+    ),
+    { initialValue: read() },
+  );
+}
+
+/**
+ * A route parameter of the page's own route or of the routes under it, or null (spec platform U16: every tab has its own address,
+ * so a tab can be linked from outside the page). Like {@link injectSelectedId} it reads the whole snapshot tree, so it is right at
+ * every moment. The tab of a record beside a list is the `tab` parameter of the child route `:id/:tab`; a page that is itself the
+ * route reads its own `:tab`.
+ */
+export function injectRouteParam(name: string): Signal<string | null> {
+  const router = inject(Router);
+  const route = inject(ActivatedRoute);
+  const read = (): string | null => {
+    let node: ActivatedRouteSnapshot | null = route.snapshot;
+    while (node) {
+      const value = node.paramMap.get(name);
+      if (value !== null) return value;
+      node = node.firstChild;
+    }
+    return null;
+  };
   return toSignal(
     router.events.pipe(
       filter((e) => e instanceof NavigationEnd),

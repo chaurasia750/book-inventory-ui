@@ -34,10 +34,10 @@ interface BookRow {
         @if (canEdit()) {
           <div class="flex flex-wrap items-end gap-2">
             <div class="min-w-[12rem] flex-1"><app-item-entry (picked)="addItem($event)" /></div>
-            <app-button size="sm" variant="secondary" (clicked)="bulkOpen.set(true)">{{ 'planning.bulk' | translate }}</app-button>
+            <app-button size="lg" variant="secondary" (clicked)="bulkOpen.set(true)">{{ 'planning.bulk' | translate }}</app-button>
             <label class="text-xs text-gray-500">{{ 'planning.estimate' | translate }}
               <input type="number" min="0" max="5000" step="1" [value]="estimate() ?? ''" (change)="estimate.set($any($event.target).value === '' ? null : +$any($event.target).value); dirty.set(true)"
-                class="mt-1 block h-10 w-28 rounded-lg border border-gray-300 px-2 text-right text-sm" />
+                class="mt-1 block h-12 w-28 rounded-xl border border-gray-200 bg-gray-50 px-2 text-right text-sm shadow-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
             </label>
           </div>
         } @else {
