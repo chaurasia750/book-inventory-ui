@@ -1,14 +1,4 @@
 <div class="flex flex-col gap-5">
-  <div class="flex flex-wrap items-center gap-3">
-    <div class="mr-auto min-w-0">
-      <h1 class="truncate text-xl font-semibold text-primary-fg">{{ statement()?.partyName || ('ledger.statement.title' | translate) }}</h1>
-      @if (statement(); as s) {
-        <p class="font-mono text-xs text-gray-500">{{ s.partyCode }}@if (!s.isActive) { · {{ 'ledger.inactive' | translate }} }</p>
-      }
-    </div>
-    <app-close-button [label]="'ledger.statement.close' | translate" (clicked)="closed.emit()" />
-  </div>
-
   <app-card>
     <form [formGroup]="filters" (ngSubmit)="load()" class="grid gap-3 sm:grid-cols-4">
       <div>

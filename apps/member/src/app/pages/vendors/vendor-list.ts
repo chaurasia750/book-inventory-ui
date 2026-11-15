@@ -1,14 +1,16 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { VendorService } from '@org/api-services';
+import { LedgerService, VendorService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { PagedList, VENDOR_STATES, VENDOR_STATUSES, VendorStatus, VendorSummary } from '@org/shared-models';
 import { vendorStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
+import { OutstandingTableComponent } from '../ledger/outstanding-table';
 import { VendorAddComponent } from './vendor-add';
 import { VendorDetailComponent } from './vendor-detail';
 import { VendorEditComponent } from './vendor-edit';
@@ -25,6 +27,8 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
   selector: 'app-vendor-list',
   standalone: true,
   imports: [
+    DecimalPipe,
+    OutstandingTableComponent,
     ReactiveFormsModule,
     TranslatePipe,
     ButtonComponent,
@@ -41,6 +45,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
 export class VendorListComponent {
   private readonly vendors = inject(VendorService);
   private readonly router = inject(Router);
+  private readonly ledger = inject(LedgerService);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -64,10 +69,18 @@ export class VendorListComponent {
   readonly loadError = signal('');
   readonly skeletonRows = [1, 2, 3];
 
+  /** Finance R17: each listed vendor's balance (the Owner's); finance R11: "with a balance only" shows the outstanding list instead. */
+  readonly balances = signal<Partial<Record<string, number>>>({});
+  readonly withBalance = signal(false);
+  readonly searchText = signal('');
+
   constructor() {
     this.search.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.applyFilters());
+      .subscribe((text) => {
+        this.searchText.set(text);
+        this.applyFilters();
+      });
     this.load();
   }
 
@@ -84,6 +97,10 @@ export class VendorListComponent {
   setState(value: string): void {
     this.state.set(value);
     this.applyFilters();
+  }
+
+  setWithBalance(value: boolean): void {
+    this.withBalance.set(value);
   }
 
   goToPage(page: number): void {
@@ -137,11 +154,19 @@ export class VendorListComponent {
         next: (result) => {
           this.loading.set(false);
           this.result.set(result);
+          this.loadBalances(result.items.map((row) => row.id));
         },
         error: (error: unknown) => {
           this.loading.set(false);
           this.loadError.set(messageForError(error, this.translate));
         },
       });
+  }
+
+  private loadBalances(ids: string[]): void {
+    this.balances.set({});
+    if (ids.length > 0) {
+      this.ledger.balances('vendors', ids).subscribe({ next: (b) => this.balances.set(b), error: () => this.balances.set({}) });
+    }
   }
 }

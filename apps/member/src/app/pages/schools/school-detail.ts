@@ -1,6 +1,5 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
 import { SchoolService } from '@org/api-services';
@@ -8,16 +7,30 @@ import { messageForError } from '@org/interceptors';
 import { SchoolDetail } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { LedgerStatementComponent } from '../ledger/ledger-statement';
+import { PartyBalanceComponent } from '../ledger/party-balance';
 
 /**
- * One school (school spec R6-R8, R10, R12): the master data with the generated code read-only, the edit dialog, the class
+ * One school's profile (school spec R6-R8, R10, R12; finance section 6): tabs Profile, Classes and, for the Owner, Ledger, and
+ * the balance in the header. The master data with the generated code read-only, the edit dialog, the class
  * list editor (add, rename, move, remove; a duplicate name is caught before the request) and activate / deactivate. Staff
  * see everything read-only. The API enforces every rule again; its catalogue message is shown on a refusal.
  */
 @Component({
   selector: 'app-school-detail',
   standalone: true,
-  imports: [DecimalPipe, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
+  imports: [
+    DecimalPipe,
+    NgClass,
+    TranslatePipe,
+    ButtonComponent,
+    CardComponent,
+    CloseButtonComponent,
+    ModalComponent,
+    SkeletonLoaderComponent,
+    LedgerStatementComponent,
+    PartyBalanceComponent,
+  ],
   templateUrl: './school-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -35,6 +48,9 @@ export class SchoolDetailComponent {
   private readonly translate = inject(TranslateService);
 
   readonly canEdit = inject(AuthService).hasAppRole('OWNER');
+
+  /** Finance section 6: the profile tabs; the later school documents become further tabs. */
+  readonly tab = signal<'profile' | 'classes' | 'ledger'>('profile');
 
   readonly school = signal<SchoolDetail | null>(null);
   readonly loading = signal(true);
@@ -55,7 +71,10 @@ export class SchoolDetailComponent {
   constructor() {
     effect(() => {
       this.id();
-      untracked(() => this.load());
+      untracked(() => {
+        this.tab.set('profile');
+        this.load();
+      });
     });
   }
 

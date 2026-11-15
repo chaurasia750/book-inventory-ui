@@ -20,10 +20,10 @@
       <div class="mr-auto flex min-w-0 flex-wrap items-center gap-3">
         <h1 class="font-mono text-xl font-semibold text-primary-fg">{{ s.code }}</h1>
         <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(s.status)">{{ 'school.status.' + s.status | translate }}</span>
+        @if (canEdit) { <app-party-balance party="schools" [id]="s.id" /> }
       </div>
       @if (canEdit) {
         <div class="flex flex-wrap gap-2">
-          <a [routerLink]="['/ledger/schools', s.id]" class="inline-flex h-10 items-center rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">{{ 'ledger.link' | translate }}</a>
           <app-button variant="secondary" (clicked)="editRequested.emit()">{{ 'school.edit.button' | translate }}</app-button>
           <app-button variant="secondary" (clicked)="openStatus()">
             {{ (s.status === 'ACTIVE' ? 'school.deactivate.button' : 'school.activate.button') | translate }}
@@ -33,6 +33,19 @@
       <app-close-button [label]="'school.close' | translate" (clicked)="closed.emit()" />
     </div>
 
+    <div class="flex gap-1 border-b border-gray-200" role="tablist">
+      <button type="button" role="tab" (click)="tab.set('profile')" [attr.aria-selected]="tab() === 'profile'"
+        class="-mb-px border-b-2 px-4 py-2 text-sm font-semibold transition-colors"
+        [ngClass]="tab() === 'profile' ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'school.tabs.profile' | translate }}</button>
+      <button type="button" role="tab" (click)="tab.set('classes')" [attr.aria-selected]="tab() === 'classes'"
+        class="-mb-px border-b-2 px-4 py-2 text-sm font-semibold transition-colors"
+        [ngClass]="tab() === 'classes' ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'school.tabs.classes' | translate }}</button>
+      @if (canEdit) { <button type="button" role="tab" (click)="tab.set('ledger')" [attr.aria-selected]="tab() === 'ledger'"
+        class="-mb-px border-b-2 px-4 py-2 text-sm font-semibold transition-colors"
+        [ngClass]="tab() === 'ledger' ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'school.tabs.ledger' | translate }}</button> }
+    </div>
+
+    @if (tab() === 'profile') {
     <app-card>
       <dl class="grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
         <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.name' | translate }}</dt><dd class="mt-1 text-base font-semibold">{{ s.name }}</dd></div>
@@ -49,7 +62,13 @@
         <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.address' | translate }}</dt><dd class="mt-1">{{ s.address || '-' }}</dd></div>
       </dl>
     </app-card>
+    }
 
+    @if (tab() === 'ledger' && canEdit) {
+      <app-ledger-statement party="schools" [id]="s.id" />
+    }
+
+    @if (tab() === 'classes') {
     <app-card>
       <h2 class="mb-3 text-lg font-semibold text-primary-fg">{{ 'school.classes.title' | translate }}</h2>
       @if (classesError()) {
@@ -87,6 +106,7 @@
         }
       }
     </app-card>
+    }
 
     @if (canEdit) {
       <app-modal [open]="statusOpen()" [title]="(s.status === 'ACTIVE' ? 'school.deactivate.title' : 'school.activate.title') | translate" (closed)="statusOpen.set(false)">

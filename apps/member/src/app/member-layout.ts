@@ -56,16 +56,13 @@ export class MemberLayoutComponent {
     },
   ];
 
-  /** Vendor spec R8, finance R13: vendors and their ledger are the Owner's; Staff have no access. */
+  /** Vendor spec R8, platform U14: vendors are the Owner's; a vendor's ledger is a tab of its profile. Staff have no access. */
   private readonly vendorNavItems: SidebarNavItem[] = [
     {
       name: 'Vendors',
       icon: TREE_ICON,
       section: 'BUSINESS',
-      subItems: [
-        { name: 'Vendor list', path: '/vendors' },
-        { name: 'Vendor ledger', path: '/ledger/vendors' },
-      ],
+      path: '/vendors',
     },
   ];
 
@@ -75,23 +72,8 @@ export class MemberLayoutComponent {
     { name: 'Audit log', icon: SETTINGS_ICON, section: 'SETTINGS', path: '/audit' },
   ];
 
-  /**
-   * School spec R9, R11, finance R13: the Owner and Staff both see the company's schools (Staff read-only); the school ledger sits
-   * in the same menu and is the Owner's only. Schools and vendors each have their own menu with their ledger inside.
-   */
-  private readonly schoolNavItems: SidebarNavItem[] = this.auth.hasAppRole('OWNER')
-    ? [
-        {
-          name: 'Schools',
-          icon: TREE_ICON,
-          section: 'BUSINESS',
-          subItems: [
-            { name: 'School list', path: '/schools' },
-            { name: 'School ledger', path: '/ledger/schools' },
-          ],
-        },
-      ]
-    : [{ name: 'Schools', icon: TREE_ICON, section: 'BUSINESS', path: '/schools' }];
+  /** School spec R9, R11, platform U14: the Owner and Staff both see the schools (Staff read-only); a school's ledger is a tab of its profile. */
+  private readonly schoolNavItems: SidebarNavItem[] = [{ name: 'Schools', icon: TREE_ICON, section: 'BUSINESS', path: '/schools' }];
 
   readonly navItems: SidebarNavItem[] = [
     ...(FEATURES.iam ? this.iamNavItems : []),

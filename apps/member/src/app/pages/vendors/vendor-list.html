@@ -12,6 +12,10 @@
       <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
         <input type="search" [formControl]="search" [placeholder]="'vendor.filters.search' | translate" [attr.aria-label]="'vendor.filters.search' | translate"
           class="h-10 min-w-[12rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <input type="checkbox" [checked]="withBalance()" (change)="setWithBalance($any($event.target).checked)" class="h-4 w-4 rounded border-gray-300" />
+          {{ 'ledger.withBalanceOnly' | translate }}
+        </label>
         @if (!hasPanel()) {
           <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'vendor.columns.status' | translate" [class]="select">
             <option value="">{{ 'vendor.filters.allStatuses' | translate }}</option>
@@ -24,6 +28,9 @@
         }
       </div>
 
+      @if (withBalance()) {
+        <app-outstanding-table party="vendors" [search]="searchText()" [selectedId]="selectedId()" (opened)="openView($event)" />
+      } @else {
       @if (loadError()) {
         <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
           <span>{{ loadError() }}</span>
@@ -63,6 +70,7 @@
                 <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.state' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.bank' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'vendor.columns.status' | translate }}</th>
+                <th class="px-4 py-3 text-right font-semibold">{{ 'ledger.balanceColumn' | translate }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -88,10 +96,11 @@
                     <td class="px-4 py-3">
                       <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(vendor.status)">{{ 'vendor.status.' + vendor.status | translate }}</span>
                     </td>
+                    <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="(balances()[vendor.id] ?? 0) < 0">{{ (balances()[vendor.id] ?? 0) | number: '1.2-2' }}</td>
                   </tr>
                 } @empty {
                   @if (!loadError()) {
-                    <tr><td colspan="6" class="py-10 text-center text-sm text-gray-400">{{ 'vendor.empty' | translate }}</td></tr>
+                    <tr><td [attr.colspan]="7" class="py-10 text-center text-sm text-gray-400">{{ 'vendor.empty' | translate }}</td></tr>
                   }
                 }
               }
@@ -101,6 +110,7 @@
       }
 
       <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+      }
     </div>
 
     <div detail>

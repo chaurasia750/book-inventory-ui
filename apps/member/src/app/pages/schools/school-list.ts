@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -5,7 +6,7 @@ import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuthService } from '@org/auth';
-import { SchoolService } from '@org/api-services';
+import { LedgerService, SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import {
   PagedList,
@@ -20,6 +21,7 @@ import {
 } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
+import { OutstandingTableComponent } from '../ledger/outstanding-table';
 import { SchoolAddComponent } from './school-add';
 import { SchoolDetailComponent } from './school-detail';
 import { SchoolEditComponent } from './school-edit';
@@ -36,6 +38,8 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
   selector: 'app-school-list',
   standalone: true,
   imports: [
+    DecimalPipe,
+    OutstandingTableComponent,
     ReactiveFormsModule,
     TranslatePipe,
     ButtonComponent,
@@ -52,6 +56,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
 export class SchoolListComponent {
   private readonly schools = inject(SchoolService);
   private readonly router = inject(Router);
+  private readonly ledger = inject(LedgerService);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -82,10 +87,18 @@ export class SchoolListComponent {
   readonly loadError = signal('');
   readonly skeletonRows = [1, 2, 3];
 
+  /** Finance R17: each listed school's balance (the Owner's); finance R11: "with a balance only" shows the outstanding list instead. */
+  readonly balances = signal<Partial<Record<string, number>>>({});
+  readonly withBalance = signal(false);
+  readonly searchText = signal('');
+
   constructor() {
     this.search.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.applyFilters());
+      .subscribe((text) => {
+        this.searchText.set(text);
+        this.applyFilters();
+      });
     this.load();
   }
 
@@ -112,6 +125,10 @@ export class SchoolListComponent {
   setState(value: string): void {
     this.state.set(value);
     this.applyFilters();
+  }
+
+  setWithBalance(value: boolean): void {
+    this.withBalance.set(value);
   }
 
   goToPage(page: number): void {
@@ -171,11 +188,19 @@ export class SchoolListComponent {
         next: (result) => {
           this.loading.set(false);
           this.result.set(result);
+          this.loadBalances(result.items.map((row) => row.id));
         },
         error: (error: unknown) => {
           this.loading.set(false);
           this.loadError.set(messageForError(error, this.translate));
         },
       });
+  }
+
+  private loadBalances(ids: string[]): void {
+    this.balances.set({});
+    if (this.canEdit && ids.length > 0) {
+      this.ledger.balances('schools', ids).subscribe({ next: (b) => this.balances.set(b), error: () => this.balances.set({}) });
+    }
   }
 }

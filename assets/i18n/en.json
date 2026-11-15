@@ -775,7 +775,12 @@
       "duplicate": "Two classes have the same name."
     },
     "close": "Close",
-    "detail": "School details"
+    "detail": "School details",
+    "tabs": {
+      "profile": "Profile",
+      "classes": "Classes",
+      "ledger": "Ledger"
+    }
   },
   "vendor": {
     "title": "Vendors",
@@ -842,6 +847,10 @@
       "button": "Activate",
       "title": "Activate vendor",
       "confirm": "The vendor can be chosen for new documents again."
+    },
+    "tabs": {
+      "profile": "Profile",
+      "ledger": "Ledger"
     }
   },
   "item": {
@@ -1161,7 +1170,6 @@
     "total": "Total outstanding",
     "empty": "Nobody has an outstanding balance.",
     "inactive": "Inactive",
-    "link": "Ledger",
     "filter": {
       "kind": "Show",
       "all": "All entries",
@@ -1197,13 +1205,11 @@
       "PURCHASE_RETURN": "Purchase return",
       "SCRATCH": "Test posting"
     },
-    "schools": {
-      "title": "School ledger",
-      "subtitle": "What every school owes. Open a school for its statement."
-    },
-    "vendors": {
-      "title": "Vendor ledger",
-      "subtitle": "What the company owes every vendor. Open a vendor for its statement."
+    "withBalanceOnly": "With a balance only",
+    "balanceColumn": "Balance",
+    "balance": {
+      "school": "Owes",
+      "vendor": "To pay"
     }
   }
 }

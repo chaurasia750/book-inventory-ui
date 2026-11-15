@@ -14,6 +14,10 @@
       <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
         <input type="search" [formControl]="search" [placeholder]="'school.filters.search' | translate" [attr.aria-label]="'school.filters.search' | translate"
           class="h-10 min-w-[12rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+        @if (canEdit) { <label class="flex items-center gap-2 text-sm text-gray-600">
+          <input type="checkbox" [checked]="withBalance()" (change)="setWithBalance($any($event.target).checked)" class="h-4 w-4 rounded border-gray-300" />
+          {{ 'ledger.withBalanceOnly' | translate }}
+        </label> }
         @if (!hasPanel()) {
           @if (canEdit) {
             <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'school.columns.status' | translate" [class]="select">
@@ -36,6 +40,9 @@
         }
       </div>
 
+      @if (withBalance()) {
+        <app-outstanding-table party="schools" [search]="searchText()" [selectedId]="selectedId()" (opened)="openView($event)" />
+      } @else {
       @if (loadError()) {
         <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
           <span>{{ loadError() }}</span>
@@ -75,6 +82,7 @@
                 <th class="px-4 py-3 font-semibold">{{ 'school.columns.sale' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'school.columns.session' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'school.columns.status' | translate }}</th>
+                @if (canEdit) { <th class="px-4 py-3 text-right font-semibold">{{ 'ledger.balanceColumn' | translate }}</th> }
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -100,10 +108,11 @@
                     <td class="px-4 py-3">
                       <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(school.status)">{{ 'school.status.' + school.status | translate }}</span>
                     </td>
+                    @if (canEdit) { <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="(balances()[school.id] ?? 0) < 0">{{ (balances()[school.id] ?? 0) | number: '1.2-2' }}</td> }
                   </tr>
                 } @empty {
                   @if (!loadError()) {
-                    <tr><td colspan="6" class="py-10 text-center text-sm text-gray-400">{{ 'school.empty' | translate }}</td></tr>
+                    <tr><td [attr.colspan]="canEdit ? 7 : 6" class="py-10 text-center text-sm text-gray-400">{{ 'school.empty' | translate }}</td></tr>
                   }
                 }
               }
@@ -113,6 +122,7 @@
       }
 
       <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+      }
     </div>
 
     <div detail>
