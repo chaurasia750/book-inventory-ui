@@ -6,6 +6,9 @@ export type SessionType = (typeof SESSION_TYPES)[number];
 export const SALE_TYPES = ['SCHOOL_ORDER', 'COUNTER_SALE', 'BOTH'] as const;
 export type SaleType = (typeof SALE_TYPES)[number];
 
+/** The standard class names (school spec R6, the list a new school starts with); an item's class is chosen from them. */
+export const CLASS_NAMES = ['Nursery', 'LKG', 'UKG', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'] as const;
+
 /** How a school pays (school spec R20): the default of its orders (sales R34). */
 export const PAYMENT_TYPES = ['CASH', 'CREDIT'] as const;
 export type PaymentType = (typeof PAYMENT_TYPES)[number];

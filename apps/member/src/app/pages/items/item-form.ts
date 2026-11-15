@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { VendorService } from '@org/api-services';
 import {
+  CLASS_NAMES,
   GST_RATES,
   ITEM_CATEGORIES,
   ItemCategory,
@@ -56,7 +57,10 @@ interface VendorOption {
         </div>
         <div>
           <label for="if-class" class="mb-1 block text-sm font-semibold">{{ 'item.fields.className' | translate }}</label>
-          <input id="if-class" formControlName="className" class="${FIELD}" />
+          <select id="if-class" formControlName="className" class="${FIELD}">
+            <option value="">-</option>
+            @for (c of classChoices(); track c) { <option [value]="c">{{ c }}</option> }
+          </select>
         </div>
         <div>
           <label for="if-subject" class="mb-1 block text-sm font-semibold">{{ 'item.fields.subject' | translate }}</label>
@@ -96,6 +100,12 @@ export class ItemFormComponent {
   cancelled = output<void>();
 
   private readonly vendors = inject(VendorService);
+
+  /** Item spec R2: the class is chosen from the standard class names; a class an item already has, if it is not one of them, stays choosable. */
+  readonly classChoices = computed<string[]>(() => {
+    const own = this.item()?.className;
+    return own && !(CLASS_NAMES as readonly string[]).includes(own) ? [...CLASS_NAMES, own] : [...CLASS_NAMES];
+  });
   private readonly destroyRef = inject(DestroyRef);
 
   readonly categories = ITEM_CATEGORIES;
