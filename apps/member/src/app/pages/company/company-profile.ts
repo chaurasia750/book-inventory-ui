@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
@@ -10,6 +11,8 @@ import { CompanyDetailsFormComponent } from './company-details-form';
 import { CompanyImagesComponent } from './company-images';
 import { CompanyInvoiceSettingsComponent } from './company-invoice-settings';
 
+type CompanyTab = 'details' | 'images' | 'bank' | 'settings';
+
 /**
  * The Company profile screen (company spec R17-R21, the owner's request "company settings"): under SETTINGS for the Owner. One page
  * with the company's details (address, contact, GSTIN, PAN, tagline), the logo and the signature, the one bank account and the invoice
@@ -18,7 +21,7 @@ import { CompanyInvoiceSettingsComponent } from './company-invoice-settings';
 @Component({
   selector: 'app-company-profile',
   standalone: true,
-  imports: [TranslatePipe, ButtonComponent, SkeletonLoaderComponent, CompanyDetailsFormComponent, CompanyImagesComponent, CompanyBankFormComponent, CompanyInvoiceSettingsComponent],
+  imports: [NgClass, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, CompanyDetailsFormComponent, CompanyImagesComponent, CompanyBankFormComponent, CompanyInvoiceSettingsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-4">
@@ -33,12 +36,19 @@ import { CompanyInvoiceSettingsComponent } from './company-invoice-settings';
       } @else if (loading()) {
         <div class="space-y-2 rounded-[10px] border border-neutral-200 bg-white p-4"><app-skeleton-loader width="40%" /><app-skeleton-loader width="100%" /><app-skeleton-loader width="80%" /></div>
       } @else if (id() && profile() && identity(); as ident) {
-        <div class="grid gap-4 lg:grid-cols-2">
-          <app-company-details-form [companyId]="id()" [profile]="profile()!" />
-          <app-company-images [companyId]="id()" [logoUrl]="ident.logoUrl" [signatureUrl]="ident.signatureUrl" />
-          <app-company-bank-form [companyId]="id()" [bank]="ident.bank" />
-          <app-company-invoice-settings [companyId]="id()" [settings]="ident.invoice" />
+        <div class="flex gap-6 overflow-x-auto border-b border-neutral-200 dark:border-charcoal-700" role="tablist">
+          @for (t of tabs; track t) {
+            <button type="button" role="tab" (click)="tab.set(t)" [attr.aria-selected]="tab() === t"
+              class="-mb-px whitespace-nowrap border-b-2 py-3 text-sm font-semibold transition-colors"
+              [ngClass]="tab() === t ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'companyProfile.tabs.' + t | translate }}</button>
+          }
         </div>
+        @switch (tab()) {
+          @case ('details') { <app-company-details-form [companyId]="id()" [profile]="profile()!" /> }
+          @case ('images') { <app-company-images [companyId]="id()" [logoUrl]="ident.logoUrl" [signatureUrl]="ident.signatureUrl" /> }
+          @case ('bank') { <app-company-bank-form [companyId]="id()" [bank]="ident.bank" /> }
+          @case ('settings') { <app-company-invoice-settings [companyId]="id()" [settings]="ident.invoice" /> }
+        }
       }
     </div>
   `,
@@ -47,6 +57,9 @@ export class CompanyProfileComponent {
   private readonly companies = inject(CompanyService);
   private readonly translate = inject(TranslateService);
 
+  /** One section at a time (the owner: the last two cards were far below the first two). */
+  readonly tabs: readonly CompanyTab[] = ['details', 'images', 'bank', 'settings'];
+  readonly tab = signal<CompanyTab>('details');
   readonly id = signal('');
   readonly profile = signal<CompanyProfile | null>(null);
   readonly identity = signal<CompanyInvoiceIdentity | null>(null);

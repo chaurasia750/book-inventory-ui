@@ -1546,9 +1546,15 @@
     "settings": {
       "title": "Invoice settings",
       "terms": "Terms and conditions",
-      "termsHint": "One item per line; the invoice numbers them.",
+      "termsHint": "One item per line; the invoice numbers them. Placeholders filled on each invoice: {{company_name}}, {{school_name}}, {{school_code}}, {{invoice_number}}, {{invoice_date}}, {{financial_year}}, {{session}}, {{order_number}}.",
       "footer": "Footer line",
       "printGstin": "Print the GSTIN in the invoice header"
+    },
+    "tabs": {
+      "details": "Company details",
+      "images": "Logo and signature",
+      "bank": "Bank account",
+      "settings": "Invoice settings"
     }
   }
 }
