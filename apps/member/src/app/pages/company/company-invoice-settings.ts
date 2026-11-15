@@ -29,6 +29,10 @@ const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] 
         </div>
         <div><label for="cs-footer" [class]="label">{{ 'companyProfile.settings.footer' | translate }}</label><input id="cs-footer" formControlName="footer" maxlength="200" [class]="field" /></div>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" formControlName="printGstin" class="h-4 w-4" /> {{ 'companyProfile.settings.printGstin' | translate }}</label>
+        <div>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" formControlName="usesItemDiscount" class="h-4 w-4" /> {{ 'companyProfile.settings.usesItemDiscount' | translate }}</label>
+          <p class="m-0 mt-1 text-xs text-gray-500">{{ 'companyProfile.settings.usesItemDiscountHint' | translate }}</p>
+        </div>
       </form>
       @if (message()) { <p class="m-0 text-sm" [class.text-red-600]="isError()" [class.text-green-700]="!isError()" role="status">{{ message() }}</p> }
       <div class="flex justify-end"><app-button [loading]="saving()" (clicked)="save()">{{ 'companyProfile.save' | translate }}</app-button></div>
@@ -52,12 +56,13 @@ export class CompanyInvoiceSettingsComponent {
     terms: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(4000)] }),
     footer: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(200)] }),
     printGstin: new FormControl(true, { nonNullable: true }),
+    usesItemDiscount: new FormControl(false, { nonNullable: true }),
   });
 
   constructor() {
     effect(() => {
       const s = this.settings();
-      this.form.reset({ terms: s.terms ?? '', footer: s.footer ?? '', printGstin: s.printGstin });
+      this.form.reset({ terms: s.terms ?? '', footer: s.footer ?? '', printGstin: s.printGstin, usesItemDiscount: s.usesItemDiscount });
     });
   }
 
@@ -69,7 +74,7 @@ export class CompanyInvoiceSettingsComponent {
     const v = this.form.getRawValue();
     this.saving.set(true);
     this.message.set('');
-    this.companies.setInvoiceIdentity(this.companyId(), { invoice: { terms: v.terms.trim(), footer: v.footer.trim(), printGstin: v.printGstin } }).subscribe({
+    this.companies.setInvoiceIdentity(this.companyId(), { invoice: { terms: v.terms.trim(), footer: v.footer.trim(), printGstin: v.printGstin, usesItemDiscount: v.usesItemDiscount } }).subscribe({
       next: () => {
         this.saving.set(false);
         this.show(this.translate.instant('companyProfile.saved'), false);
