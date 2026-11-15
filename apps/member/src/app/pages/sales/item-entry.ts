@@ -30,11 +30,14 @@ const PAUSE_MS = 250;
   template: `
     <div class="relative">
       <label for="oe-scan" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.editor.addItem' | translate }}</label>
+      <svg class="pointer-events-none absolute bottom-[14px] left-4 h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+      </svg>
       <input #box id="oe-scan" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="oe-suggestions" [attr.aria-expanded]="suggestions().length > 0"
         [placeholder]="'sales.editor.scanHint' | translate"
         (input)="suggest(box.value)" (keydown.arrowdown)="move(1); $event.preventDefault()" (keydown.arrowup)="move(-1); $event.preventDefault()"
         (keydown.enter)="enter(box.value); $event.preventDefault()" (keydown.escape)="close()"
-        class="h-12 w-full rounded-xl border border-gray-300 bg-white px-4 text-base focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+        class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50 pl-12 pr-4 text-base shadow-sm placeholder:text-gray-400 focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
       @if (message()) {
         <p class="mt-1 text-xs text-red-600" role="alert">{{ message() }}</p>
       }

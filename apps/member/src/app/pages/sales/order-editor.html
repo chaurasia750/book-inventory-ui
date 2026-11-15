@@ -74,8 +74,8 @@
           <!-- R27: the search sits first and wide; class sets and bulk add are beside it -->
           <div class="flex flex-wrap items-end gap-2">
             <div class="min-w-[18rem] flex-1"><app-item-entry (picked)="addItem($event)" /></div>
-            <app-button variant="secondary" [loading]="saving()" (clicked)="openSets()">{{ 'sales.classSets.button' | translate }}</app-button>
-            <app-button variant="secondary" [loading]="saving()" (clicked)="openBulk()">{{ 'sales.bulk.button' | translate }}</app-button>
+            <app-button size="lg" variant="secondary" [loading]="saving()" (clicked)="openSets()">{{ 'sales.classSets.button' | translate }}</app-button>
+            <app-button size="lg" variant="secondary" [loading]="saving()" (clicked)="openBulk()">{{ 'sales.bulk.button' | translate }}</app-button>
           </div>
           @if (lines().length === 0) {
             <div class="grid gap-3 sm:grid-cols-2">
