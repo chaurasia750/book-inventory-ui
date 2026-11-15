@@ -65,7 +65,7 @@ export class SchoolDetailComponent {
 
   readonly canEdit = inject(AuthService).hasAppRole('OWNER');
 
-  /** Platform U14c: the tab is the `tab` of the address (`/schools/:id/payments`), so it can be linked; no tab in the address is the profile. */
+  /** Platform U16: the tab is the `tab` of the address (`/schools/:id/payments`), so it can be linked; no tab in the address is the profile. */
   private readonly routeTab = injectRouteParam('tab');
   /** The tabs this account sees: the ledger is the Owner's only (finance R13). */
   /** Sales section 6: the school's orders and invoices are tabs of its profile (Owner and Staff); the payments (payment R2) and the ledger are the Owner's. */

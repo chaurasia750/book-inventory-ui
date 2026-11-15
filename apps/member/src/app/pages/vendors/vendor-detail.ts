@@ -47,7 +47,7 @@ export class VendorDetailComponent {
   private readonly vendors = inject(VendorService);
   private readonly translate = inject(TranslateService);
 
-  /** Platform U14c: the tab is the `tab` of the address (`/vendors/:id/ledger`), so it can be linked; no tab in the address is the profile. */
+  /** Platform U16: the tab is the `tab` of the address (`/vendors/:id/ledger`), so it can be linked; no tab in the address is the profile. */
   private readonly routeTab = injectRouteParam('tab');
   readonly tabs: readonly ('profile' | 'ledger')[] = ['profile', 'ledger'];
   readonly tab = computed<'profile' | 'ledger'>(() => this.tabs.find((t) => t === this.routeTab()) ?? 'profile');

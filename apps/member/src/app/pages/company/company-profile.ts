@@ -67,7 +67,7 @@ export class CompanyProfileComponent {
 
   /** One section at a time (the owner: the last two cards were far below the first two). */
   readonly tabs: readonly CompanyTab[] = ['details', 'images', 'bank', 'settings', 'cutoffs'];
-  /** Platform U14c: the section is the `tab` of the address (`/company-profile/bank`), so it can be linked; no section in the address is the details. */
+  /** Platform U16: the section is the `tab` of the address (`/company-profile/bank`), so it can be linked; no section in the address is the details. */
   private readonly routeTab = injectRouteParam('tab');
   readonly tab = computed<CompanyTab>(() => this.tabs.find((t) => t === this.routeTab()) ?? 'details');
   /** The address of a section of the Company profile (the details are the profile's own address). */
