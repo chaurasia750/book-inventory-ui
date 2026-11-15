@@ -1,0 +1,52 @@
+/* Platform U19: pages change calmly, one shared behaviour for every app.
+   a) the room of the scrollbar is always kept, so the page never shifts sideways when it grows taller than the screen;
+   c) a page change fades in over about 150 ms (the browser's view transition; a CSS fade where there is none);
+   d) arriving data fades in over about 150 ms (table rows, list rows, anything marked `.appear`);
+   e) nothing is animated for a person who asks for reduced motion. */
+html {
+  scrollbar-gutter: stable;
+}
+
+@keyframes calm-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 150ms;
+  animation-timing-function: ease-out;
+}
+
+tbody > tr,
+ul.divide-y > li,
+.appear {
+  animation: calm-appear 150ms ease-out;
+}
+
+/* The fallback for a browser with no view transitions: the page the router puts after its outlet fades in. */
+@supports not (view-transition-name: none) {
+  router-outlet + * {
+    animation: calm-appear 150ms ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  tbody > tr,
+  ul.divide-y > li,
+  .appear,
+  router-outlet + * {
+    animation: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

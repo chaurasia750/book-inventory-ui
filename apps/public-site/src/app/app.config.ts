@@ -15,6 +15,7 @@ import { AuthService, LOGIN_URL } from '@org/auth';
 import { API_BASE_URL } from '@org/api-services';
 import { authInterceptor, errorInterceptor, loadingInterceptor } from '@org/interceptors';
 import { appRoutes } from './app.routes';
+import { withCalmViewTransitions } from '@org/ui';
 import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
@@ -24,6 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       appRoutes,
       withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' }),
+      withCalmViewTransitions(),
     ),
     provideHttpClient(withInterceptors([loadingInterceptor, authInterceptor, errorInterceptor])),
     provideAnimationsAsync(),

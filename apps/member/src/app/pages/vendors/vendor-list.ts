@@ -67,7 +67,7 @@ export class VendorListComponent {
   readonly result = signal<PagedList<VendorSummary> | null>(null);
   readonly loading = signal(false);
   readonly loadError = signal('');
-  readonly skeletonRows = [1, 2, 3];
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
 
   /** Finance R17: each listed vendor's balance (the Owner's); finance R11: "with a balance only" shows the outstanding list instead. */
   readonly balances = signal<Partial<Record<string, number>>>({});
