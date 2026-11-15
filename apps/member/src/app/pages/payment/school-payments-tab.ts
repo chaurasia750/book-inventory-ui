@@ -21,7 +21,13 @@ const PAGE_SIZE = 10;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
-      <div class="flex justify-end"><app-button size="sm" (clicked)="receiveOpen.set(true)">{{ 'payment.tab.receive' | translate }}</app-button></div>
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <label class="flex items-center gap-2 text-xs">
+          <input type="checkbox" class="h-4 w-4" [checked]="pendingOnly()" (change)="setPendingOnly($any($event.target).checked)" />
+          {{ 'payment.tab.pendingOnly' | translate }}
+        </label>
+        <app-button size="sm" (clicked)="receiveOpen.set(true)">{{ 'payment.tab.receive' | translate }}</app-button>
+      </div>
       @if (error()) {
         <div class="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
           <span>{{ error() }}</span><app-button size="sm" variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
@@ -58,7 +64,7 @@ const PAGE_SIZE = 10;
       <app-pagination [page]="page()" [pageSize]="pageSize" [total]="total()" (pageChange)="goTo($event)" />
     </div>
     <app-receive-payment-dialog [open]="receiveOpen()" [schoolId]="schoolId()" (closed)="receiveOpen.set(false)" (recordedReceipt)="load()" />
-    <app-receipt-detail-dialog [receiptId]="openId()" (closed)="openId.set(null)" />
+    <app-receipt-detail-dialog [receiptId]="openId()" (closed)="openId.set(null)" (changed)="load()" />
   `,
 })
 export class SchoolPaymentsTabComponent {
@@ -75,6 +81,8 @@ export class SchoolPaymentsTabComponent {
   readonly error = signal('');
   readonly receiveOpen = signal(false);
   readonly openId = signal<string | null>(null);
+  /** Payment R16: only the receipts that have a pending cheque. */
+  readonly pendingOnly = signal(false);
 
   constructor() {
     effect(() => {
@@ -89,7 +97,7 @@ export class SchoolPaymentsTabComponent {
   load(): void {
     this.loading.set(true);
     this.error.set('');
-    this.payments.list({ schoolId: this.schoolId(), pageIndex: this.page(), pageSize: PAGE_SIZE }).subscribe({
+    this.payments.list({ schoolId: this.schoolId(), chequeStatus: this.pendingOnly() ? 'PENDING' : undefined, pageIndex: this.page(), pageSize: PAGE_SIZE }).subscribe({
       next: (p) => {
         this.rows.set(p.items);
         this.total.set(p.totalCount);
@@ -100,6 +108,12 @@ export class SchoolPaymentsTabComponent {
         this.error.set(messageForError(e, this.translate));
       },
     });
+  }
+
+  setPendingOnly(on: boolean): void {
+    this.pendingOnly.set(on);
+    this.page.set(1);
+    this.load();
   }
 
   goTo(page: number): void {

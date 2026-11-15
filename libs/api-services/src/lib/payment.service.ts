@@ -34,6 +34,16 @@ export class PaymentService {
     return this.api.get<ReceiptDetail>(`/receipts/${id}`);
   }
 
+  /** R10: the cheque cleared on this date (`yyyy-MM-dd`, not before the cheque date). */
+  clearCheque(receiptId: string, modeId: string, date: string): Observable<void> {
+    return this.api.post<void>(`/receipts/${receiptId}/cheques/${modeId}/clear`, { date });
+  }
+
+  /** R10, R11: the cheque bounced on this date, with a reason (5-500 characters). */
+  bounceCheque(receiptId: string, modeId: string, date: string, reason: string): Observable<void> {
+    return this.api.post<void>(`/receipts/${receiptId}/cheques/${modeId}/bounce`, { date, reason });
+  }
+
   /** R4-R9: records a payment; the same `clientRequestId` returns the receipt already recorded. */
   record(request: RecordReceiptRequest): Observable<ReceiptDetail> {
     return this.api.post<ReceiptDetail>('/receipts', request);

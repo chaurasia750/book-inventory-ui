@@ -1,19 +1,26 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ReceiptDetail } from '@org/shared-models';
 import { ButtonComponent, ModalComponent } from '@org/ui';
 
+/** Today as `yyyy-MM-dd` in the browser's own time zone (the business date the Owner sees). */
+function todayIso(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 /**
  * One receipt (payment spec R16): its number, date, school, status, modes with their references and cheque status, what it was
- * applied to and the advance. Read-only here; cheque results, adjusting and cancelling come with their own screens.
+ * applied to and the advance. A pending cheque has Clear and Bounce (R10, R11); adjusting and cancelling come with their own screens.
  */
 @Component({
   selector: 'app-receipt-detail-dialog',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, TranslatePipe, ButtonComponent, ModalComponent],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal size="wide" [open]="receiptId() !== null" [title]="'payment.detail.title' | translate" (closed)="closed.emit()">
@@ -47,6 +54,12 @@ import { ButtonComponent, ModalComponent } from '@org/ui';
                     @if (m.type === 'CHEQUE') {
                       {{ m.chequeNumber }} · {{ m.chequeDate | date: 'dd MMM yy' }} · {{ m.bankName }}
                       @if (m.chequeStatus) { <span class="ml-1 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-semibold">{{ 'payment.cheque.' + m.chequeStatus | translate }}</span> }
+                      @if (m.chequeStatus === 'PENDING' && r.summary.status === 'RECORDED') {
+                        <span class="ml-2 inline-flex gap-1">
+                          <app-button size="sm" variant="secondary" (clicked)="startAction(m.id, 'clear')">{{ 'payment.cheque.clearAction' | translate }}</app-button>
+                          <app-button size="sm" variant="secondary" (clicked)="startAction(m.id, 'bounce')">{{ 'payment.cheque.bounceAction' | translate }}</app-button>
+                        </span>
+                      }
                     } @else { {{ m.reference || '-' }} }
                   </td>
                   <td class="py-1.5 text-right font-mono">{{ m.amount | number: '1.2-2' }}</td>
@@ -54,6 +67,28 @@ import { ButtonComponent, ModalComponent } from '@org/ui';
               }
             </tbody>
           </table>
+          @if (action(); as a) {
+            <div class="space-y-2 rounded-lg border border-neutral-200 p-3 dark:border-charcoal-700" role="group" [attr.aria-label]="'payment.cheque.' + a.kind + 'Action' | translate">
+              <p class="m-0 text-sm font-semibold">{{ 'payment.cheque.' + a.kind + 'Action' | translate }}</p>
+              <div class="grid gap-2 sm:grid-cols-[10rem_1fr]">
+                <div>
+                  <label for="cq-date" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'payment.cheque.date' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
+                  <input id="cq-date" type="date" [formControl]="actionDate" class="h-10 w-full rounded-lg border border-gray-300 bg-white px-2 text-sm" />
+                </div>
+                @if (a.kind === 'bounce') {
+                  <div>
+                    <label for="cq-reason" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'payment.cheque.reason' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
+                    <input id="cq-reason" [formControl]="actionReason" maxlength="500" class="h-10 w-full rounded-lg border border-gray-300 bg-white px-2 text-sm" />
+                  </div>
+                }
+              </div>
+              @if (actionError()) { <p class="m-0 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-600" role="alert">{{ actionError() }}</p> }
+              <div class="flex justify-end gap-2">
+                <app-button size="sm" variant="secondary" (clicked)="action.set(null)">{{ 'users.cancel' | translate }}</app-button>
+                <app-button size="sm" [loading]="acting()" (clicked)="saveAction()">{{ 'payment.cheque.save' | translate }}</app-button>
+              </div>
+            </div>
+          }
           <div>
             <p class="m-0 mb-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'payment.detail.appliedTo' | translate }}</p>
             @if (r.allocations.length === 0) {
@@ -80,6 +115,8 @@ export class ReceiptDetailDialogComponent {
   /** The receipt to show; the dialog is closed while this is null. */
   readonly receiptId = input<string | null>(null);
   readonly closed = output<void>();
+  /** A cheque result was saved: the school's list and balance reload. */
+  readonly changed = output<void>();
 
   private readonly payments = inject(PaymentService);
   private readonly translate = inject(TranslateService);
@@ -87,12 +124,53 @@ export class ReceiptDetailDialogComponent {
   readonly receipt = signal<ReceiptDetail | null>(null);
   readonly loading = signal(false);
   readonly error = signal('');
+  /** Payment R10: the cheque result being entered (clear or bounce) with its date and, for a bounce, its reason. */
+  readonly action = signal<{ modeId: string; kind: 'clear' | 'bounce' } | null>(null);
+  readonly acting = signal(false);
+  readonly actionError = signal('');
+  readonly actionDate = new FormControl(todayIso(), { nonNullable: true });
+  readonly actionReason = new FormControl('', { nonNullable: true });
 
   constructor() {
     effect(() => {
       if (this.receiptId() !== null) {
         untracked(() => this.load());
       }
+    });
+  }
+
+  startAction(modeId: string, kind: 'clear' | 'bounce'): void {
+    this.actionError.set('');
+    this.actionDate.setValue(todayIso());
+    this.actionReason.setValue('');
+    this.action.set({ modeId, kind });
+  }
+
+  saveAction(): void {
+    const a = this.action();
+    const receipt = this.receipt();
+    if (!a || !receipt || !this.actionDate.value) {
+      this.actionError.set(this.translate.instant('payment.cheque.dateRequired'));
+      return;
+    }
+
+    this.acting.set(true);
+    this.actionError.set('');
+    const call =
+      a.kind === 'clear'
+        ? this.payments.clearCheque(receipt.summary.id, a.modeId, this.actionDate.value)
+        : this.payments.bounceCheque(receipt.summary.id, a.modeId, this.actionDate.value, this.actionReason.value.trim());
+    call.subscribe({
+      next: () => {
+        this.acting.set(false);
+        this.action.set(null);
+        this.changed.emit();
+        this.load();
+      },
+      error: (e: unknown) => {
+        this.acting.set(false);
+        this.actionError.set(messageForError(e, this.translate));
+      },
     });
   }
 

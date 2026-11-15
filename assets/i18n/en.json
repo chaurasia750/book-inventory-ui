@@ -236,6 +236,11 @@
       "invalid_remark": "The remark can have at most 500 characters.",
       "invalid_allocation": "The amount applied to an invoice must be above zero, at most what is due on it, and all together at most the payment.",
       "invoice_not_open": "This invoice is not an open invoice of the school.",
+      "cheque_not_found": "The cheque could not be found in this receipt.",
+      "cheque_result_set": "This cheque already has a result (cleared or bounced).",
+      "invalid_result_date": "The date cannot be in the future, and a cheque cannot clear before its cheque date.",
+      "invalid_reason": "Give the reason, 5 to 500 characters.",
+      "receipt_not_recorded": "Only a recorded receipt can be changed; this one was cancelled.",
       "too_many_ids": "At most 100 invoices can be asked at once."
     },
     "price": {
@@ -948,9 +953,19 @@
   },
   "payment": {
     "mode": { "CASH": "Cash", "UPI": "UPI", "BANK_TRANSFER": "Bank transfer", "CHEQUE": "Cheque" },
-    "cheque": { "PENDING": "Pending", "CLEARED": "Cleared", "BOUNCED": "Bounced" },
+    "cheque": {
+      "PENDING": "Pending",
+      "CLEARED": "Cleared",
+      "BOUNCED": "Bounced",
+      "clearAction": "Mark cleared",
+      "bounceAction": "Mark bounced",
+      "date": "Date",
+      "reason": "Reason for the bounce",
+      "save": "Save",
+      "dateRequired": "Choose the date."
+    },
     "status": { "RECORDED": "Recorded", "CANCELLED": "Cancelled" },
-    "tab": { "receive": "Receive payment", "empty": "No payments yet." },
+    "tab": { "receive": "Receive payment", "empty": "No payments yet.", "pendingOnly": "Only receipts with a pending cheque" },
     "invoice": { "paid": "Paid", "due": "Due" },
     "detail": {
       "title": "Payment receipt",
@@ -958,7 +973,7 @@
       "advance": "Advance",
       "reference": "Reference",
       "appliedTo": "Applied to",
-      "noAllocations": "Not applied to any invoice: all of it is advance."
+      "noAllocations": "Not applied to any invoice."
     },
     "receive": {
       "title": "Receive payment",
