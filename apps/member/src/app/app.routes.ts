@@ -53,6 +53,22 @@ export const appRoutes: Route[] = [
         // An item's stock opens beside the list (platform U10); the id is the item's. Writing is the Owner's (the panel shows no forms to Staff).
         children: [{ path: ':id', children: [] }],
       },
+      // Sales spec Q11: the order editor and the invoice open full width from the school's profile (not a menu entry, platform U14).
+      {
+        path: 'school-orders/:id',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/sales/order-editor').then((m) => m.OrderEditorComponent),
+      },
+      {
+        path: 'invoices/:id',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/sales/invoice-view').then((m) => m.InvoiceViewComponent),
+      },
+      {
+        path: 'session-cut-offs',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('./pages/sales/session-cut-offs').then((m) => m.SessionCutOffsComponent),
+      },
       {
         path: 'items',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],

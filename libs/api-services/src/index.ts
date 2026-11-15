@@ -12,3 +12,4 @@ export * from './lib/stock.service';
 export * from './lib/iam-self.service';
 export * from './lib/core-audit.service';
 export * from './lib/ledger.service';
+export * from './lib/sales.service';
