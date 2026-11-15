@@ -7,7 +7,7 @@ import { CompanyInvoiceSettings } from '@org/shared-models';
 import { ButtonComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20';
-const CARD = 'flex flex-col gap-3 rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800';
+const CARD = 'flex flex-col gap-3';
 const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500';
 
 /**
@@ -21,7 +21,6 @@ const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] 
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section [class]="card">
-      <h2 class="m-0 text-base font-semibold text-primary-fg">{{ 'companyProfile.settings.title' | translate }}</h2>
       <form [formGroup]="form" class="flex flex-col gap-3">
         <div>
           <label for="cs-terms" [class]="label">{{ 'companyProfile.settings.terms' | translate }}</label>

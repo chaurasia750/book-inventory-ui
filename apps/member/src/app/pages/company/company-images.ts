@@ -5,7 +5,7 @@ import { messageForError } from '@org/interceptors';
 import { CompanyImageKind } from '@org/shared-models';
 import { ButtonComponent } from '@org/ui';
 
-const CARD = 'flex flex-col gap-3 rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800';
+const CARD = 'flex flex-col gap-3';
 const MAX_BYTES = 2 * 1024 * 1024;
 
 /**
@@ -19,7 +19,6 @@ const MAX_BYTES = 2 * 1024 * 1024;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section [class]="card">
-      <h2 class="m-0 text-base font-semibold text-primary-fg">{{ 'companyProfile.images.title' | translate }}</h2>
       @for (kind of kinds; track kind) {
         <div class="flex flex-wrap items-center gap-3 border-t border-neutral-200 pt-3 first:border-t-0 first:pt-0 dark:border-charcoal-700">
           <div class="flex h-20 w-32 items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50 dark:border-charcoal-700 dark:bg-charcoal-900">

@@ -85,7 +85,6 @@ export class MemberLayoutComponent {
     { name: 'Staff', icon: MEMBERS_ICON, section: 'SETTINGS', path: '/staff' },
     { name: 'Audit log', icon: SETTINGS_ICON, section: 'SETTINGS', path: '/audit' },
     { name: 'Company profile', icon: SETTINGS_ICON, section: 'SETTINGS', path: '/company-profile' },
-    { name: 'Session cut-offs', icon: SETTINGS_ICON, section: 'SETTINGS', path: '/session-cut-offs' },
   ];
 
   /** School spec R9, R11, platform U14: the Owner and Staff both see the schools (Staff read-only); a school's ledger is a tab of its profile. */

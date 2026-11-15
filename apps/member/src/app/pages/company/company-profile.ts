@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
@@ -5,10 +6,13 @@ import { CompanyService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { CompanyInvoiceIdentity, CompanyProfile } from '@org/shared-models';
 import { ButtonComponent, SkeletonLoaderComponent } from '@org/ui';
+import { SessionCutOffsComponent } from '../sales/session-cut-offs';
 import { CompanyBankFormComponent } from './company-bank-form';
 import { CompanyDetailsFormComponent } from './company-details-form';
 import { CompanyImagesComponent } from './company-images';
 import { CompanyInvoiceSettingsComponent } from './company-invoice-settings';
+
+type CompanyTab = 'details' | 'images' | 'bank' | 'settings' | 'cutoffs';
 
 /**
  * The Company profile screen (company spec R17-R21, the owner's request "company settings"): under SETTINGS for the Owner. One page
@@ -18,14 +22,10 @@ import { CompanyInvoiceSettingsComponent } from './company-invoice-settings';
 @Component({
   selector: 'app-company-profile',
   standalone: true,
-  imports: [TranslatePipe, ButtonComponent, SkeletonLoaderComponent, CompanyDetailsFormComponent, CompanyImagesComponent, CompanyBankFormComponent, CompanyInvoiceSettingsComponent],
+  imports: [NgClass, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, CompanyDetailsFormComponent, CompanyImagesComponent, CompanyBankFormComponent, CompanyInvoiceSettingsComponent, SessionCutOffsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex flex-col gap-4">
-      <div>
-        <h1 class="text-2xl font-bold text-primary-fg">{{ 'companyProfile.title' | translate }}</h1>
-        <p class="mt-0.5 text-sm text-gray-500">{{ 'companyProfile.subtitle' | translate }}</p>
-      </div>
+    <div class="flex flex-col gap-3">
       @if (error()) {
         <div class="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
           <span>{{ error() }}</span><app-button size="sm" variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
@@ -33,12 +33,29 @@ import { CompanyInvoiceSettingsComponent } from './company-invoice-settings';
       } @else if (loading()) {
         <div class="space-y-2 rounded-[10px] border border-neutral-200 bg-white p-4"><app-skeleton-loader width="40%" /><app-skeleton-loader width="100%" /><app-skeleton-loader width="80%" /></div>
       } @else if (id() && profile() && identity(); as ident) {
-        <div class="grid gap-4 lg:grid-cols-2">
-          <app-company-details-form [companyId]="id()" [profile]="profile()!" />
-          <app-company-images [companyId]="id()" [logoUrl]="ident.logoUrl" [signatureUrl]="ident.signatureUrl" />
-          <app-company-bank-form [companyId]="id()" [bank]="ident.bank" />
-          <app-company-invoice-settings [companyId]="id()" [settings]="ident.invoice" />
-        </div>
+        <section class="flex flex-col gap-1 rounded-[10px] border border-neutral-200 bg-white px-4 py-3.5 dark:border-charcoal-700 dark:bg-charcoal-800">
+          <h1 class="m-0 text-xl font-semibold text-primary-fg">{{ profile()!.name }}</h1>
+          <p class="m-0 text-xs text-gray-500">{{ 'companyProfile.title' | translate }} · {{ 'companyProfile.subtitle' | translate }}</p>
+        </section>
+
+        <section class="overflow-hidden rounded-[10px] border border-neutral-200 bg-white dark:border-charcoal-700 dark:bg-charcoal-800">
+          <div class="flex gap-6 overflow-x-auto border-b border-neutral-200 px-4 dark:border-charcoal-700" role="tablist">
+            @for (t of tabs; track t) {
+              <button type="button" role="tab" (click)="tab.set(t)" [attr.aria-selected]="tab() === t"
+                class="-mb-px whitespace-nowrap border-b-2 py-3 text-sm font-semibold transition-colors"
+                [ngClass]="tab() === t ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'companyProfile.tabs.' + t | translate }}</button>
+            }
+          </div>
+          <div class="p-4">
+            @switch (tab()) {
+              @case ('details') { <app-company-details-form [companyId]="id()" [profile]="profile()!" /> }
+              @case ('images') { <app-company-images [companyId]="id()" [logoUrl]="ident.logoUrl" [signatureUrl]="ident.signatureUrl" /> }
+              @case ('bank') { <app-company-bank-form [companyId]="id()" [bank]="ident.bank" /> }
+              @case ('settings') { <app-company-invoice-settings [companyId]="id()" [settings]="ident.invoice" /> }
+              @case ('cutoffs') { <app-session-cut-offs /> }
+            }
+          </div>
+        </section>
       }
     </div>
   `,
@@ -47,6 +64,9 @@ export class CompanyProfileComponent {
   private readonly companies = inject(CompanyService);
   private readonly translate = inject(TranslateService);
 
+  /** One section at a time (the owner: the last two cards were far below the first two). */
+  readonly tabs: readonly CompanyTab[] = ['details', 'images', 'bank', 'settings', 'cutoffs'];
+  readonly tab = signal<CompanyTab>('details');
   readonly id = signal('');
   readonly profile = signal<CompanyProfile | null>(null);
   readonly identity = signal<CompanyInvoiceIdentity | null>(null);

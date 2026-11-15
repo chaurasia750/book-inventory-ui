@@ -8,7 +8,7 @@ import { ButtonComponent } from '@org/ui';
 const SELECT = 'h-10 rounded-lg border border-gray-300 bg-white px-2 text-sm focus:border-brand-500 focus:outline-none';
 
 /**
- * The company's session cut-offs (school spec R19, BRD Q-05), under SETTINGS for the Owner: the day and month from which an
+ * The company's session cut-offs (school spec R19, BRD Q-05), a tab of the Company profile for the Owner: the day and month from which an
  * Apr-Mar school's dates and a Jan-Dec school's dates belong to the next session. The server checks the day and the month range.
  */
 @Component({
@@ -18,12 +18,9 @@ const SELECT = 'h-10 rounded-lg border border-gray-300 bg-white px-2 text-sm foc
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex max-w-2xl flex-col gap-3">
-      <div>
-        <h1 class="text-2xl font-bold text-primary-fg">{{ 'sales.cutOffs.title' | translate }}</h1>
-        <p class="mt-0.5 text-sm text-gray-500">{{ 'sales.cutOffs.subtitle' | translate }}</p>
-      </div>
+      <p class="m-0 text-sm text-gray-500">{{ 'sales.cutOffs.subtitle' | translate }}</p>
       @if (value(); as v) {
-        <section class="flex flex-col gap-4 rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800">
+        <section class="flex flex-col gap-4">
           @for (row of rows; track row.key) {
             <div>
               <span class="mb-1 block text-sm font-semibold">{{ 'sales.cutOffs.' + row.key | translate }}<span class="text-red-500" aria-hidden="true"> *</span></span>
