@@ -2,7 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { LedgerService } from '@org/api-services';
@@ -14,14 +14,14 @@ import { LedgerStatementComponent } from './ledger-statement';
 const PAGE_SIZE = 20;
 
 /**
- * The outstanding lists (finance spec R11, R16): the Schools tab and the Vendors tab (one route each), every party with a
+ * The school ledger and the vendor ledger lists (finance spec R11, R16), each opened from its own menu (Schools, Vendors): every party with a
  * non-zero balance, largest first, with the total of the list, searchable and paged. A party's statement opens in the panel
  * beside the list (platform U10). The Owner's only (R13).
  */
 @Component({
   selector: 'app-outstanding-list',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, RouterLink, RouterLinkActive, TranslatePipe, ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, LedgerStatementComponent],
+  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, LedgerStatementComponent],
   templateUrl: './outstanding-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

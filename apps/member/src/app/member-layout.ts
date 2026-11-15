@@ -39,9 +39,6 @@ export class MemberLayoutComponent {
     { name: 'Dashboard', icon: DASHBOARD_ICON, section: 'MAIN', path: '/' },
   ];
 
-  /** Finance spec R13: the ledger is the Owner's only, in its own menu group. */
-  private readonly ledgerNavItems: SidebarNavItem[] = [{ name: 'Ledger', icon: SETTINGS_ICON, section: 'LEDGER', path: '/ledger' }];
-
   /**
    * Item spec R9, price spec R5, stock spec R10: the Owner and Staff both see the items, their prices and their stock (Staff
    * read-only, without purchase prices), as one "Items" menu with three entries (owner's request, 2026-11-15).
@@ -59,8 +56,18 @@ export class MemberLayoutComponent {
     },
   ];
 
-  /** Vendor spec R8: vendors are the Owner's; Staff have no access. */
-  private readonly vendorNavItems: SidebarNavItem[] = [{ name: 'Vendors', icon: TREE_ICON, section: 'VENDORS', path: '/vendors' }];
+  /** Vendor spec R8, finance R13: vendors and their ledger are the Owner's; Staff have no access. */
+  private readonly vendorNavItems: SidebarNavItem[] = [
+    {
+      name: 'Vendors',
+      icon: TREE_ICON,
+      section: 'VENDORS',
+      subItems: [
+        { name: 'Vendor list', path: '/vendors' },
+        { name: 'Vendor ledger', path: '/ledger/vendors' },
+      ],
+    },
+  ];
 
   /** R66: the Owner manages the Staff of their own company and reads the audit log of it (core A7). */
   private readonly ownerNavItems: SidebarNavItem[] = [
@@ -68,15 +75,29 @@ export class MemberLayoutComponent {
     { name: 'Audit log', icon: SETTINGS_ICON, section: 'LOGS', path: '/audit' },
   ];
 
-  /** School spec R9, R11: the Owner and Staff both see the company's schools (Staff read-only). Schools and vendors each have their own menu group (their ledgers join them later). */
-  private readonly schoolNavItems: SidebarNavItem[] = [{ name: 'Schools', icon: TREE_ICON, section: 'SCHOOLS', path: '/schools' }];
+  /**
+   * School spec R9, R11, finance R13: the Owner and Staff both see the company's schools (Staff read-only); the school ledger sits
+   * in the same menu and is the Owner's only. Schools and vendors each have their own menu with their ledger inside.
+   */
+  private readonly schoolNavItems: SidebarNavItem[] = this.auth.hasAppRole('OWNER')
+    ? [
+        {
+          name: 'Schools',
+          icon: TREE_ICON,
+          section: 'SCHOOLS',
+          subItems: [
+            { name: 'School list', path: '/schools' },
+            { name: 'School ledger', path: '/ledger/schools' },
+          ],
+        },
+      ]
+    : [{ name: 'Schools', icon: TREE_ICON, section: 'SCHOOLS', path: '/schools' }];
 
   readonly navItems: SidebarNavItem[] = [
     ...(FEATURES.iam ? this.iamNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.schoolNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.itemNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.vendorNavItems : []),
-    ...(this.auth.hasAppRole('OWNER') ? this.ledgerNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];
 

@@ -1,15 +1,10 @@
 <div class="flex flex-col gap-4">
   <div>
-    <h1 class="text-2xl font-bold text-primary-fg">{{ 'ledger.title' | translate }}</h1>
-    <p class="mt-0.5 text-sm text-gray-500">{{ 'ledger.subtitle' | translate }}</p>
+    <h1 class="text-2xl font-bold text-primary-fg">{{ 'ledger.' + party + '.title' | translate }}</h1>
+    <p class="mt-0.5 text-sm text-gray-500">{{ 'ledger.' + party + '.subtitle' | translate }}</p>
   </div>
 
-  <nav class="flex gap-2" [attr.aria-label]="'ledger.tabs' | translate">
-    <a routerLink="/ledger/schools" routerLinkActive="bg-gold-100 text-gold-800" class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600">{{ 'ledger.schools' | translate }}</a>
-    <a routerLink="/ledger/vendors" routerLinkActive="bg-gold-100 text-gold-800" class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600">{{ 'ledger.vendors' | translate }}</a>
-  </nav>
-
-  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'ledger.title' | translate" [detailLabel]="'ledger.statement.title' | translate">
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'ledger.' + party + '.title' | translate" [detailLabel]="'ledger.statement.title' | translate">
     <div list>
       <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
         <input type="search" [formControl]="search" [placeholder]="'ledger.search' | translate" [attr.aria-label]="'ledger.search' | translate"

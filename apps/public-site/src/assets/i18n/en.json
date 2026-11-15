@@ -1155,11 +1155,6 @@
     }
   },
   "ledger": {
-    "title": "Ledger",
-    "subtitle": "What every school owes and what the company owes every vendor. Open a row for its statement.",
-    "tabs": "Ledger lists",
-    "schools": "Schools",
-    "vendors": "Vendors",
     "search": "Search name or code",
     "total": "Total outstanding",
     "empty": "Nobody has an outstanding balance.",
@@ -1199,6 +1194,14 @@
       "SALES_RETURN": "Sales return",
       "PURCHASE_RETURN": "Purchase return",
       "SCRATCH": "Test posting"
+    },
+    "schools": {
+      "title": "School ledger",
+      "subtitle": "What every school owes. Open a school for its statement."
+    },
+    "vendors": {
+      "title": "Vendor ledger",
+      "subtitle": "What the company owes every vendor. Open a vendor for its statement."
     }
   }
 }
