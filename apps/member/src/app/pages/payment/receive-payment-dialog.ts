@@ -16,7 +16,7 @@ import {
   SchoolDues,
   proofFileError,
 } from '@org/shared-models';
-import { ButtonComponent, DatePickerComponent, ModalComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent, SidePanelComponent } from '@org/ui';
 
 interface ModeRow {
   type: PaymentModeType;
@@ -34,7 +34,7 @@ const blankMode = (): ModeRow => ({ type: 'CASH', amount: '', reference: '', che
 const money = (value: number): number => Math.round(value * 100) / 100;
 
 /**
- * The "Receive payment" dialog of a school (payment spec R3-R9): the school's balance and open invoices first, then the modes (a
+ * The "Receive payment" side panel of a school (payment spec R3-R9; platform U17: the form scrolls, the totals and the buttons stay at the bottom): the school's balance and open invoices first, then the modes (a
  * mix is one receipt), the date and a remark. The payment is applied oldest invoice first (the preview here only repeats what the
  * server does) or by hand; the part applied to no invoice is the advance. The same client request id is sent on every attempt of
  * one dialog, so a retry never records the payment twice (R9).
@@ -42,10 +42,10 @@ const money = (value: number): number => Math.round(value * 100) / 100;
 @Component({
   selector: 'app-receive-payment-dialog',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, ModalComponent],
+  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SidePanelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <app-modal size="wide" [open]="open()" [title]="'payment.receive.title' | translate" (closed)="close()">
+    <app-side-panel [isOpen]="open()" panelWidth="min(760px, 100vw)" [title]="'payment.receive.title' | translate" (closed)="close()">
       @if (recorded(); as done) {
         <div class="space-y-4 text-sm" role="status">
           <p class="m-0 font-semibold text-primary-fg">{{ 'payment.receive.done' | translate: { number: done.summary.number } }}</p>
@@ -68,7 +68,8 @@ const money = (value: number): number => Math.round(value * 100) / 100;
           <span>{{ loadError() }}</span><app-button size="sm" variant="secondary" (clicked)="loadDues()">{{ 'users.retry' | translate }}</app-button>
         </div>
       } @else if (dues(); as d) {
-        <div class="space-y-4">
+        <div class="flex min-h-0 flex-1 flex-col gap-4">
+          <div class="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
           <div class="rounded-lg border border-neutral-200 p-3 dark:border-charcoal-700">
             <p class="m-0 text-sm">
               {{ 'payment.receive.balance' | translate }}:
@@ -178,7 +179,8 @@ const money = (value: number): number => Math.round(value * 100) / 100;
             @if (proofError()) { <p class="m-0 mt-1 text-xs text-red-600" role="alert">{{ proofError() }}</p> }
             @else if (proofFiles().length > 0) { <p class="m-0 mt-1 text-xs text-gray-500">{{ proofNames() }}</p> }
           </div>
-          <div class="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-3 text-sm dark:border-charcoal-700">
+          </div>
+          <div class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-3 text-sm dark:border-charcoal-700">
             <div class="flex flex-wrap gap-x-5 gap-y-1">
               <span>{{ 'payment.detail.total' | translate }}: <span class="font-mono font-semibold">{{ total() | number: '1.2-2' }}</span></span>
               <span>{{ 'payment.receive.applied' | translate }}: <span class="font-mono">{{ applied() | number: '1.2-2' }}</span></span>
@@ -192,7 +194,7 @@ const money = (value: number): number => Math.round(value * 100) / 100;
           @if (error()) { <p class="m-0 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-600" role="alert">{{ error() }}</p> }
         </div>
       }
-    </app-modal>
+    </app-side-panel>
   `,
 })
 export class ReceivePaymentDialogComponent {

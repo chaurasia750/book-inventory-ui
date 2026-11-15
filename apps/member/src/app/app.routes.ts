@@ -123,7 +123,8 @@ export const appRoutes: Route[] = [
         children: [
           { path: 'new', canActivate: [appRoleGuard(['OWNER'])], children: [] },
           { path: ':id/edit', canActivate: [appRoleGuard(['OWNER'])], children: [] },
-          // A tab of the school has its own address, `/schools/:id/payments` (platform U16); the panel state reads it like `:id`.
+          // A tab of the school has its own address, `/schools/:id/payments` (platform U16), and a record of the tab is one segment more (`/schools/:id/payments/:itemId`); the panel state reads them like `:id`.
+          { path: ':id/:tab/:itemId', children: [] },
           { path: ':id/:tab', children: [] },
           { path: ':id', children: [] },
         ],

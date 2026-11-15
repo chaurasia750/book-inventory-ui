@@ -1,10 +1,11 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ReceiptSummary } from '@org/shared-models';
-import { ButtonComponent, PaginationComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, PaginationComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
 import { ReceiptDetailDialogComponent } from './receipt-detail-dialog';
 import { ReceivePaymentDialogComponent } from './receive-payment-dialog';
 
@@ -12,7 +13,7 @@ const PAGE_SIZE = 10;
 
 /**
  * The Payments tab of a school's profile (payment spec R16, platform U14): the school's receipts newest first, paged, with the
- * Receive payment button (R3-R9). A row opens the receipt. For the Owner only (payment R2); the tab is not offered to Staff.
+ * Receive payment button (R3-R9). A row opens the receipt beside the list; the receipt and the new-payment form are in the address. For the Owner only (payment R2); the tab is not offered to Staff.
  */
 @Component({
   selector: 'app-school-payments-tab',
@@ -26,7 +27,7 @@ const PAGE_SIZE = 10;
           <input type="checkbox" class="h-4 w-4" [checked]="pendingOnly()" (change)="setPendingOnly($any($event.target).checked)" />
           {{ 'payment.tab.pendingOnly' | translate }}
         </label>
-        <app-button size="sm" (clicked)="receiveOpen.set(true)">{{ 'payment.tab.receive' | translate }}</app-button>
+        <app-button size="sm" (clicked)="openNew()">{{ 'payment.tab.receive' | translate }}</app-button>
       </div>
       @if (error()) {
         <div class="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
@@ -48,7 +49,7 @@ const PAGE_SIZE = 10;
               <tr><td colspan="4" class="px-3 py-3"><app-skeleton-loader width="100%" /></td></tr>
             } @else {
               @for (r of rows(); track r.id) {
-                <tr class="cursor-pointer hover:bg-neutral-50 dark:hover:bg-charcoal-700" tabindex="0" (click)="openId.set(r.id)" (keydown.enter)="openId.set(r.id)">
+                <tr class="cursor-pointer hover:bg-neutral-50 dark:hover:bg-charcoal-700" tabindex="0" (click)="openReceipt(r.id)" (keydown.enter)="openReceipt(r.id)">
                   <td class="whitespace-nowrap px-3 py-2 font-mono font-medium text-primary-fg" [class.line-through]="r.status === 'CANCELLED'">{{ r.number }}</td>
                   <td class="whitespace-nowrap px-3 py-2 text-gray-600">{{ r.receiptDate | date: 'dd MMM yy' }}</td>
                   <td class="px-3 py-2"><span class="rounded-full px-2 py-0.5 text-[11px] font-semibold" [class]="r.status === 'CANCELLED' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'">{{ 'payment.status.' + r.status | translate }}</span></td>
@@ -63,8 +64,8 @@ const PAGE_SIZE = 10;
       </div>
       <app-pagination [page]="page()" [pageSize]="pageSize" [total]="total()" (pageChange)="goTo($event)" />
     </div>
-    <app-receive-payment-dialog [open]="receiveOpen()" [schoolId]="schoolId()" (closed)="receiveOpen.set(false)" (recordedReceipt)="load()" />
-    <app-receipt-detail-dialog [receiptId]="openId()" (closed)="openId.set(null)" (changed)="load()" />
+    <app-receive-payment-dialog [open]="receiveOpen()" [schoolId]="schoolId()" (closed)="closePanel()" (recordedReceipt)="load()" />
+    <app-receipt-detail-dialog [receiptId]="openId()" (closed)="closePanel()" (changed)="load()" />
   `,
 })
 export class SchoolPaymentsTabComponent {
@@ -79,8 +80,14 @@ export class SchoolPaymentsTabComponent {
   readonly page = signal(1);
   readonly loading = signal(true);
   readonly error = signal('');
-  readonly receiveOpen = signal(false);
-  readonly openId = signal<string | null>(null);
+  private readonly router = inject(Router);
+  /** Platform U16: the receipt open beside the list, or `new` for the form of a new payment, is the last segment of the address (`/schools/:id/payments/:itemId`). */
+  private readonly itemId = injectRouteParam('itemId');
+  readonly receiveOpen = computed(() => this.itemId() === 'new');
+  readonly openId = computed(() => {
+    const id = this.itemId();
+    return id && id !== 'new' ? id : null;
+  });
   /** Payment R16: only the receipts that have a pending cheque. */
   readonly pendingOnly = signal(false);
 
@@ -108,6 +115,18 @@ export class SchoolPaymentsTabComponent {
         this.error.set(messageForError(e, this.translate));
       },
     });
+  }
+
+  openNew(): void {
+    void this.router.navigate(['/schools', this.schoolId(), 'payments', 'new']);
+  }
+
+  openReceipt(id: string): void {
+    void this.router.navigate(['/schools', this.schoolId(), 'payments', id]);
+  }
+
+  closePanel(): void {
+    void this.router.navigate(['/schools', this.schoolId(), 'payments']);
   }
 
   setPendingOnly(on: boolean): void {
