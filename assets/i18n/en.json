@@ -224,6 +224,25 @@
       "already_active": "The item is already active.",
       "already_inactive": "The item is already inactive."
     },
+    "payment": {
+      "receipt_not_found": "The receipt could not be found.",
+      "school_not_found": "The school could not be found.",
+      "invalid_request_id": "A payment needs a request id so that a retry cannot record it twice.",
+      "invalid_date": "The receipt date cannot be in the future.",
+      "invalid_modes": "A receipt needs one to ten payment modes.",
+      "invalid_amount": "An amount must be above zero, with at most two decimals.",
+      "invalid_reference": "A UPI transaction id or a bank UTR number must have 4 to 50 characters.",
+      "invalid_cheque": "A cheque needs its number (4 to 20 characters), its date and the school's bank.",
+      "invalid_remark": "The remark can have at most 500 characters.",
+      "invalid_allocation": "The amount applied to an invoice must be above zero, at most what is due on it, and all together at most the payment.",
+      "invoice_not_open": "This invoice is not an open invoice of the school.",
+      "cheque_not_found": "The cheque could not be found in this receipt.",
+      "cheque_result_set": "This cheque already has a result (cleared or bounced).",
+      "invalid_result_date": "The date cannot be in the future, and a cheque cannot clear before its cheque date.",
+      "invalid_reason": "Give the reason, 5 to 500 characters.",
+      "receipt_not_recorded": "Only a recorded receipt can be changed; this one was cancelled.",
+      "too_many_ids": "At most 100 invoices can be asked at once."
+    },
     "price": {
       "item_not_found": "The item could not be found.",
       "version_not_found": "The price version could not be found.",
@@ -852,6 +871,7 @@
       "classes": "Classes",
       "ledger": "Ledger",
       "orders": "Orders",
+      "payments": "Payments",
       "invoices": "Invoices",
       "bookLists": "Book lists"
     },
@@ -929,6 +949,56 @@
     "tabs": {
       "profile": "Profile",
       "ledger": "Ledger"
+    }
+  },
+  "payment": {
+    "mode": { "CASH": "Cash", "UPI": "UPI", "BANK_TRANSFER": "Bank transfer", "CHEQUE": "Cheque" },
+    "cheque": {
+      "PENDING": "Pending",
+      "CLEARED": "Cleared",
+      "BOUNCED": "Bounced",
+      "clearAction": "Mark cleared",
+      "bounceAction": "Mark bounced",
+      "date": "Date",
+      "reason": "Reason for the bounce",
+      "save": "Save",
+      "dateRequired": "Choose the date."
+    },
+    "status": { "RECORDED": "Recorded", "CANCELLED": "Cancelled" },
+    "tab": { "receive": "Receive payment", "empty": "No payments yet.", "pendingOnly": "Only receipts with a pending cheque" },
+    "invoice": { "paid": "Paid", "due": "Due" },
+    "detail": {
+      "title": "Payment receipt",
+      "total": "Total",
+      "advance": "Advance",
+      "reference": "Reference",
+      "appliedTo": "Applied to",
+      "noAllocations": "Not applied to any invoice."
+    },
+    "receive": {
+      "title": "Receive payment",
+      "loading": "Loading...",
+      "balance": "Balance",
+      "advanceHint": "the school has paid in advance",
+      "noOpen": "No open invoices: the whole payment will be an advance.",
+      "due": "Due",
+      "applied": "Applied",
+      "byHand": "Choose the amount for each invoice myself (otherwise the oldest invoice is paid first)",
+      "modes": "How the money came",
+      "mode": "Mode",
+      "amount": "Amount",
+      "upiId": "UPI transaction id",
+      "utr": "UTR number",
+      "chequeNumber": "Cheque number",
+      "chequeDate": "Cheque date",
+      "bankName": "School's bank",
+      "addMode": "Add another mode",
+      "removeMode": "Remove this mode",
+      "date": "Receipt date (today if empty)",
+      "remark": "Remark",
+      "submit": "Record payment",
+      "done": "Payment recorded: {{number}}.",
+      "close": "Close"
     }
   },
   "item": {

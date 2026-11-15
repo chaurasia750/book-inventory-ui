@@ -23,3 +23,4 @@ export * from './lib/login-history.model';
 export * from './lib/ledger.model';
 export * from './lib/sales.model';
 export * from './lib/planning.model';
+export * from './lib/payment.model';

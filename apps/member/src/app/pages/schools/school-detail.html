@@ -82,6 +82,10 @@
       <app-school-documents-tab kind="invoices" [schoolId]="s.id" />
     }
 
+    @if (tab() === 'payments' && canEdit) {
+      <app-school-payments-tab [schoolId]="s.id" />
+    }
+
     @if (tab() === 'ledger' && canEdit) {
       <app-ledger-statement party="schools" [id]="s.id" />
     }

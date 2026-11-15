@@ -9,6 +9,7 @@ export * from './lib/vendor.service';
 export * from './lib/item.service';
 export * from './lib/price.service';
 export * from './lib/stock.service';
+export * from './lib/payment.service';
 export * from './lib/iam-self.service';
 export * from './lib/core-audit.service';
 export * from './lib/ledger.service';
