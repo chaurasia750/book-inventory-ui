@@ -122,3 +122,59 @@ export interface TemporaryPasswordResponse {
 
 /** Account statuses are shared with the user list. */
 export type StaffStatus = AccountStatus;
+
+/** Company spec R21: the company's master data as the profile screen shows it (the name and the state are read-only there). */
+export interface CompanyProfile {
+  name: string;
+  state: string | null;
+  address: string | null;
+  mobile: string | null;
+  email: string | null;
+  gstin: string | null;
+  pan: string | null;
+  tagline: string | null;
+}
+
+/** Company spec R21: what an Owner may change; the name and the state are not part of it. */
+export interface EditCompanyProfileRequest {
+  address: string;
+  mobile: string;
+  email: string;
+  gstin: string;
+  pan: string;
+  tagline: string;
+}
+
+/** Company spec R19: the one bank account with its UPI id. */
+export interface CompanyBankDetails {
+  accountHolder: string | null;
+  bankName: string | null;
+  accountNumber: string | null;
+  ifsc: string | null;
+  branch: string | null;
+  upiId: string | null;
+}
+
+/** Company spec R20: the terms and conditions, the footer line and whether the GSTIN prints. */
+export interface CompanyInvoiceSettings {
+  terms: string | null;
+  footer: string | null;
+  printGstin: boolean;
+}
+
+/** `GET companies/current/invoice-identity` (company spec R17-R20). */
+export interface CompanyInvoiceIdentity {
+  logoUrl: string | null;
+  signatureUrl: string | null;
+  bank: CompanyBankDetails;
+  invoice: CompanyInvoiceSettings;
+}
+
+/** `PUT companies/{id}/invoice-identity`: an absent part keeps its current values. */
+export interface SetCompanyInvoiceIdentityRequest {
+  bank?: CompanyBankDetails;
+  invoice?: CompanyInvoiceSettings;
+}
+
+export type CompanyImageKind = 'logo' | 'signature';
+

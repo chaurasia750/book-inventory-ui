@@ -84,6 +84,7 @@ export class MemberLayoutComponent {
   private readonly ownerNavItems: SidebarNavItem[] = [
     { name: 'Staff', icon: MEMBERS_ICON, section: 'SETTINGS', path: '/staff' },
     { name: 'Audit log', icon: SETTINGS_ICON, section: 'SETTINGS', path: '/audit' },
+    { name: 'Company profile', icon: SETTINGS_ICON, section: 'SETTINGS', path: '/company-profile' },
     { name: 'Session cut-offs', icon: SETTINGS_ICON, section: 'SETTINGS', path: '/session-cut-offs' },
   ];
 

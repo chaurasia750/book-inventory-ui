@@ -79,6 +79,11 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('./pages/sales/invoice-view').then((m) => m.InvoiceViewComponent),
       },
       {
+        path: 'company-profile',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('./pages/company/company-profile').then((m) => m.CompanyProfileComponent),
+      },
+      {
         path: 'session-cut-offs',
         canActivate: [appRoleGuard(['OWNER'])],
         loadComponent: () => import('./pages/sales/session-cut-offs').then((m) => m.SessionCutOffsComponent),

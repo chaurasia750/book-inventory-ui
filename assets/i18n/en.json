@@ -154,7 +154,15 @@
       "reason_required": "A reason of 5 to 500 characters is required.",
       "already_active": "The company is already active.",
       "already_inactive": "The company is already inactive.",
-      "not_active": "The company is not active."
+      "not_active": "The company is not active.",
+      "invalid_bank": "Give all five bank details (holder, bank, branch, account number, IFSC): an account number of 9 to 18 digits and a valid IFSC.",
+      "logo_invalid": "The logo must be a PNG or JPEG image up to 2 MB.",
+      "signature_invalid": "The signature must be a PNG or JPEG image up to 2 MB.",
+      "image_not_found": "This company has no such image.",
+      "invalid_mobile": "The mobile number must have 10 to 15 digits.",
+      "invalid_email": "The email address is not valid.",
+      "invalid_gstin": "The GSTIN must be 15 characters in the GST format.",
+      "invalid_pan": "The PAN must be 10 characters: five letters, four digits and a letter."
     },
     "school": {
       "not_found": "The school could not be found.",
@@ -168,7 +176,8 @@
       "invalid_opening_balance": "The opening balance must be 0 or more with at most two decimals.",
       "invalid_state": "The business runs only in Bihar for now.",
       "already_active": "The school is already active.",
-      "already_inactive": "The school is already inactive."
+      "already_inactive": "The school is already inactive.",
+      "invalid_gstin": "The GSTIN must be 15 characters in the GST format."
     },
     "core": {
       "company_required": "Choose a company first."
@@ -1501,5 +1510,45 @@
       "removed": "Removed since {{session}}:"
     },
     "diffHint": "Marks compare with {{session}}."
+  },
+  "companyProfile": {
+    "title": "Company profile",
+    "subtitle": "What every invoice carries: your company's details, logo, bank account and terms.",
+    "save": "Save",
+    "saved": "Saved.",
+    "details": {
+      "title": "Company details",
+      "name": "Company name",
+      "state": "State",
+      "fixedHint": "The name and the state are kept by the administrator.",
+      "address": "Address",
+      "mobile": "Mobile",
+      "email": "Email",
+      "tagline": "Tagline"
+    },
+    "images": {
+      "title": "Logo and signature",
+      "logo": "Logo",
+      "signature": "Signature",
+      "none": "No image",
+      "choose": "Choose image",
+      "remove": "Remove",
+      "hint": "PNG or JPEG, up to 2 MB."
+    },
+    "bank": {
+      "title": "Bank account",
+      "hint": "Printed at the bottom of every invoice. Fill all five details or none.",
+      "accountHolder": "Account holder",
+      "bankName": "Bank",
+      "branch": "Branch",
+      "accountNumber": "Account number"
+    },
+    "settings": {
+      "title": "Invoice settings",
+      "terms": "Terms and conditions",
+      "termsHint": "One item per line; the invoice numbers them.",
+      "footer": "Footer line",
+      "printGstin": "Print the GSTIN in the invoice header"
+    }
   }
 }
