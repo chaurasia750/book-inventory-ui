@@ -83,8 +83,14 @@ export const appRoutes: Route[] = [
         canActivate: [appRoleGuard(['OWNER'])],
         loadComponent: () => import('./pages/company/company-profile').then((m) => m.CompanyProfileComponent),
       },
+      {
+        // A section of the Company profile has its own address, `/company-profile/bank` (platform U16).
+        path: 'company-profile/:tab',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('./pages/company/company-profile').then((m) => m.CompanyProfileComponent),
+      },
       // The session cut-offs are a tab of the Company profile now (platform U14b); the old address still works.
-      { path: 'session-cut-offs', redirectTo: 'company-profile', pathMatch: 'full' },
+      { path: 'session-cut-offs', redirectTo: 'company-profile/cutoffs', pathMatch: 'full' },
       {
         path: 'items',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
@@ -104,6 +110,8 @@ export const appRoutes: Route[] = [
         children: [
           { path: 'new', children: [] },
           { path: ':id/edit', children: [] },
+          // A tab of the vendor has its own address, `/vendors/:id/ledger` (platform U16).
+          { path: ':id/:tab', children: [] },
           { path: ':id', children: [] },
         ],
       },
@@ -115,6 +123,8 @@ export const appRoutes: Route[] = [
         children: [
           { path: 'new', canActivate: [appRoleGuard(['OWNER'])], children: [] },
           { path: ':id/edit', canActivate: [appRoleGuard(['OWNER'])], children: [] },
+          // A tab of the school has its own address, `/schools/:id/payments` (platform U16); the panel state reads it like `:id`.
+          { path: ':id/:tab', children: [] },
           { path: ':id', children: [] },
         ],
       },

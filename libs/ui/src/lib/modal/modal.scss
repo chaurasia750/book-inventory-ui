@@ -13,8 +13,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  /* Above a side panel (z-index 9999): a dialog opened from a panel, such as the book picker, must not hide behind it. */
+  z-index: 10000;
   padding: 1rem;
+}
+
+/* A wide dialog holds a table or a form whose height changes (loading, loaded, done): it stays at the same place near the top instead of jumping around the middle. */
+.app-modal-backdrop--top {
+  align-items: flex-start;
+  padding-top: 6vh;
 }
 
 .app-modal {

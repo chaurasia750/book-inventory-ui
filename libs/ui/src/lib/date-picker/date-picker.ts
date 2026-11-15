@@ -2,11 +2,13 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   forwardRef,
   HostListener,
   inject,
   Input,
+  OnDestroy,
   Output,
   signal,
 } from '@angular/core';
@@ -15,6 +17,9 @@ import { CommonModule } from '@angular/common';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const CALENDAR_WIDTH = 288;
+const CALENDAR_HEIGHT = 340;
+const GAP = 4;
 
 @Component({
   selector: 'app-date-picker',
@@ -61,7 +66,7 @@ const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
       </div>
 
       @if (isOpen()) {
-        <div class="absolute z-50 mt-1 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg animate-fade-in p-3">
+        <div class="fixed z-50 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg animate-fade-in p-3" [style.top.px]="popupTop()" [style.left.px]="popupLeft()">
           <!-- Header: Month/Year nav -->
           <div class="flex items-center justify-between mb-3">
             <button type="button" (click)="prevMonth()"
@@ -138,7 +143,11 @@ const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
     </div>
   `,
 })
-export class DatePickerComponent implements ControlValueAccessor {
+/**
+ * The calendar is `position: fixed` and placed from the input's own rectangle (below it, or above it when there is no room), so it is
+ * never clipped by a scrolling dialog or card around the field.
+ */
+export class DatePickerComponent implements ControlValueAccessor, OnDestroy {
   @Input() label = '';
   @Input() placeholder = 'DD/MM/YYYY';
   @Input() error = false;
@@ -148,16 +157,20 @@ export class DatePickerComponent implements ControlValueAccessor {
   @Output() valueChange = new EventEmitter<string>();
 
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly months = MONTHS;
   readonly days = DAYS;
 
   readonly isOpen = signal(false);
+  readonly popupTop = signal(0);
+  readonly popupLeft = signal(0);
   readonly viewMonth = signal(new Date().getMonth());
   readonly viewYear = signal(new Date().getFullYear());
   private _selectedDate: Date | null = null;
 
   private _today = new Date();
+  private readonly replace = (): void => this.place();
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private onChange: (val: string) => void = () => {};
@@ -208,7 +221,7 @@ export class DatePickerComponent implements ControlValueAccessor {
   @HostListener('document:click')
   onDocumentClick(): void {
     if (this.isOpen()) {
-      this.isOpen.set(false);
+      this.close();
       this.onTouched();
       this.cdr.markForCheck();
     }
@@ -237,11 +250,45 @@ export class DatePickerComponent implements ControlValueAccessor {
   }
 
   toggle(): void {
-    this.isOpen.set(!this.isOpen());
-    if (this.isOpen() && this._selectedDate) {
+    if (this.isOpen()) {
+      this.close();
+    } else {
+      this.openCalendar();
+    }
+    this.cdr.markForCheck();
+  }
+
+  ngOnDestroy(): void {
+    this.stopFollowing();
+  }
+
+  private openCalendar(): void {
+    if (this._selectedDate) {
       this.viewMonth.set(this._selectedDate.getMonth());
       this.viewYear.set(this._selectedDate.getFullYear());
     }
+    this.place();
+    this.isOpen.set(true);
+    window.addEventListener('scroll', this.replace, true);
+    window.addEventListener('resize', this.replace);
+  }
+
+  private close(): void {
+    this.isOpen.set(false);
+    this.stopFollowing();
+  }
+
+  private stopFollowing(): void {
+    window.removeEventListener('scroll', this.replace, true);
+    window.removeEventListener('resize', this.replace);
+  }
+
+  /** Below the field, or above it when the room below is smaller than the calendar; kept inside the window sideways. */
+  private place(): void {
+    const rect = this.host.nativeElement.getBoundingClientRect();
+    const below = window.innerHeight - rect.bottom;
+    this.popupTop.set(below >= CALENDAR_HEIGHT + GAP ? rect.bottom + GAP : Math.max(GAP, rect.top - CALENDAR_HEIGHT - GAP));
+    this.popupLeft.set(Math.max(GAP, Math.min(rect.left, window.innerWidth - CALENDAR_WIDTH - GAP)));
     this.cdr.markForCheck();
   }
 

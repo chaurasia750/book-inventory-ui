@@ -114,7 +114,7 @@ function todayIso(): string {
             <span>{{ 'payment.detail.advance' | translate }}: <span class="font-mono">{{ r.advanceAmount | number: '1.2-2' }}</span></span>
           </div>
           @if (r.remark) { <p class="m-0 text-xs text-gray-600">{{ r.remark }}</p> }
-          <app-receipt-proofs [receiptId]="r.summary.id" [proofs]="r.proofs ?? []" [canEdit]="r.summary.status === 'RECORDED'" (changed)="load()" />
+          <app-receipt-proofs [receiptId]="r.summary.id" [proofs]="r.proofs" [canEdit]="r.summary.status === 'RECORDED'" (changed)="load()" />
           @if (r.summary.status === 'CANCELLED') {
             <p class="m-0 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ 'payment.cancel.cancelledOn' | translate: { date: (r.cancelledOn | date: 'dd MMM yyyy'), reason: r.cancelReason } }}</p>
           }

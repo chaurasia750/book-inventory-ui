@@ -1,12 +1,13 @@
 import { DecimalPipe, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
 import { SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { SchoolDetail } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
 import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 import { SchoolDocumentsTabComponent } from '../sales/school-documents-tab';
@@ -16,6 +17,9 @@ import { BookListsTabComponent } from '../planning/book-lists-tab';
 
 /** Planning section 6: the Book lists tab joins the profile tabs. */
 type ProfileTab = 'profile' | 'classes' | 'orders' | 'invoices' | 'payments' | 'bookLists' | 'ledger';
+
+/** The segment of a tab in the address: the tab's name, with `bookLists` written `book-lists`. */
+const tabPath = (tab: ProfileTab): string => (tab === 'bookLists' ? 'book-lists' : tab);
 
 /**
  * One school's profile (school spec R6-R8, R10, R12; finance section 6): tabs Profile, Classes and, for the Owner, Ledger, and
@@ -29,6 +33,7 @@ type ProfileTab = 'profile' | 'classes' | 'orders' | 'invoices' | 'payments' | '
   imports: [
     DecimalPipe,
     NgClass,
+    RouterLink,
     TranslatePipe,
     ButtonComponent,
     CardComponent,
@@ -60,13 +65,21 @@ export class SchoolDetailComponent {
 
   readonly canEdit = inject(AuthService).hasAppRole('OWNER');
 
-  /** Finance section 6: the profile tabs; the later school documents become further tabs. */
-  readonly tab = signal<ProfileTab>('profile');
+  /** Platform U16: the tab is the `tab` of the address (`/schools/:id/payments`), so it can be linked; no tab in the address is the profile. */
+  private readonly routeTab = injectRouteParam('tab');
   /** The tabs this account sees: the ledger is the Owner's only (finance R13). */
   /** Sales section 6: the school's orders and invoices are tabs of its profile (Owner and Staff); the payments (payment R2) and the ledger are the Owner's. */
   readonly tabs: readonly ProfileTab[] = this.canEdit
     ? ['profile', 'orders', 'invoices', 'payments', 'bookLists', 'ledger', 'classes']
     : ['profile', 'orders', 'invoices', 'bookLists', 'classes'];
+
+  /** The tab shown: the one in the address when this account sees it, else the profile. */
+  readonly tab = computed<ProfileTab>(() => this.tabs.find((t) => tabPath(t) === this.routeTab()) ?? 'profile');
+
+  /** The address of a tab of this school (the profile is the school's own address). */
+  tabLink(tab: ProfileTab): string[] {
+    return tab === 'profile' ? ['/schools', this.id()] : ['/schools', this.id(), tabPath(tab)];
+  }
 
   readonly school = signal<SchoolDetail | null>(null);
   readonly loading = signal(true);
@@ -87,10 +100,7 @@ export class SchoolDetailComponent {
   constructor() {
     effect(() => {
       this.id();
-      untracked(() => {
-        this.tab.set('profile');
-        this.load();
-      });
+      untracked(() => this.load());
     });
   }
 

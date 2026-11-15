@@ -75,13 +75,13 @@ export class AdjustAdvancePanelComponent {
   readonly dues = signal<SchoolDues | null>(null);
   readonly loading = signal(true);
   readonly manual = signal(false);
-  readonly amounts = signal<Record<string, string>>({});
+  readonly amounts = signal<Partial<Record<string, string>>>({});
   readonly saving = signal(false);
   readonly error = signal('');
 
   /** R13, R6: the oldest-first plan the server will make for the advance (a preview). */
-  readonly preview = computed<Record<string, number>>(() => {
-    const plan: Record<string, number> = {};
+  readonly preview = computed<Partial<Record<string, number>>>(() => {
+    const plan: Partial<Record<string, number>> = {};
     let left = this.receipt().advanceAmount;
     for (const o of this.dues()?.openInvoices ?? []) {
       const take = money(Math.min(left, o.due));
@@ -98,7 +98,7 @@ export class AdjustAdvancePanelComponent {
     if (!open) {
       return false;
     }
-    const applied = this.manual() ? Object.values(this.amounts()).reduce((sum, v) => sum + (Number(v) || 0), 0) : Object.values(this.preview()).reduce((sum, v) => sum + v, 0);
+    const applied = this.manual() ? Object.values(this.amounts()).reduce<number>((sum, v) => sum + (Number(v) || 0), 0) : Object.values(this.preview()).reduce<number>((sum, v) => sum + (Number(v) || 0), 0);
     return applied > 0 && money(applied) <= this.receipt().advanceAmount;
   });
 
