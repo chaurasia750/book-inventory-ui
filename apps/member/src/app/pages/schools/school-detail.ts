@@ -10,11 +10,12 @@ import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, S
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
 import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 import { SchoolDocumentsTabComponent } from '../sales/school-documents-tab';
+import { SchoolPaymentsTabComponent } from '../payment/school-payments-tab';
 import { InvoiceLayoutSettingComponent } from '../sales/invoice-layout-setting';
 import { BookListsTabComponent } from '../planning/book-lists-tab';
 
 /** Planning section 6: the Book lists tab joins the profile tabs. */
-type ProfileTab = 'profile' | 'classes' | 'orders' | 'invoices' | 'bookLists' | 'ledger';
+type ProfileTab = 'profile' | 'classes' | 'orders' | 'invoices' | 'payments' | 'bookLists' | 'ledger';
 
 /**
  * One school's profile (school spec R6-R8, R10, R12; finance section 6): tabs Profile, Classes and, for the Owner, Ledger, and
@@ -37,6 +38,7 @@ type ProfileTab = 'profile' | 'classes' | 'orders' | 'invoices' | 'bookLists' | 
     LedgerStatementComponent,
     PartyLedgerSummaryComponent,
     SchoolDocumentsTabComponent,
+    SchoolPaymentsTabComponent,
     InvoiceLayoutSettingComponent,
     BookListsTabComponent,
   ],
@@ -61,9 +63,9 @@ export class SchoolDetailComponent {
   /** Finance section 6: the profile tabs; the later school documents become further tabs. */
   readonly tab = signal<ProfileTab>('profile');
   /** The tabs this account sees: the ledger is the Owner's only (finance R13). */
-  /** Sales section 6: the school's orders and invoices are tabs of its profile (Owner and Staff); the ledger is the Owner's. */
+  /** Sales section 6: the school's orders and invoices are tabs of its profile (Owner and Staff); the payments (payment R2) and the ledger are the Owner's. */
   readonly tabs: readonly ProfileTab[] = this.canEdit
-    ? ['profile', 'orders', 'invoices', 'bookLists', 'ledger', 'classes']
+    ? ['profile', 'orders', 'invoices', 'payments', 'bookLists', 'ledger', 'classes']
     : ['profile', 'orders', 'invoices', 'bookLists', 'classes'];
 
   readonly school = signal<SchoolDetail | null>(null);

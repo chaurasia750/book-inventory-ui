@@ -4,7 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
-import { CompanyService, SalesService } from '@org/api-services';
+import { CompanyService, PaymentService, SalesService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { InvoiceDetail, InvoiceGroupView, InvoiceLayout } from '@org/shared-models';
 import { ButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
@@ -54,6 +54,9 @@ import { SaleTotalsComponent } from './sale-totals';
               }
             </div>
           </div>
+          @if (paid(); as p) {
+            <p class="m-0 text-xs text-gray-600">{{ 'payment.invoice.paid' | translate }}: <span class="font-mono">{{ p.allocated | number: '1.2-2' }}</span> · {{ 'payment.invoice.due' | translate }}: <span class="font-mono font-semibold">{{ p.due | number: '1.2-2' }}</span></p>
+          }
           <ol class="flex flex-wrap gap-4 text-xs">
             <li class="flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-700 text-white">&#10003;</span>{{ 'sales.story.issued' | translate }} <span class="font-mono font-semibold">{{ inv.totals.grandTotal | number: '1.2-2' }}</span></li>
             <li class="flex items-center gap-2">
@@ -175,6 +178,7 @@ import { SaleTotalsComponent } from './sale-totals';
 export class InvoiceViewComponent {
   private readonly sales = inject(SalesService);
   private readonly companies = inject(CompanyService);
+  private readonly payments = inject(PaymentService);
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
@@ -183,6 +187,8 @@ export class InvoiceViewComponent {
   readonly isOwner = inject(AuthService).hasAppRole('OWNER');
   readonly layouts: InvoiceLayout[] = ['BOOK_LIST', 'BY_CLASS'];
   readonly invoice = signal<InvoiceDetail | null>(null);
+  /** Payment R16: what receipts applied to this invoice and what is still due (the Owner's; null until read). */
+  readonly paid = signal<{ allocated: number; due: number } | null>(null);
   /** Sales R36: the company's item-wise discount setting (company R23). */
   readonly usesItemDiscount = signal(false);
   /** The Discount column shows when the setting is on or a line of this invoice has a discount. */
@@ -212,7 +218,15 @@ export class InvoiceViewComponent {
   }
 
   load(): void {
-    this.sales.invoice(this.id, this.layout).subscribe({ next: (i) => this.invoice.set(i), error: (e: unknown) => this.error.set(messageForError(e, this.translate)) });
+    this.sales.invoice(this.id, this.layout).subscribe({ next: (i) => { this.invoice.set(i); this.loadPaid(i.summary.status); }, error: (e: unknown) => this.error.set(messageForError(e, this.translate)) });
+  }
+
+  private loadPaid(status: string): void {
+    if (!this.isOwner || status !== 'ISSUED') {
+      this.paid.set(null);
+      return;
+    }
+    this.payments.invoiceDues([this.id]).subscribe({ next: (d) => this.paid.set(d[0] ? { allocated: d[0].allocated, due: d[0].due } : null), error: () => this.paid.set(null) });
   }
 
   /** R31: the title of the document (the same rule as the PDF): TAX INVOICE with GST; without it CASH MEMO or CREDIT MEMO. */
