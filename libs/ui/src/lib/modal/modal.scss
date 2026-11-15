@@ -13,7 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  /* Above a side panel (z-index 9999): a dialog opened from a panel, such as the book picker, must not hide behind it. */
+  z-index: 10000;
   padding: 1rem;
 }
 

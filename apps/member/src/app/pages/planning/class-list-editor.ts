@@ -3,7 +3,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PlanningService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ClassBookListView, ItemSummary } from '@org/shared-models';
-import { ButtonComponent, ModalComponent } from '@org/ui';
+import { ButtonComponent, SidePanelComponent } from '@org/ui';
 import { BulkItemPickerComponent, BulkPick } from '../sales/bulk-item-picker';
 import { ItemEntryComponent } from '../sales/item-entry';
 
@@ -17,18 +17,19 @@ interface BookRow {
 }
 
 /**
- * Planning spec R2, R3, R5, R7: one class's book list for a session. Add books by scan or search or pick many, set the copies per
+ * Planning spec R2, R3, R5, R7: one class's book list for a session, in the side panel (a list can be long: the table scrolls inside the
+ * panel with its header kept, the Save and Cancel buttons stay at the bottom, and on a small screen the panel takes the full width). Add books by scan or search or pick many, set the copies per
  * student and the approximate number of students, save (the list is replaced as a whole) or delete. Books added or changed since
  * the previous session are marked; books removed since then are listed. Staff see it read-only.
  */
 @Component({
   selector: 'app-class-list-editor',
   standalone: true,
-  imports: [TranslatePipe, ButtonComponent, ModalComponent, ItemEntryComponent, BulkItemPickerComponent],
+  imports: [TranslatePipe, ButtonComponent, SidePanelComponent, ItemEntryComponent, BulkItemPickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <app-modal [open]="true" [title]="'planning.editorTitle' | translate: { className: list().className, session: session() }" (closed)="closed.emit()">
-      <div class="space-y-3">
+    <app-side-panel [isOpen]="true" panelWidth="min(720px, 100vw)" [title]="'planning.editorTitle' | translate: { className: list().className, session: session() }" (closed)="closed.emit()">
+      <div class="flex min-h-0 flex-1 flex-col gap-3">
         @if (error()) { <p class="rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-600" role="alert">{{ error() }}</p> }
         @if (canEdit()) {
           <div class="flex flex-wrap items-end gap-2">
@@ -42,7 +43,7 @@ interface BookRow {
         } @else {
           <p class="text-sm">{{ 'planning.estimate' | translate }}: <span class="font-mono">{{ estimate() ?? '-' }}</span></p>
         }
-        <div class="max-h-80 overflow-auto rounded-lg border border-neutral-200 dark:border-charcoal-700">
+        <div class="min-h-[10rem] flex-1 overflow-auto rounded-lg border border-neutral-200 dark:border-charcoal-700">
           <table class="w-full text-left text-xs">
             <thead class="sticky top-0 bg-neutral-50 text-[11px] uppercase tracking-[0.05em] text-gray-500 dark:bg-charcoal-900">
               <tr>
@@ -79,7 +80,7 @@ interface BookRow {
           </p>
         }
         @if (canEdit()) {
-          <div class="flex items-center justify-between gap-2">
+          <div class="flex shrink-0 items-center justify-between gap-2 border-t border-neutral-200 pt-3 dark:border-charcoal-700">
             <div>
               @if (list().hasList) { <app-button size="sm" variant="danger" (clicked)="delete()">{{ 'planning.delete' | translate }}</app-button> }
             </div>
@@ -90,7 +91,7 @@ interface BookRow {
           </div>
         }
       </div>
-    </app-modal>
+    </app-side-panel>
     <app-bulk-item-picker [open]="bulkOpen()" [classes]="classes()" [askQuantity]="false" (closed)="bulkOpen.set(false)" (picked)="bulkPicked($event)" />
   `,
 })
