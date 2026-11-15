@@ -104,7 +104,7 @@ export class OrderEditorComponent {
   readonly totalsEditable = computed(() => this.editable() && !this.anyInvoiced());
   readonly sessions = computed(() => {
     const c = this.choice();
-    return c ? [c.previous, c.session, c.next] : [];
+    return c ? [c.previous, c.session, c.next] : this.session() ? [this.session()] : [];
   });
 
   constructor() {
@@ -128,14 +128,23 @@ export class OrderEditorComponent {
     });
   }
 
-  private loadSchool(schoolId: string, then: (isGstDefault: boolean, paymentType: PaymentType) => void): void {
+  /**
+   * The school's classes and defaults. A new order needs the school (a failure stops the page); an order that exists already carries
+   * its school's name and code, so a school the caller can no longer read (a deactivated school, which Staff do not see) only leaves
+   * the class choice empty and the order opens all the same.
+   */
+  private loadSchool(schoolId: string, then: (isGstDefault: boolean, paymentType: PaymentType) => void, required = true): void {
     this.schools.get(schoolId).subscribe({
       next: (s) => {
         this.schoolName.set(s.name);
         this.classes.set(s.classes.map((c) => c.name));
         then(s.isGstDefault, s.paymentType);
       },
-      error: (e: unknown) => this.fail(e),
+      error: (e: unknown) => {
+        if (required) {
+          this.fail(e);
+        }
+      },
     });
   }
 
@@ -159,7 +168,7 @@ export class OrderEditorComponent {
     this.totalKind.set(o.totalDiscount.kind);
     this.totalValue.set(o.totalDiscount.value);
     if (this.classes().length === 0) {
-      this.loadSchool(o.school.id, () => undefined);
+      this.loadSchool(o.school.id, () => undefined, false);
     }
     const itemIds = [...new Set(o.lines.map((l) => l.item.id))];
     const versions$ = itemIds.length ? forkJoin(itemIds.map((id) => this.prices.versions(id))) : of([] as PriceVersion[][]);
@@ -179,11 +188,15 @@ export class OrderEditorComponent {
     if (!this.schoolId() || !this.orderDate.value) {
       return;
     }
-    this.sales.sessionChoice(this.schoolId(), this.orderDate.value).subscribe((c) => {
-      this.choice.set(c);
-      if (useDefault || !this.sessions().includes(this.session())) {
-        this.session.set(c.session);
-      }
+    this.sales.sessionChoice(this.schoolId(), this.orderDate.value).subscribe({
+      next: (c) => {
+        this.choice.set(c);
+        if (useDefault || !this.sessions().includes(this.session())) {
+          this.session.set(c.session);
+        }
+      },
+      // The session of an existing order stays as it is when the choice cannot be read; the server checks the session on every save.
+      error: () => this.choice.set(null),
     });
   }
 
