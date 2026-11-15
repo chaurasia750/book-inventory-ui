@@ -1,17 +1,20 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { catchError, concatMap, from, map, of, toArray } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import {
   MAX_RECEIPT_MODES,
+  MAX_RECEIPT_PROOFS,
   PAYMENT_MODE_TYPES,
   PaymentModeType,
   ReceiptDetail,
   ReceiptModeRequest,
   RecordReceiptRequest,
   SchoolDues,
+  proofFileError,
 } from '@org/shared-models';
 import { ButtonComponent, DatePickerComponent, ModalComponent } from '@org/ui';
 
@@ -50,6 +53,12 @@ const money = (value: number): number => Math.round(value * 100) / 100;
             {{ 'payment.detail.total' | translate }}: <span class="font-mono">{{ done.summary.totalAmount | number: '1.2-2' }}</span>
             · {{ 'payment.detail.advance' | translate }}: <span class="font-mono">{{ done.advanceAmount | number: '1.2-2' }}</span>
           </p>
+          @if (proofFailures().length > 0) {
+            <div class="rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700" role="alert">
+              <p class="m-0 font-semibold">{{ 'payment.proof.failed' | translate }}</p>
+              @for (f of proofFailures(); track f) { <p class="m-0">{{ f }}</p> }
+            </div>
+          }
           <div class="flex justify-end"><app-button (clicked)="close()">{{ 'payment.receive.close' | translate }}</app-button></div>
         </div>
       } @else if (loading()) {
@@ -162,6 +171,13 @@ const money = (value: number): number => Math.round(value * 100) / 100;
             </div>
           </div>
 
+          <div>
+            <label for="pm-proof" [class]="label">{{ 'payment.proof.optional' | translate }}</label>
+            <input id="pm-proof" type="file" multiple accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" (change)="chooseProofs($any($event.target))"
+              class="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm" />
+            @if (proofError()) { <p class="m-0 mt-1 text-xs text-red-600" role="alert">{{ proofError() }}</p> }
+            @else if (proofFiles().length > 0) { <p class="m-0 mt-1 text-xs text-gray-500">{{ proofNames() }}</p> }
+          </div>
           <div class="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-3 text-sm dark:border-charcoal-700">
             <div class="flex flex-wrap gap-x-5 gap-y-1">
               <span>{{ 'payment.detail.total' | translate }}: <span class="font-mono font-semibold">{{ total() | number: '1.2-2' }}</span></span>
@@ -205,6 +221,11 @@ export class ReceivePaymentDialogComponent {
   readonly error = signal('');
   readonly date = new FormControl('', { nonNullable: true });
   readonly remark = new FormControl('', { nonNullable: true });
+  /** Payment R20: the optional proof files; they are uploaded after the receipt is recorded. */
+  readonly proofFiles = signal<File[]>([]);
+  readonly proofError = signal('');
+  readonly proofFailures = signal<string[]>([]);
+  readonly proofNames = computed(() => this.proofFiles().map((f) => f.name).join(', '));
 
   private clientRequestId = crypto.randomUUID();
 
@@ -246,6 +267,9 @@ export class ReceivePaymentDialogComponent {
     this.error.set('');
     this.date.reset('');
     this.remark.reset('');
+    this.proofFiles.set([]);
+    this.proofError.set('');
+    this.proofFailures.set([]);
     this.loadDues();
   }
 
@@ -284,16 +308,46 @@ export class ReceivePaymentDialogComponent {
     this.error.set('');
     this.saving.set(true);
     this.payments.record(this.requestOf()).subscribe({
-      next: (receipt) => {
-        this.saving.set(false);
-        this.recorded.set(receipt);
-        this.recordedReceipt.emit(receipt);
-      },
+      next: (receipt) => this.uploadProofs(receipt),
       error: (e: unknown) => {
         this.saving.set(false);
         this.error.set(messageForError(e, this.translate));
       },
     });
+  }
+
+  /** R20: checks the chosen proof files (type, size, at most five) before anything is sent. */
+  chooseProofs(input: HTMLInputElement): void {
+    const files = Array.from(input.files ?? []);
+    this.proofError.set('');
+    const problem = files.length > MAX_RECEIPT_PROOFS ? 'tooMany' : files.map((f) => proofFileError(f)).find((p) => p !== null);
+    if (problem) {
+      this.proofError.set(this.translate.instant(`payment.proof.${problem}`));
+      this.proofFiles.set([]);
+      input.value = '';
+      return;
+    }
+    this.proofFiles.set(files);
+  }
+
+  /** R20: after the receipt is recorded the proofs go one by one; a failed one is listed, the receipt stays recorded. */
+  private uploadProofs(receipt: ReceiptDetail): void {
+    from(this.proofFiles())
+      .pipe(
+        concatMap((file) =>
+          this.payments.uploadProof(receipt.summary.id, file).pipe(
+            map(() => null),
+            catchError((e: unknown) => of(`${file.name}: ${messageForError(e, this.translate)}`)),
+          ),
+        ),
+        toArray(),
+      )
+      .subscribe((results) => {
+        this.proofFailures.set(results.filter((r): r is string => r !== null));
+        this.saving.set(false);
+        this.recorded.set(receipt);
+        this.recordedReceipt.emit(receipt);
+      });
   }
 
   close(): void {

@@ -6,6 +6,9 @@ import { PaymentService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ReceiptDetail } from '@org/shared-models';
 import { ButtonComponent, ModalComponent } from '@org/ui';
+import { AdjustAdvancePanelComponent } from './adjust-advance-panel';
+import { CancelReceiptPanelComponent } from './cancel-receipt-panel';
+import { ReceiptProofsComponent } from './receipt-proofs';
 
 /** Today as `yyyy-MM-dd` in the browser's own time zone (the business date the Owner sees). */
 function todayIso(): string {
@@ -15,12 +18,12 @@ function todayIso(): string {
 
 /**
  * One receipt (payment spec R16): its number, date, school, status, modes with their references and cheque status, what it was
- * applied to and the advance. A pending cheque has Clear and Bounce (R10, R11); adjusting and cancelling come with their own screens.
+ * applied to and the advance. A pending cheque has Clear and Bounce (R10, R11); a recorded receipt can have its advance adjusted and be cancelled (R13, R14).
  */
 @Component({
   selector: 'app-receipt-detail-dialog',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent, ReceiptProofsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal size="wide" [open]="receiptId() !== null" [title]="'payment.detail.title' | translate" (closed)="closed.emit()">
@@ -106,6 +109,22 @@ function todayIso(): string {
             <span>{{ 'payment.detail.advance' | translate }}: <span class="font-mono">{{ r.advanceAmount | number: '1.2-2' }}</span></span>
           </div>
           @if (r.remark) { <p class="m-0 text-xs text-gray-600">{{ r.remark }}</p> }
+          <app-receipt-proofs [receiptId]="r.summary.id" [proofs]="r.proofs ?? []" [canEdit]="r.summary.status === 'RECORDED'" (changed)="load()" />
+          @if (r.summary.status === 'CANCELLED') {
+            <p class="m-0 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ 'payment.cancel.cancelledOn' | translate: { date: (r.cancelledOn | date: 'dd MMM yyyy'), reason: r.cancelReason } }}</p>
+          }
+          @if (r.summary.status === 'RECORDED') {
+            @if (panel() === 'adjust') {
+              <app-adjust-advance-panel [receipt]="r" (done)="afterPanel()" (cancelled)="panel.set(null)" />
+            } @else if (panel() === 'cancel') {
+              <app-cancel-receipt-panel [receiptId]="r.summary.id" (done)="afterPanel()" (cancelled)="panel.set(null)" />
+            } @else {
+              <div class="flex flex-wrap justify-end gap-2">
+                @if (r.advanceAmount > 0) { <app-button size="sm" variant="secondary" (clicked)="panel.set('adjust')">{{ 'payment.adjust.button' | translate }}</app-button> }
+                <app-button size="sm" variant="secondary" (clicked)="panel.set('cancel')">{{ 'payment.cancel.button' | translate }}</app-button>
+              </div>
+            }
+          }
         </div>
       }
     </app-modal>
@@ -130,6 +149,8 @@ export class ReceiptDetailDialogComponent {
   readonly actionError = signal('');
   readonly actionDate = new FormControl(todayIso(), { nonNullable: true });
   readonly actionReason = new FormControl('', { nonNullable: true });
+  /** Payment R13, R14: the advance or cancel panel under the receipt, if one is open. */
+  readonly panel = signal<'adjust' | 'cancel' | null>(null);
 
   constructor() {
     effect(() => {
@@ -137,6 +158,12 @@ export class ReceiptDetailDialogComponent {
         untracked(() => this.load());
       }
     });
+  }
+
+  afterPanel(): void {
+    this.panel.set(null);
+    this.changed.emit();
+    this.load();
   }
 
   startAction(modeId: string, kind: 'clear' | 'bounce'): void {
@@ -182,6 +209,7 @@ export class ReceiptDetailDialogComponent {
 
     this.loading.set(true);
     this.error.set('');
+    this.panel.set(null);
     this.receipt.set(null);
     this.payments.get(id).subscribe({
       next: (receipt) => {
