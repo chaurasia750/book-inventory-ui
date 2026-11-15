@@ -46,7 +46,7 @@ const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
         </span>
       }
       <div class="relative">
-        <input type="text" readonly [value]="displayValue" [placeholder]="placeholder"
+        <input type="text" readonly [attr.id]="inputId || null" [value]="displayValue" [placeholder]="placeholder"
           (click)="toggle()"
           [class]="error
             ? 'peer block w-full appearance-none rounded-lg border px-3 pb-2 pt-4 text-sm text-primary-fg transition-colors focus:outline-none focus:ring-2 border-red-400 bg-red-500/5 focus:border-red-400 focus:ring-red-400/20'
@@ -142,6 +142,8 @@ export class DatePickerComponent implements ControlValueAccessor {
   @Input() label = '';
   @Input() placeholder = 'DD/MM/YYYY';
   @Input() error = false;
+  /** The id of the inner input, so a page's own <label for> points at it. */
+  @Input() inputId = '';
 
   @Output() valueChange = new EventEmitter<string>();
 

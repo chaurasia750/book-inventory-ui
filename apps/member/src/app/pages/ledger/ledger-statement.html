@@ -26,11 +26,11 @@
         @case ('DATES') {
           <div>
             <label for="ls-from" class="mb-1 block text-xs font-semibold text-gray-600">{{ 'ledger.filter.from' | translate }}</label>
-            <input id="ls-from" type="date" formControlName="from" [class]="field" />
+            <app-date-picker inputId="ls-from" formControlName="from" />
           </div>
           <div>
             <label for="ls-to" class="mb-1 block text-xs font-semibold text-gray-600">{{ 'ledger.filter.to' | translate }}</label>
-            <input id="ls-to" type="date" formControlName="to" [class]="field" />
+            <app-date-picker inputId="ls-to" formControlName="to" />
           </div>
         }
       }

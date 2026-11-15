@@ -5,7 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LedgerService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { LedgerStatement, LedgerStatementParams } from '@org/shared-models';
-import { ButtonComponent, CardComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, CardComponent, DatePickerComponent, SkeletonLoaderComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 
@@ -20,7 +20,7 @@ type FilterKind = 'ALL' | 'YEAR' | 'SESSION' | 'DATES';
 @Component({
   selector: 'app-ledger-statement',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, SkeletonLoaderComponent],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, SkeletonLoaderComponent, DatePickerComponent],
   templateUrl: './ledger-statement.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -5,9 +5,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StockService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { OpeningImportRowError } from '@org/shared-models';
-import { ButtonComponent, ModalComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent, ModalComponent } from '@org/ui';
 
-const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 const MAX_BYTES = 5 * 1024 * 1024;
 
 /**
@@ -18,7 +17,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
 @Component({
   selector: 'app-stock-import',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent, DatePickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal [open]="open()" [title]="'stock.import.title' | translate" (closed)="close()">
@@ -69,7 +68,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
             </div>
             <div>
               <label for="si-date" class="mb-1 block text-sm font-semibold">{{ 'stock.import.openingDate' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-              <input id="si-date" type="date" [formControl]="openingDate" class="${FIELD}" />
+              <app-date-picker inputId="si-date" [formControl]="openingDate" />
             </div>
           </div>
           <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EnterOpeningRequest, STOCK_TYPES, StockType } from '@org/shared-models';
-import { ButtonComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 
@@ -13,7 +13,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
 @Component({
   selector: 'app-stock-opening-form',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
@@ -33,7 +33,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
         </div>
         <div>
           <label for="so-date" class="mb-1 block text-sm font-semibold">{{ 'stock.fields.openingDate' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          <input id="so-date" type="date" formControlName="openingDate" class="${FIELD}" />
+          <app-date-picker inputId="so-date" formControlName="openingDate" />
         </div>
       </div>
       @if (form.touched && form.invalid) {
