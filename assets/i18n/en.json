@@ -1000,6 +1000,8 @@
     "invoice": { "paid": "Paid", "due": "Due" },
     "detail": {
       "title": "Payment receipt",
+      "print": "Print",
+      "downloadPdf": "Download PDF",
       "total": "Total",
       "advance": "Advance",
       "reference": "Reference",
