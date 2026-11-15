@@ -13,6 +13,7 @@ import { ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoad
 import { ItemAddComponent } from './item-add';
 import { ItemDetailComponent } from './item-detail';
 import { ItemEditComponent } from './item-edit';
+import { ItemImportComponent } from './item-import';
 
 const PAGE_SIZE = 20;
 const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -35,6 +36,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
     ItemAddComponent,
     ItemDetailComponent,
     ItemEditComponent,
+    ItemImportComponent,
   ],
   templateUrl: './item-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,6 +55,7 @@ export class ItemListComponent {
   readonly selectedId = computed(() => this.panel().id);
   readonly hasPanel = computed(() => this.panel().mode !== null);
 
+  readonly importOpen = signal(false);
   readonly select = SELECT;
   readonly categories = ITEM_CATEGORIES;
   readonly statuses = ITEM_STATUSES;

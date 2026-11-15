@@ -5,7 +5,10 @@
       <p class="mt-0.5 text-sm text-gray-500">{{ 'item.subtitle' | translate }}</p>
     </div>
     @if (canEdit) {
-      <app-button (clicked)="openAdd()">{{ 'item.add.button' | translate }}</app-button>
+      <div class="flex gap-2">
+        <app-button variant="secondary" (clicked)="importOpen.set(true)">{{ 'item.import.button' | translate }}</app-button>
+        <app-button (clicked)="openAdd()">{{ 'item.add.button' | translate }}</app-button>
+      </div>
     }
   </div>
 
@@ -134,3 +137,7 @@
     </div>
   </app-list-detail>
 </div>
+
+@if (canEdit) {
+  <app-item-import [open]="importOpen()" (closed)="importOpen.set(false)" (imported)="load()" />
+}

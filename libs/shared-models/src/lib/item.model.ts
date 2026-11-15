@@ -68,3 +68,16 @@ export interface ItemFields {
   subject?: string;
   hsnCode?: string;
 }
+
+/** Item spec R22: one wrong row of an import file. */
+export interface ItemImportRowError {
+  rowNumber: number;
+  column: 'ItemCode' | 'Barcode' | 'Name' | 'Category' | 'Class' | 'Subject' | 'HsnCode' | 'GstRate' | 'Vendor' | 'StockManaged';
+  code: string;
+}
+
+/** Item spec R22: how many items an import created and updated. */
+export interface ItemImportResult {
+  created: number;
+  updated: number;
+}
