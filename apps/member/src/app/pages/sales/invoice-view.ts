@@ -1,10 +1,10 @@
 import { DatePipe, DecimalPipe, Location, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
-import { SalesService } from '@org/api-services';
+import { CompanyService, SalesService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { InvoiceDetail, InvoiceGroupView, InvoiceLayout } from '@org/shared-models';
 import { ButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
@@ -74,7 +74,7 @@ import { SaleTotalsComponent } from './sale-totals';
                   <th class="px-3 py-2 text-right font-semibold">MRP</th>
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }}</th>
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
-                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }}</th>
+                  @if (showDiscount()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }}</th> }
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
                 </tr>
               </thead>
@@ -82,7 +82,7 @@ import { SaleTotalsComponent } from './sale-totals';
                 @for (g of inv.groups; track g.className ?? '') {
                   @if (inv.layout === 'BY_CLASS') {
                     <tr class="bg-neutral-50/60 dark:bg-charcoal-900/40">
-                      <td colspan="7" class="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] text-primary-fg">{{ g.className ?? ('sales.layout.general' | translate) }}</td>
+                      <td [attr.colspan]="showDiscount() ? 7 : 6" class="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] text-primary-fg">{{ g.className ?? ('sales.layout.general' | translate) }}</td>
                     </tr>
                   }
                   @for (l of g.lines; track l.id) {
@@ -92,13 +92,13 @@ import { SaleTotalsComponent } from './sale-totals';
                       <td class="px-3 py-2 text-right font-mono">{{ l.price.mrp | number: '1.2-2' }}</td>
                       <td class="px-3 py-2 text-right font-mono">{{ l.price.rate | number: '1.2-2' }}</td>
                       <td class="px-3 py-2 text-right">{{ l.quantity }}</td>
-                      <td class="px-3 py-2 text-right font-mono">{{ l.amounts.itemDiscount | number: '1.2-2' }}</td>
+                      @if (showDiscount()) { <td class="px-3 py-2 text-right font-mono">{{ l.amounts.itemDiscount | number: '1.2-2' }}</td> }
                       <td class="px-3 py-2 text-right font-mono">{{ l.amounts.lineAmount | number: '1.2-2' }}</td>
                     </tr>
                   }
                   @if (inv.layout === 'BY_CLASS') {
                     <tr>
-                      <td colspan="6" class="px-3 py-1.5 text-right text-[11px] font-semibold text-gray-500">{{ 'sales.layout.subtotal' | translate }}</td>
+                      <td [attr.colspan]="showDiscount() ? 6 : 5" class="px-3 py-1.5 text-right text-[11px] font-semibold text-gray-500">{{ 'sales.layout.subtotal' | translate }}</td>
                       <td class="px-3 py-1.5 text-right font-mono font-semibold">{{ groupAmount(g) | number: '1.2-2' }}</td>
                     </tr>
                   }
@@ -174,6 +174,7 @@ import { SaleTotalsComponent } from './sale-totals';
 })
 export class InvoiceViewComponent {
   private readonly sales = inject(SalesService);
+  private readonly companies = inject(CompanyService);
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
@@ -182,6 +183,10 @@ export class InvoiceViewComponent {
   readonly isOwner = inject(AuthService).hasAppRole('OWNER');
   readonly layouts: InvoiceLayout[] = ['BOOK_LIST', 'BY_CLASS'];
   readonly invoice = signal<InvoiceDetail | null>(null);
+  /** Sales R36: the company's item-wise discount setting (company R23). */
+  readonly usesItemDiscount = signal(false);
+  /** The Discount column shows when the setting is on or a line of this invoice has a discount. */
+  readonly showDiscount = computed(() => this.usesItemDiscount() || (this.invoice()?.lines ?? []).some((l) => l.amounts.itemDiscount > 0));
   readonly error = signal('');
   readonly cancelOpen = signal(false);
   readonly cancelError = signal('');
@@ -193,6 +198,7 @@ export class InvoiceViewComponent {
   private layout: InvoiceLayout | undefined;
 
   constructor() {
+    this.companies.invoiceIdentity().subscribe({ next: (i) => this.usesItemDiscount.set(i.invoice.usesItemDiscount), error: () => this.usesItemDiscount.set(false) });
     this.load();
   }
 

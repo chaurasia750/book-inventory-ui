@@ -1596,7 +1596,9 @@
       "terms": "Terms and conditions",
       "termsHint": "One item per line; the invoice numbers them. Placeholders filled on each invoice: {{company_name}}, {{school_name}}, {{school_code}}, {{invoice_number}}, {{invoice_date}}, {{financial_year}}, {{session}}, {{order_number}}.",
       "footer": "Footer line",
-      "printGstin": "Print the GSTIN in the invoice header"
+      "printGstin": "Print the GSTIN in the invoice header",
+      "usesItemDiscount": "Item-wise discount",
+      "usesItemDiscountHint": "Off: orders and invoices have only a total discount. On: each line can also carry its own discount and the invoice shows a Discount column."
     },
     "tabs": {
       "details": "Company details",

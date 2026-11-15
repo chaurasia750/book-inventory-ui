@@ -155,11 +155,12 @@ export interface CompanyBankDetails {
   upiId: string | null;
 }
 
-/** Company spec R20: the terms and conditions, the footer line and whether the GSTIN prints. */
+/** Company spec R20, R23: the terms and conditions, the footer line, whether the GSTIN prints and whether a line may carry its own discount. */
 export interface CompanyInvoiceSettings {
   terms: string | null;
   footer: string | null;
   printGstin: boolean;
+  usesItemDiscount: boolean;
 }
 
 /** `GET companies/current/invoice-identity` (company spec R17-R20). */

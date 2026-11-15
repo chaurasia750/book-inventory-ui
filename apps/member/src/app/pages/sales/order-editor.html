@@ -99,7 +99,7 @@
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.version' | translate }}</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }}</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
-                <th class="px-3 py-2 font-semibold">{{ 'sales.columns.discount' | translate }}</th>
+                @if (showDiscount()) { <th class="px-3 py-2 font-semibold">{{ 'sales.columns.discount' | translate }}</th> }
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
                 @if (!isDraft()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns2.invoiced' | translate }}</th> }
                 @if (editable()) { <th class="px-3 py-2"><span class="sr-only">{{ 'sales.editor.remove' | translate }}</span></th> }
@@ -134,8 +134,9 @@
                       <input type="number" [min]="l.invoiced || 1" step="1" [value]="l.quantity" (change)="setLine(i, { quantity: +$any($event.target).value })" class="h-8 w-20 rounded border border-gray-300 px-2 text-right text-xs" [attr.aria-label]="'sales.columns.qty' | translate" />
                     } @else { {{ l.quantity }} }
                   </td>
+                  @if (showDiscount()) {
                   <td class="px-3 py-2">
-                    @if (editable() && !lock) {
+                    @if (editable() && !lock && usesItemDiscount()) {
                       <div class="flex gap-1">
                         <select [value]="l.discKind" (change)="setLine(i, { discKind: $any($event.target).value })" class="h-8 rounded border border-gray-300 px-1 text-xs" [attr.aria-label]="'sales.columns.discount' | translate">
                           @for (k of discountKinds; track k) { <option [value]="k" [selected]="k === l.discKind">{{ 'sales.discount.' + k | translate }}</option> }
@@ -146,6 +147,7 @@
                       </div>
                     } @else { {{ l.discKind === 'NONE' ? '-' : (l.discValue | number: '1.2-2') + (l.discKind === 'PERCENT' ? ' %' : '') }} }
                   </td>
+                  }
                   <td class="px-3 py-2 text-right font-mono">{{ s ? (s.amounts.lineAmount | number: '1.2-2') : '' }}</td>
                   @if (!isDraft()) { <td class="px-3 py-2 text-right">{{ l.invoiced }} / {{ l.quantity }}</td> }
                   @if (editable()) {
