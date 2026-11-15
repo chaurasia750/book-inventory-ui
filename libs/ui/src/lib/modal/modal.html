@@ -1,6 +1,7 @@
 @if (open()) {
   <div
     class="app-modal-backdrop"
+    [class.app-modal-backdrop--top]="size() === 'wide'"
     tabindex="0"
     role="button"
     aria-label="Close overlay"
