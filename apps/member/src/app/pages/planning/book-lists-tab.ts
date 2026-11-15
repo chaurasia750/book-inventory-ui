@@ -23,7 +23,7 @@ import { CopyListsDialogComponent } from './copy-lists-dialog';
       <div class="flex flex-wrap items-center justify-between gap-2">
         <label class="flex items-center gap-2 text-sm">{{ 'planning.session' | translate }}
           <select [value]="session()" (change)="session.set($any($event.target).value); load()" class="h-9 rounded-lg border border-gray-300 bg-white px-2 text-sm">
-            @for (s of sessions(); track s) { <option [value]="s">{{ s }}</option> }
+            @for (s of sessions(); track s) { <option [value]="s" [selected]="s === session()">{{ s }}</option> }
           </select>
         </label>
         @if (canEdit()) {

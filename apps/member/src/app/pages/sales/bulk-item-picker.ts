@@ -81,8 +81,8 @@ const FIELD = 'h-10 rounded-lg border border-gray-300 bg-white px-2 text-sm focu
               </label>
               <label class="text-xs text-gray-500">{{ 'sales.bulk.className' | translate }}
                 <select [value]="className() ?? ''" (change)="className.set($any($event.target).value || null)" [class]="field + ' mt-1 block'">
-                  <option value="">{{ 'sales.bulk.noClass' | translate }}</option>
-                  @for (c of classes(); track c) { <option [value]="c">{{ c }}</option> }
+                  <option value="" [selected]="!className()">{{ 'sales.bulk.noClass' | translate }}</option>
+                  @for (c of classes(); track c) { <option [value]="c" [selected]="c === className()">{{ c }}</option> }
                 </select>
               </label>
             </div>

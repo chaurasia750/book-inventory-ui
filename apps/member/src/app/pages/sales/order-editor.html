@@ -36,7 +36,7 @@
           <label for="oe-session" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.editor.session' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           @if (isDraft()) {
             <select id="oe-session" [value]="session()" (change)="session.set($any($event.target).value); dirty.set(true)" [class]="field">
-              @for (s of sessions(); track s) { <option [value]="s">{{ s }}</option> }
+              @for (s of sessions(); track s) { <option [value]="s" [selected]="s === session()">{{ s }}</option> }
             </select>
           } @else { <p class="text-sm">{{ session() }}</p> }
         </div>
@@ -50,7 +50,7 @@
         <div>
           <label for="oe-payment" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.editor.paymentType' | translate }}</label>
           <select id="oe-payment" [value]="paymentType()" [disabled]="!totalsEditable()" (change)="paymentType.set($any($event.target).value); dirty.set(true)" [class]="field">
-            @for (t of paymentTypes; track t) { <option [value]="t">{{ 'school.paymentType.' + t | translate }}</option> }
+            @for (t of paymentTypes; track t) { <option [value]="t" [selected]="t === paymentType()">{{ 'school.paymentType.' + t | translate }}</option> }
           </select>
         </div>
         <div class="lg:col-span-1">
@@ -125,15 +125,15 @@
                   <td class="px-3 py-2">
                     @if (editable() && !lock) {
                       <select [value]="l.className ?? ''" (change)="setLine(i, { className: $any($event.target).value || null })" class="h-8 rounded border border-gray-300 px-1 text-xs" [attr.aria-label]="'sales.columns2.className' | translate">
-                        <option value="">-</option>
-                        @for (c of classes(); track c) { <option [value]="c">{{ c }}</option> }
+                        <option value="" [selected]="!l.className">-</option>
+                        @for (c of classes(); track c) { <option [value]="c" [selected]="c === l.className">{{ c }}</option> }
                       </select>
                     } @else { {{ l.className || '-' }} }
                   </td>
                   <td class="px-3 py-2">
                     @if (editable() && !lock) {
                       <select [value]="l.versionId" (change)="setLine(i, { versionId: $any($event.target).value })" class="h-8 rounded border border-gray-300 px-2 text-xs" [attr.aria-label]="'sales.columns.version' | translate">
-                        @for (v of l.versions; track v.id) { <option [value]="v.id">{{ v.versionName }}</option> }
+                        @for (v of l.versions; track v.id) { <option [value]="v.id" [selected]="v.id === l.versionId">{{ v.versionName }}</option> }
                       </select>
                     } @else { {{ s?.price?.versionName }} }
                   </td>
@@ -147,7 +147,7 @@
                     @if (editable() && !lock) {
                       <div class="flex gap-1">
                         <select [value]="l.discKind" (change)="setLine(i, { discKind: $any($event.target).value })" class="h-8 rounded border border-gray-300 px-1 text-xs" [attr.aria-label]="'sales.columns.discount' | translate">
-                          @for (k of discountKinds; track k) { <option [value]="k">{{ 'sales.discount.' + k | translate }}</option> }
+                          @for (k of discountKinds; track k) { <option [value]="k" [selected]="k === l.discKind">{{ 'sales.discount.' + k | translate }}</option> }
                         </select>
                         @if (l.discKind !== 'NONE') {
                           <input type="number" min="0" step="0.01" [value]="l.discValue" (change)="setLine(i, { discValue: +$any($event.target).value })" class="h-8 w-20 rounded border border-gray-300 px-2 text-right text-xs" [attr.aria-label]="'sales.columns.discount' | translate" />
@@ -178,7 +178,7 @@
           <span class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.totals.totalDiscount' | translate }}</span>
           <div class="flex gap-2">
             <select [value]="totalKind()" [disabled]="!totalsEditable()" (change)="totalKind.set($any($event.target).value); dirty.set(true)" class="h-10 rounded-lg border border-gray-300 px-2 text-sm" [attr.aria-label]="'sales.totals.totalDiscount' | translate">
-              @for (k of discountKinds; track k) { <option [value]="k">{{ 'sales.discount.' + k | translate }}</option> }
+              @for (k of discountKinds; track k) { <option [value]="k" [selected]="k === totalKind()">{{ 'sales.discount.' + k | translate }}</option> }
             </select>
             @if (totalKind() !== 'NONE') {
               <input type="number" min="0" step="0.01" [value]="totalValue()" [readonly]="!totalsEditable()" (change)="totalValue.set(+$any($event.target).value); dirty.set(true)" class="h-10 w-28 rounded-lg border border-gray-300 px-2 text-right text-sm" [attr.aria-label]="'sales.totals.totalDiscount' | translate" />
