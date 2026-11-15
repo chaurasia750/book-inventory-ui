@@ -68,6 +68,14 @@
       </dl>
     }
 
+    @if (tab() === 'orders') {
+      <app-school-documents-tab kind="orders" [schoolId]="s.id" />
+    }
+
+    @if (tab() === 'invoices') {
+      <app-school-documents-tab kind="invoices" [schoolId]="s.id" />
+    }
+
     @if (tab() === 'ledger' && canEdit) {
       <app-ledger-statement party="schools" [id]="s.id" />
     }

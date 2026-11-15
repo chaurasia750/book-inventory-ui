@@ -3,6 +3,8 @@
 //   /admin/*   -> dist/apps/admin/browser      (SPA fallback to /admin/index.html)
 //   /<company slug>/* -> dist/apps/member/browser (SPA fallback to its index.html; platform spec U12). /member/* still
 //                        reaches the same app (the old address; the app moves the user to the company's own address).
+//                        The member index is served with <base href="/<slug>/"> written into the markup: the browser
+//                        reads the page's preload hints before base-href.js can add a base.
 //   /*         -> dist/apps/public-site/browser (SPA fallback to /index.html)
 //
 // Run `npx nx run-many -t build` first, then `node scripts/serve-single.mjs`.
@@ -100,8 +102,15 @@ const server = createServer(async (req, res) => {
     let contentType = MIME_TYPES[ext] ?? 'application/octet-stream';
 
     if (ext === '.html' && app.mount) {
+      // The base address of a mounted app is its mount point (for the company app the first segment is the company's
+      // slug, platform spec U12). It has to be in the markup, not only written by base-href.js: the browser resolves the
+      // relative modulepreload hints of index.html before that script runs.
+      const html = data.toString('utf-8');
+      const base = `<base href="${app.mount}/">`;
       content = Buffer.from(
-        data.toString('utf-8').replace(/<base href="[^"]*"\/?>/, `<base href="${app.mount}/">`)
+        /<base\b/i.test(html)
+          ? html.replace(/<base href="[^"]*"\/?>/i, base)
+          : html.replace(/<head([^>]*)>/i, `<head$1>${base}`),
       );
     }
 

@@ -9,6 +9,7 @@ import { schoolStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
 import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
+import { SchoolDocumentsTabComponent } from '../sales/school-documents-tab';
 
 /**
  * One school's profile (school spec R6-R8, R10, R12; finance section 6): tabs Profile, Classes and, for the Owner, Ledger, and
@@ -30,6 +31,7 @@ import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
     SkeletonLoaderComponent,
     LedgerStatementComponent,
     PartyLedgerSummaryComponent,
+    SchoolDocumentsTabComponent,
   ],
   templateUrl: './school-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,9 +52,12 @@ export class SchoolDetailComponent {
   readonly canEdit = inject(AuthService).hasAppRole('OWNER');
 
   /** Finance section 6: the profile tabs; the later school documents become further tabs. */
-  readonly tab = signal<'profile' | 'classes' | 'ledger'>('profile');
+  readonly tab = signal<'profile' | 'classes' | 'orders' | 'invoices' | 'ledger'>('profile');
   /** The tabs this account sees: the ledger is the Owner's only (finance R13). */
-  readonly tabs: readonly ('profile' | 'classes' | 'ledger')[] = this.canEdit ? ['profile', 'classes', 'ledger'] : ['profile', 'classes'];
+  /** Sales section 6: the school's orders and invoices are tabs of its profile (Owner and Staff); the ledger is the Owner's. */
+  readonly tabs: readonly ('profile' | 'classes' | 'orders' | 'invoices' | 'ledger')[] = this.canEdit
+    ? ['profile', 'orders', 'invoices', 'ledger', 'classes']
+    : ['profile', 'orders', 'invoices', 'classes'];
 
   readonly school = signal<SchoolDetail | null>(null);
   readonly loading = signal(true);
