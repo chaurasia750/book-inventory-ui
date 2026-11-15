@@ -1,13 +1,10 @@
 <div class="flex flex-col gap-3">
-  <form [formGroup]="filters" (ngSubmit)="load()" class="flex flex-wrap items-end gap-2">
-    <div class="flex flex-wrap gap-1.5" role="group" [attr.aria-label]="'ledger.filter.kind' | translate">
-      @for (k of kinds(); track k) {
-        <button type="button" (click)="choose(k)" [attr.aria-pressed]="filters.controls.kind.value === k"
-          class="min-h-[30px] rounded-full border px-3 py-1 text-xs font-semibold transition-colors"
-          [ngClass]="filters.controls.kind.value === k ? 'border-gold-500 bg-gold-50 text-gold-800' : 'border-neutral-300 bg-white text-gray-600 hover:border-gold-500 dark:bg-charcoal-800'">
-          {{ 'ledger.filter.' + kindKey(k) | translate }}
-        </button>
-      }
+  <form [formGroup]="filters" (ngSubmit)="load()" class="flex flex-wrap items-end gap-3">
+    <div class="w-44">
+      <label for="ls-kind" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'ledger.filter.kind' | translate }}</label>
+      <select id="ls-kind" [formControl]="filters.controls.kind" (change)="kindChanged()" [class]="field">
+        @for (k of kinds(); track k) { <option [value]="k">{{ 'ledger.filter.' + kindKey(k) | translate }}</option> }
+      </select>
     </div>
     @switch (filters.controls.kind.value) {
       @case ('YEAR') {
@@ -34,7 +31,7 @@
       }
     }
     @if (filters.controls.kind.value !== 'ALL') {
-      <app-button type="submit" size="sm" [loading]="loading()">{{ 'ledger.filter.apply' | translate }}</app-button>
+      <app-button type="submit" [loading]="loading()">{{ 'ledger.filter.apply' | translate }}</app-button>
     }
   </form>
 

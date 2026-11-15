@@ -48,9 +48,9 @@ const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
       <div class="relative">
         <input type="text" readonly [attr.id]="inputId || null" [value]="displayValue" [placeholder]="placeholder"
           (click)="toggle()"
-          [class]="error
-            ? 'peer block w-full appearance-none rounded-lg border px-3 pb-2 pt-4 text-sm text-primary-fg transition-colors focus:outline-none focus:ring-2 border-red-400 bg-red-500/5 focus:border-red-400 focus:ring-red-400/20'
-            : 'peer block w-full appearance-none rounded-lg border px-3 pb-2 pt-4 text-sm text-primary-fg transition-colors focus:outline-none focus:ring-2 border-gray-300 focus:border-brand-500 focus:ring-brand-500/20 bg-transparent'" />
+          [class]="(label ? 'pb-2 pt-4 ' : 'h-10 py-0 ') + (error
+            ? 'peer block w-full appearance-none rounded-lg border px-3 text-sm text-primary-fg transition-colors focus:outline-none focus:ring-2 border-red-400 bg-red-500/5 focus:border-red-400 focus:ring-red-400/20'
+            : 'peer block w-full appearance-none rounded-lg border px-3 text-sm text-primary-fg transition-colors focus:outline-none focus:ring-2 border-gray-300 focus:border-brand-500 focus:ring-brand-500/20 bg-transparent')" />
         <button type="button" (click)="toggle()"
           class="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded transition-colors">
           <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
