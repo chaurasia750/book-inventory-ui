@@ -206,6 +206,21 @@
       "invalid_barcode": "A barcode must have 4 to 30 letters, digits or hyphens.",
       "duplicate_barcode": "A barcode appears twice in the list.",
       "barcode_taken": "A barcode is already used by another item.",
+      "import": {
+        "invalid_file": "Upload an Excel file (.xlsx) made from the template.",
+        "too_large": "The file is larger than 5 MB.",
+        "too_many_rows": "The file has more than 5000 rows.",
+        "empty": "The file has no rows to import.",
+        "rows_invalid": "Some rows of the file are wrong; nothing was imported. Fix the rows listed and upload again.",
+        "item_unknown": "No item of your company has this item code.",
+        "duplicate_row": "This item or barcode appears more than once in the file.",
+        "invalid_category": "The category must be Book, Copy, Pen, Pencil, Bag, Tie or Other (a new item needs one).",
+        "invalid_stock_managed": "Stock managed must be yes or no.",
+        "invalid_number": "The GST rate must be a number.",
+        "vendor_unknown": "No active vendor of your company has this name.",
+        "name_required": "A new item needs a name.",
+        "cannot_clear": "The name and the category cannot be cleared."
+      },
       "already_active": "The item is already active.",
       "already_inactive": "The item is already inactive."
     },
@@ -917,6 +932,36 @@
     }
   },
   "item": {
+    "import": {
+      "button": "Import",
+      "title": "Import items from Excel",
+      "hint": "Fill the template: a row with an item code (or a known barcode) updates that item, any other row creates a new item. In an update a blank cell keeps the value and - clears an optional one. Every row is applied, or none if any row is wrong.",
+      "template": "Download template",
+      "file": "Excel file (.xlsx, at most 5 MB, 5000 rows)",
+      "submit": "Import",
+      "close": "Close",
+      "required": "Choose an .xlsx file.",
+      "notXlsx": "Only .xlsx files can be imported.",
+      "tooLarge": "The file is larger than 5 MB.",
+      "templateError": "The template could not be downloaded.",
+      "done": "{{created}} items created, {{updated}} items updated.",
+      "refused": "Nothing was imported. Correct these rows and upload the file again:",
+      "row": "Row",
+      "column": "Column",
+      "reason": "Reason",
+      "columns": {
+        "ItemCode": "Item code",
+        "Barcode": "Barcode",
+        "Name": "Name",
+        "Category": "Category",
+        "Class": "Class",
+        "Subject": "Subject",
+        "HsnCode": "HSN code",
+        "GstRate": "GST rate",
+        "Vendor": "Vendor",
+        "StockManaged": "Stock managed"
+      }
+    },
     "title": "Items",
     "subtitle": "Books, copies, pens and everything else your company buys and sells.",
     "close": "Close",
