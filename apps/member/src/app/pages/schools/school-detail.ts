@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
 import { SchoolService } from '@org/api-services';
@@ -16,7 +17,7 @@ import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, S
 @Component({
   selector: 'app-school-detail',
   standalone: true,
-  imports: [DecimalPipe, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
+  imports: [DecimalPipe, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
   templateUrl: './school-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

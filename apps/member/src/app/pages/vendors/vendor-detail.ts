@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { VendorService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
@@ -15,7 +16,7 @@ import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, S
 @Component({
   selector: 'app-vendor-detail',
   standalone: true,
-  imports: [DecimalPipe, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
+  imports: [DecimalPipe, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
   templateUrl: './vendor-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
