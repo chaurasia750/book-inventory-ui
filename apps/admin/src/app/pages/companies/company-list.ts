@@ -65,7 +65,7 @@ export class CompanyListComponent {
   readonly result = signal<PagedList<CompanySummary> | null>(null);
   readonly loading = signal(false);
   readonly loadError = signal('');
-  readonly skeletonRows = [1, 2, 3];
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
 
   readonly createOpen = signal(false);
   readonly creating = signal(false);

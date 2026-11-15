@@ -116,6 +116,17 @@ export const appRoutes: Route[] = [
         ],
       },
       {
+        path: 'customers',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/customers/customer-list').then((m) => m.CustomerListComponent),
+        // The customer, the form for a new one and the edit form open beside the list (platform U10); Staff add but never edit (customer R9).
+        children: [
+          { path: 'new', children: [] },
+          { path: ':id/edit', canActivate: [appRoleGuard(['OWNER'])], children: [] },
+          { path: ':id', children: [] },
+        ],
+      },
+      {
         path: 'schools',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/schools/school-list').then((m) => m.SchoolListComponent),

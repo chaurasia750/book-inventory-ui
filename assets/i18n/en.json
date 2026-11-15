@@ -196,6 +196,20 @@
       "already_active": "The vendor is already active.",
       "already_inactive": "The vendor is already inactive."
     },
+    "customer": {
+      "not_found": "The customer could not be found.",
+      "invalid_name": "The customer name must be 2 to 150 characters.",
+      "invalid_field": "A customer detail is too long.",
+      "invalid_mobile": "The mobile number must have 10 to 15 digits.",
+      "mobile_required": "The mobile number is required.",
+      "mobile_taken": "A customer with this mobile number already exists.",
+      "invalid_school": "Choose an active school of this company.",
+      "invalid_class": "Choose one of the classes of the chosen school.",
+      "invalid_opening_balance": "The opening balance must be zero or more, with at most two decimals.",
+      "invalid_credit_limit": "The credit limit must be more than zero, with at most two decimals.",
+      "already_active": "The customer is already active.",
+      "already_inactive": "The customer is already inactive."
+    },
     "item": {
       "not_found": "The item could not be found.",
       "invalid_name": "The item name must be 2 to 200 characters.",
@@ -1032,6 +1046,70 @@
       "submit": "Record payment",
       "done": "Payment recorded: {{number}}.",
       "close": "Close"
+    }
+  },
+  "customer": {
+    "title": "Customers",
+    "subtitle": "The people who buy from your shop on credit.",
+    "close": "Close",
+    "panelLabel": "Customer details",
+    "empty": "No customers match these filters.",
+    "filters": {
+      "search": "Search name, code or mobile",
+      "allStatuses": "All statuses",
+      "allSchools": "All schools"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Customer",
+      "mobile": "Mobile",
+      "school": "School",
+      "status": "Status"
+    },
+    "fields": {
+      "name": "Customer name",
+      "mobile": "Mobile",
+      "address": "Address",
+      "school": "School",
+      "noSchool": "No school",
+      "className": "Class",
+      "noClass": "No class",
+      "classHint": "Choose a school first to pick its class.",
+      "openingBalance": "Opening balance",
+      "openingBalanceHint": "What the customer owed the shop at the start. Zero or more.",
+      "creditLimit": "Credit limit",
+      "creditLimitHint": "Optional. More than zero; it only warns on a bill, it never blocks it.",
+      "none": "-"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "add": {
+      "button": "Add customer",
+      "title": "Add customer",
+      "submit": "Add customer"
+    },
+    "edit": {
+      "button": "Edit",
+      "title": "Edit customer",
+      "submit": "Save changes"
+    },
+    "deactivate": {
+      "button": "Deactivate",
+      "title": "Deactivate customer",
+      "confirm": "An inactive customer is not suggested on a bill. You can activate it again."
+    },
+    "activate": {
+      "button": "Activate",
+      "title": "Activate customer",
+      "confirm": "The customer is suggested on a bill again."
+    },
+    "picker": {
+      "label": "Customer",
+      "placeholder": "Type a name or mobile number",
+      "none": "No customer found.",
+      "addNew": "Add a new customer"
     }
   },
   "item": {

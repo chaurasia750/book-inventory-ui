@@ -45,7 +45,7 @@
 
       @if (hasPanel()) {
         <ul class="m-0 list-none divide-y divide-neutral-100 p-0 dark:divide-charcoal-700">
-          @if (loading()) {
+          @if (loading() && !result()) {
             @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
           } @else {
             @for (item of result()?.items ?? []; track item.id) {
@@ -79,7 +79,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              @if (loading()) {
+              @if (loading() && !result()) {
                 @for (i of skeletonRows; track i) {
                   <tr>
                     <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>

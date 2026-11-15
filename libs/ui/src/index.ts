@@ -33,3 +33,5 @@ export * from './lib/credentials-dialog/credentials-dialog';
 export * from './lib/list-detail/list-detail';
 export * from './lib/list-detail/close-button';
 export * from './lib/list-detail/selected-id';
+export * from './lib/table-cards/install-table-cards';
+export * from './lib/calm-pages/with-calm-view-transitions';

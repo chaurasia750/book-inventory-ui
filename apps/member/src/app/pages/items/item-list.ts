@@ -70,7 +70,7 @@ export class ItemListComponent {
   readonly result = signal<PagedList<ItemSummary> | null>(null);
   readonly loading = signal(false);
   readonly loadError = signal('');
-  readonly skeletonRows = [1, 2, 3];
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
 
   constructor() {
     this.search.valueChanges

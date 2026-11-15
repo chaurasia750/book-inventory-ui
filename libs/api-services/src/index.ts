@@ -6,6 +6,7 @@ export * from './lib/company.service';
 export * from './lib/staff.service';
 export * from './lib/school.service';
 export * from './lib/vendor.service';
+export * from './lib/customer.service';
 export * from './lib/item.service';
 export * from './lib/price.service';
 export * from './lib/stock.service';

@@ -70,7 +70,7 @@ export class UserManagementComponent {
   readonly result = signal<PagedList<UserSummary> | null>(null);
   readonly loading = signal(false);
   readonly loadError = signal('');
-  readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
 
   readonly createOpen = signal(false);
   readonly creating = signal(false);
