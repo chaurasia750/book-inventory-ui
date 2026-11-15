@@ -241,6 +241,8 @@
       "invalid_result_date": "The date cannot be in the future, and a cheque cannot clear before its cheque date.",
       "invalid_reason": "Give the reason, 5 to 500 characters.",
       "no_advance": "This receipt has no advance to apply.",
+      "proof_invalid": "A proof must be a PNG, JPEG or PDF file of at most 5 MB, and a receipt can have at most 5.",
+      "proof_not_found": "The proof could not be found.",
       "receipt_has_cheque_result": "A receipt with a cleared or bounced cheque cannot be cancelled.",
       "receipt_not_recorded": "Only a recorded receipt can be changed; this one was cancelled.",
       "too_many_ids": "At most 100 invoices can be asked at once."
@@ -967,6 +969,19 @@
       "dateRequired": "Choose the date."
     },
     "status": { "RECORDED": "Recorded", "CANCELLED": "Cancelled" },
+    "proof": {
+      "title": "Proof of payment",
+      "optional": "Proof of payment (optional: cheque photo, UPI screenshot, bank slip)",
+      "none": "No proof attached.",
+      "open": "Open",
+      "remove": "Remove",
+      "confirmRemove": "Yes, remove",
+      "add": "Add a proof (PNG, JPEG or PDF, at most 5 MB, at most 5 files)",
+      "notAllowed": "A proof must be a PNG, JPEG or PDF file.",
+      "tooLarge": "A proof can be at most 5 MB.",
+      "tooMany": "At most 5 proof files can be attached.",
+      "failed": "The payment is recorded, but these proofs were not attached:"
+    },
     "adjust": {
       "button": "Adjust advance",
       "title": "Apply the advance to invoices",

@@ -8,6 +8,7 @@ import { ReceiptDetail } from '@org/shared-models';
 import { ButtonComponent, ModalComponent } from '@org/ui';
 import { AdjustAdvancePanelComponent } from './adjust-advance-panel';
 import { CancelReceiptPanelComponent } from './cancel-receipt-panel';
+import { ReceiptProofsComponent } from './receipt-proofs';
 
 /** Today as `yyyy-MM-dd` in the browser's own time zone (the business date the Owner sees). */
 function todayIso(): string {
@@ -22,7 +23,7 @@ function todayIso(): string {
 @Component({
   selector: 'app-receipt-detail-dialog',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent, ReceiptProofsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal size="wide" [open]="receiptId() !== null" [title]="'payment.detail.title' | translate" (closed)="closed.emit()">
@@ -108,6 +109,7 @@ function todayIso(): string {
             <span>{{ 'payment.detail.advance' | translate }}: <span class="font-mono">{{ r.advanceAmount | number: '1.2-2' }}</span></span>
           </div>
           @if (r.remark) { <p class="m-0 text-xs text-gray-600">{{ r.remark }}</p> }
+          <app-receipt-proofs [receiptId]="r.summary.id" [proofs]="r.proofs ?? []" [canEdit]="r.summary.status === 'RECORDED'" (changed)="load()" />
           @if (r.summary.status === 'CANCELLED') {
             <p class="m-0 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">{{ 'payment.cancel.cancelledOn' | translate: { date: (r.cancelledOn | date: 'dd MMM yyyy'), reason: r.cancelReason } }}</p>
           }

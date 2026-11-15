@@ -9,6 +9,27 @@ export type ChequeStatus = 'PENDING' | 'CLEARED' | 'BOUNCED';
 /** Payment spec R14: a receipt is recorded or cancelled. */
 export type ReceiptStatus = 'RECORDED' | 'CANCELLED';
 
+/** Payment spec R20: a receipt has at most five proof files, each a PNG, JPEG or PDF of at most 5 MB. */
+export const MAX_RECEIPT_PROOFS = 5;
+export const MAX_PROOF_BYTES = 5 * 1024 * 1024;
+
+/** R20: one proof file of a receipt as the detail lists it (never its bytes). */
+export interface ReceiptProof {
+  id: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+}
+
+/** R20: why a file cannot be a proof (checked in the browser first; the server decides by the file's own bytes): a message key under `payment.proof`, or null when it can. */
+export function proofFileError(file: File): 'notAllowed' | 'tooLarge' | null {
+  const name = file.name.toLowerCase();
+  if (!/\.(png|jpe?g|pdf)$/.test(name)) {
+    return 'notAllowed';
+  }
+  return file.size > MAX_PROOF_BYTES ? 'tooLarge' : null;
+}
+
 /** Payment spec R10 limit: a receipt has one to ten modes. */
 export const MAX_RECEIPT_MODES = 10;
 
@@ -80,6 +101,7 @@ export interface ReceiptDetail {
   advanceAmount: number;
   modes: ReceiptModeDetail[];
   allocations: ReceiptAllocationDetail[];
+  proofs: ReceiptProof[];
 }
 
 /** R3: an open invoice of a school with what was applied and what is still due. */

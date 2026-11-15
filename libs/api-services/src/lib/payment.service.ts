@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { InvoiceDue, PagedList, ReceiptAllocationRequest, ReceiptDetail, ReceiptSearchParams, ReceiptSummary, RecordReceiptRequest, SchoolDues } from '@org/shared-models';
+import { InvoiceDue, PagedList, ReceiptAllocationRequest, ReceiptProof, ReceiptDetail, ReceiptSearchParams, ReceiptSummary, RecordReceiptRequest, SchoolDues } from '@org/shared-models';
 import { API_BASE_URL } from './api-base-url.token';
 import { ApiService, QueryParams } from './api.service';
 
@@ -52,6 +52,22 @@ export class PaymentService {
   /** R14: cancels a recorded receipt with a reason (5-500 characters). */
   cancelReceipt(receiptId: string, reason: string): Observable<void> {
     return this.api.post<void>(`/receipts/${receiptId}/cancel`, { reason });
+  }
+
+  /** R20: attaches a proof file (PNG, JPEG or PDF, at most 5 MB) to a recorded receipt. */
+  uploadProof(receiptId: string, file: File): Observable<ReceiptProof> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+    return this.http.post<ReceiptProof>(`${this.baseUrl}/receipts/${receiptId}/proofs`, form);
+  }
+
+  /** R20: the proof file's bytes (it needs the sign-in, so it is fetched here and not linked). */
+  proofFile(receiptId: string, proofId: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/receipts/${receiptId}/proofs/${proofId}`, { responseType: 'blob' });
+  }
+
+  removeProof(receiptId: string, proofId: string): Observable<void> {
+    return this.api.delete<void>(`/receipts/${receiptId}/proofs/${proofId}`);
   }
 
   /** R4-R9: records a payment; the same `clientRequestId` returns the receipt already recorded. */
