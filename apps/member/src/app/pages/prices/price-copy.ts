@@ -4,7 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PriceService, VendorService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { CopyPriceResult, ITEM_CATEGORIES, ItemCategory } from '@org/shared-models';
-import { ButtonComponent, ModalComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent, ModalComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 
@@ -15,7 +15,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
 @Component({
   selector: 'app-price-copy',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent, DatePickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal [open]="open()" [title]="'price.copy.title' | translate" (closed)="closed.emit()">
@@ -47,7 +47,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
             </div>
             <div>
               <label for="pc-date" class="mb-1 block text-sm font-semibold">{{ 'price.fields.effectiveFrom' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-              <input id="pc-date" type="date" formControlName="effectiveFrom" class="${FIELD}" />
+              <app-date-picker inputId="pc-date" formControlName="effectiveFrom" />
             </div>
             <div>
               <label for="pc-vendor" class="mb-1 block text-sm font-semibold">{{ 'price.selection.vendor' | translate }}</label>

@@ -775,7 +775,12 @@
       "duplicate": "Two classes have the same name."
     },
     "close": "Close",
-    "detail": "School details"
+    "detail": "School details",
+    "tabs": {
+      "profile": "Profile",
+      "classes": "Classes",
+      "ledger": "Ledger"
+    }
   },
   "vendor": {
     "title": "Vendors",
@@ -842,6 +847,10 @@
       "button": "Activate",
       "title": "Activate vendor",
       "confirm": "The vendor can be chosen for new documents again."
+    },
+    "tabs": {
+      "profile": "Profile",
+      "ledger": "Ledger"
     }
   },
   "item": {
@@ -1157,16 +1166,10 @@
     }
   },
   "ledger": {
-    "title": "Ledger",
-    "subtitle": "What every school owes and what the company owes every vendor. Open a row for its statement.",
-    "tabs": "Ledger lists",
-    "schools": "Schools",
-    "vendors": "Vendors",
     "search": "Search name or code",
     "total": "Total outstanding",
     "empty": "Nobody has an outstanding balance.",
     "inactive": "Inactive",
-    "link": "Ledger",
     "filter": {
       "kind": "Show",
       "all": "All entries",
@@ -1201,6 +1204,18 @@
       "SALES_RETURN": "Sales return",
       "PURCHASE_RETURN": "Purchase return",
       "SCRATCH": "Test posting"
+    },
+    "withBalanceOnly": "With a balance only",
+    "balanceColumn": "Balance",
+    "balance": {
+      "school": "Balance due",
+      "vendor": "To pay"
+    },
+    "tiles": {
+      "opening": "Opening balance",
+      "debit": "Total debit",
+      "credit": "Total credit",
+      "advance": "Advance (paid ahead)"
     }
   }
 }

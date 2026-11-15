@@ -1,111 +1,95 @@
-<div class="flex flex-col gap-5">
-  <div class="flex flex-wrap items-center gap-3">
-    <div class="mr-auto min-w-0">
-      <h1 class="truncate text-xl font-semibold text-primary-fg">{{ statement()?.partyName || ('ledger.statement.title' | translate) }}</h1>
-      @if (statement(); as s) {
-        <p class="font-mono text-xs text-gray-500">{{ s.partyCode }}@if (!s.isActive) { · {{ 'ledger.inactive' | translate }} }</p>
-      }
+<div class="flex flex-col gap-3">
+  <form [formGroup]="filters" (ngSubmit)="load()" class="flex flex-wrap items-end gap-3">
+    <div class="w-44">
+      <label for="ls-kind" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'ledger.filter.kind' | translate }}</label>
+      <select id="ls-kind" [formControl]="filters.controls.kind" (change)="kindChanged()" [class]="field">
+        @for (k of kinds(); track k) { <option [value]="k">{{ 'ledger.filter.' + kindKey(k) | translate }}</option> }
+      </select>
     </div>
-    <app-close-button [label]="'ledger.statement.close' | translate" (clicked)="closed.emit()" />
-  </div>
-
-  <app-card>
-    <form [formGroup]="filters" (ngSubmit)="load()" class="grid gap-3 sm:grid-cols-4">
-      <div>
-        <label for="ls-kind" class="mb-1 block text-xs font-semibold text-gray-600">{{ 'ledger.filter.kind' | translate }}</label>
-        <select id="ls-kind" formControlName="kind" [class]="field">
-          <option value="ALL">{{ 'ledger.filter.all' | translate }}</option>
-          <option value="YEAR">{{ 'ledger.filter.year' | translate }}</option>
-          @if (party() === 'schools') { <option value="SESSION">{{ 'ledger.filter.session' | translate }}</option> }
-          <option value="DATES">{{ 'ledger.filter.dates' | translate }}</option>
-        </select>
-      </div>
-      @switch (filters.controls.kind.value) {
-        @case ('YEAR') {
-          <div>
-            <label for="ls-year" class="mb-1 block text-xs font-semibold text-gray-600">{{ 'ledger.filter.year' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-            <input id="ls-year" formControlName="financialYear" placeholder="2026-27" [class]="field" />
-          </div>
-        }
-        @case ('SESSION') {
-          <div>
-            <label for="ls-session" class="mb-1 block text-xs font-semibold text-gray-600">{{ 'ledger.filter.session' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-            <input id="ls-session" formControlName="session" placeholder="2026-27 / 2027" [class]="field" />
-          </div>
-        }
-        @case ('DATES') {
-          <div>
-            <label for="ls-from" class="mb-1 block text-xs font-semibold text-gray-600">{{ 'ledger.filter.from' | translate }}</label>
-            <input id="ls-from" type="date" formControlName="from" [class]="field" />
-          </div>
-          <div>
-            <label for="ls-to" class="mb-1 block text-xs font-semibold text-gray-600">{{ 'ledger.filter.to' | translate }}</label>
-            <input id="ls-to" type="date" formControlName="to" [class]="field" />
-          </div>
-        }
+    @switch (filters.controls.kind.value) {
+      @case ('YEAR') {
+        <div class="w-32">
+          <label for="ls-year" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'ledger.filter.year' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
+          <input id="ls-year" formControlName="financialYear" placeholder="2026-27" [class]="field" />
+        </div>
       }
-      <div class="flex items-end">
-        <app-button type="submit" [loading]="loading()">{{ 'ledger.filter.apply' | translate }}</app-button>
-      </div>
-    </form>
-  </app-card>
+      @case ('SESSION') {
+        <div class="w-32">
+          <label for="ls-session" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'ledger.filter.session' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
+          <input id="ls-session" formControlName="session" placeholder="2026-27" [class]="field" />
+        </div>
+      }
+      @case ('DATES') {
+        <div class="w-40">
+          <label for="ls-from" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'ledger.filter.from' | translate }}</label>
+          <app-date-picker inputId="ls-from" formControlName="from" />
+        </div>
+        <div class="w-40">
+          <label for="ls-to" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'ledger.filter.to' | translate }}</label>
+          <app-date-picker inputId="ls-to" formControlName="to" />
+        </div>
+      }
+    }
+    @if (filters.controls.kind.value !== 'ALL') {
+      <app-button type="submit" [loading]="loading()">{{ 'ledger.filter.apply' | translate }}</app-button>
+    }
+  </form>
 
-  @if (loading() && !statement()) {
-    <app-card>
-      <div class="space-y-3">
-        <app-skeleton-loader width="100%" />
-        <app-skeleton-loader width="80%" />
-      </div>
-    </app-card>
-  } @else if (loadError()) {
-    <div class="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+  @if (loadError()) {
+    <div class="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
       <span>{{ loadError() }}</span>
-      <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+      <app-button size="sm" variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+    </div>
+  } @else if (loading() && !statement()) {
+    <div class="space-y-2">
+      <app-skeleton-loader width="100%" />
+      <app-skeleton-loader width="80%" />
     </div>
   } @else if (statement(); as s) {
-    <app-card [padding]="false">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
-            <tr>
-              <th class="px-4 py-3 font-semibold">{{ 'ledger.statement.date' | translate }}</th>
-              <th class="px-4 py-3 font-semibold">{{ 'ledger.statement.document' | translate }}</th>
-              <th class="px-4 py-3 font-semibold">{{ 'ledger.statement.detail' | translate }}</th>
-              <th class="px-4 py-3 text-right font-semibold">{{ 'ledger.statement.debit' | translate }}</th>
-              <th class="px-4 py-3 text-right font-semibold">{{ 'ledger.statement.credit' | translate }}</th>
-              <th class="px-4 py-3 text-right font-semibold">{{ 'ledger.statement.balance' | translate }}</th>
+    <div class="overflow-x-auto rounded-lg border border-neutral-200 dark:border-charcoal-700">
+      <table class="w-full min-w-[640px] text-left text-xs">
+        <thead class="bg-neutral-50 text-[11px] uppercase tracking-[0.05em] text-gray-500 dark:bg-charcoal-900">
+          <tr>
+            <th class="whitespace-nowrap px-3 py-2 font-semibold">{{ 'ledger.statement.date' | translate }}</th>
+            <th class="whitespace-nowrap px-3 py-2 font-semibold">{{ 'ledger.statement.document' | translate }}</th>
+            <th class="px-3 py-2 font-semibold">{{ 'ledger.statement.detail' | translate }}</th>
+            <th class="px-3 py-2 text-right font-semibold">{{ 'ledger.statement.debit' | translate }}</th>
+            <th class="px-3 py-2 text-right font-semibold">{{ 'ledger.statement.credit' | translate }}</th>
+            <th class="px-3 py-2 text-right font-semibold">{{ 'ledger.statement.balance' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
+          <tr class="bg-neutral-50 font-semibold dark:bg-charcoal-900">
+            <td class="px-3 py-2" colspan="5">{{ 'ledger.statement.opening' | translate }}</td>
+            <td class="px-3 py-2 text-right font-mono" [class.text-red-600]="s.openingBalance < 0">{{ s.openingBalance | number: '1.2-2' }}</td>
+          </tr>
+          @for (r of s.rows; track $index) {
+            <tr [class.bg-red-50]="r.postingKind === 'REVERSAL'">
+              <td class="whitespace-nowrap px-3 py-2 text-gray-600">{{ r.date | date: 'dd MMM yy' }}</td>
+              <td class="whitespace-nowrap px-3 py-2">
+                <span class="font-medium text-primary-fg">{{ 'ledger.documentType.' + r.documentType | translate }}</span>
+                <span class="ml-1 font-mono text-gray-500">{{ r.documentNumber }}</span>
+                @if (r.postingKind === 'REVERSAL') { <span class="ml-1 text-red-600">({{ 'ledger.statement.cancelled' | translate }})</span> }
+              </td>
+              <td class="px-3 py-2 text-gray-500" [class.line-through]="r.postingKind === 'REVERSAL'">
+                {{ r.narration || '' }}@if (r.session) { <span>{{ r.narration ? ' · ' : '' }}{{ 'ledger.filter.session' | translate }} {{ r.session }}</span> }
+              </td>
+              <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.debitAmount ? (r.debitAmount | number: '1.2-2') : '' }}</td>
+              <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.creditAmount ? (r.creditAmount | number: '1.2-2') : '' }}</td>
+              <td class="whitespace-nowrap px-3 py-2 text-right font-mono font-semibold" [class.text-red-600]="r.balance < 0">{{ r.balance | number: '1.2-2' }}</td>
             </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            <tr class="bg-gray-50/60">
-              <td class="px-4 py-3 text-gray-500" colspan="5">{{ 'ledger.statement.opening' | translate }}</td>
-              <td class="px-4 py-3 text-right font-mono font-semibold" [class.text-red-600]="s.openingBalance < 0">{{ s.openingBalance | number: '1.2-2' }}</td>
-            </tr>
-            @for (r of s.rows; track $index) {
-              <tr>
-                <td class="whitespace-nowrap px-4 py-3 text-gray-600">{{ r.date | date: 'dd MMM yyyy' }}</td>
-                <td class="px-4 py-3">
-                  <span class="block font-medium text-primary-fg">{{ 'ledger.documentType.' + r.documentType | translate }}@if (r.postingKind === 'REVERSAL') { <span class="text-xs text-red-600"> ({{ 'ledger.statement.cancelled' | translate }})</span> }</span>
-                  <span class="block font-mono text-xs text-gray-500">{{ r.documentNumber }}</span>
-                </td>
-                <td class="px-4 py-3 text-xs text-gray-500">{{ r.narration || '' }}@if (r.session) { <span class="block">{{ 'ledger.filter.session' | translate }} {{ r.session }}</span> }</td>
-                <td class="px-4 py-3 text-right font-mono">{{ r.debitAmount ? (r.debitAmount | number: '1.2-2') : '' }}</td>
-                <td class="px-4 py-3 text-right font-mono">{{ r.creditAmount ? (r.creditAmount | number: '1.2-2') : '' }}</td>
-                <td class="px-4 py-3 text-right font-mono font-semibold" [class.text-red-600]="r.balance < 0">{{ r.balance | number: '1.2-2' }}</td>
-              </tr>
-            } @empty {
-              <tr><td colspan="6" class="py-8 text-center text-sm text-gray-400">{{ 'ledger.statement.empty' | translate }}</td></tr>
-            }
-            <tr class="border-t-2 border-gray-200 bg-gray-50/60 font-semibold">
-              <td class="px-4 py-3" colspan="3">{{ 'ledger.statement.totals' | translate }}</td>
-              <td class="px-4 py-3 text-right font-mono">{{ s.totalDebit | number: '1.2-2' }}</td>
-              <td class="px-4 py-3 text-right font-mono">{{ s.totalCredit | number: '1.2-2' }}</td>
-              <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="s.closingBalance < 0">{{ s.closingBalance | number: '1.2-2' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </app-card>
-    <p class="text-xs text-gray-500">{{ (party() === 'schools' ? 'ledger.statement.schoolSign' : 'ledger.statement.vendorSign') | translate }}</p>
+          } @empty {
+            <tr><td colspan="6" class="py-6 text-center text-sm text-gray-400">{{ 'ledger.statement.empty' | translate }}</td></tr>
+          }
+          <tr class="bg-neutral-50 font-semibold dark:bg-charcoal-900">
+            <td class="px-3 py-2" colspan="3">{{ 'ledger.statement.totals' | translate }}</td>
+            <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ s.totalDebit | number: '1.2-2' }}</td>
+            <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ s.totalCredit | number: '1.2-2' }}</td>
+            <td class="whitespace-nowrap px-3 py-2 text-right font-mono" [class]="s.closingBalance > 0 ? 'text-red-700' : 'text-green-700'">{{ s.closingBalance | number: '1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="m-0 text-xs text-gray-500">{{ (party() === 'schools' ? 'ledger.statement.schoolSign' : 'ledger.statement.vendorSign') | translate }}</p>
   }
 </div>

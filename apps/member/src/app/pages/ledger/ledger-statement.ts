@@ -1,18 +1,18 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LedgerService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { LedgerStatement, LedgerStatementParams } from '@org/shared-models';
-import { ButtonComponent, CardComponent, CloseButtonComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent, SkeletonLoaderComponent } from '@org/ui';
 
-const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
+const FIELD = 'h-10 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 
 type FilterKind = 'ALL' | 'YEAR' | 'SESSION' | 'DATES';
 
 /**
- * A school's or vendor's statement, in the panel beside the outstanding list (finance spec R9, R10, platform U10): one filter at a
+ * The Ledger tab of a school's or vendor's profile (finance spec R9, R10, section 6): one filter at a
  * time (all, a financial year, a session for schools, or a date range), the opening row, every entry with its running balance,
  * and the totals. A school's balance is what it owes, a vendor's what the company owes (R7); a negative balance is an advance.
  * Nothing is computed here: the statement is the server's.
@@ -20,7 +20,7 @@ type FilterKind = 'ALL' | 'YEAR' | 'SESSION' | 'DATES';
 @Component({
   selector: 'app-ledger-statement',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, SkeletonLoaderComponent],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, DatePickerComponent],
   templateUrl: './ledger-statement.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,12 +28,14 @@ export class LedgerStatementComponent {
   readonly party = input.required<'schools' | 'vendors'>();
   /** The school's or vendor's id; a new id loads its statement. */
   readonly id = input.required<string>();
-  readonly closed = output<void>();
 
   private readonly ledger = inject(LedgerService);
   private readonly translate = inject(TranslateService);
 
   readonly field = FIELD;
+
+  /** The filter choices; the session filter is the schools' only (R9). */
+  readonly kinds = computed<FilterKind[]>(() => (this.party() === 'schools' ? ['ALL', 'YEAR', 'SESSION', 'DATES'] : ['ALL', 'YEAR', 'DATES']));
 
   readonly filters = new FormGroup({
     kind: new FormControl<FilterKind>('ALL', { nonNullable: true }),
@@ -56,6 +58,17 @@ export class LedgerStatementComponent {
         this.load();
       });
     });
+  }
+
+  kindKey(kind: FilterKind): string {
+    return { ALL: 'all', YEAR: 'year', SESSION: 'session', DATES: 'dates' }[kind];
+  }
+
+  /** "All entries" loads at once; the other choices show their inputs first. */
+  kindChanged(): void {
+    if (this.filters.controls.kind.value === 'ALL') {
+      this.load();
+    }
   }
 
   load(): void {

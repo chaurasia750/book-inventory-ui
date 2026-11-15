@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-5">
+<div class="flex flex-col gap-3">
 
   @if (loading()) {
     <div class="flex justify-end"><app-close-button [label]="'school.close' | translate" (clicked)="closed.emit()" /></div>
@@ -16,42 +16,65 @@
       <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
     </div>
   } @else if (school(); as s) {
-    <div class="flex flex-wrap items-center gap-3">
-      <div class="mr-auto flex min-w-0 flex-wrap items-center gap-3">
-        <h1 class="font-mono text-xl font-semibold text-primary-fg">{{ s.code }}</h1>
-        <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(s.status)">{{ 'school.status.' + s.status | translate }}</span>
+    <section class="flex flex-col gap-3 rounded-[10px] border border-neutral-200 bg-white px-4 py-3.5 dark:border-charcoal-700 dark:bg-charcoal-800">
+      <div class="flex flex-wrap items-start justify-between gap-2.5">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="m-0 text-xl font-semibold text-primary-fg">{{ s.name }}</h1>
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold" [class]="statusClass(s.status)">{{ 'school.status.' + s.status | translate }}</span>
+          </div>
+          <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+            <span class="font-mono text-primary-fg">{{ s.code }}</span>
+            <span>{{ 'school.sessionType.' + s.sessionType | translate }}</span>
+            <span>{{ 'school.saleType.' + s.saleType | translate }}</span>
+            @if (s.contactPerson) { <span>{{ s.contactPerson }}</span> }
+            @if (s.mobile) { <span class="font-mono">{{ s.mobile }}</span> }
+            @if (s.gstin) { <span>GST <span class="font-mono text-primary-fg">{{ s.gstin }}</span></span> }
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          @if (canEdit) {
+            <app-button size="sm" variant="secondary" (clicked)="editRequested.emit()">{{ 'school.edit.button' | translate }}</app-button>
+            <app-button size="sm" variant="secondary" (clicked)="openStatus()">
+              {{ (s.status === 'ACTIVE' ? 'school.deactivate.button' : 'school.activate.button') | translate }}
+            </app-button>
+          }
+          <app-close-button [label]="'school.close' | translate" (clicked)="closed.emit()" />
+        </div>
       </div>
       @if (canEdit) {
-        <div class="flex flex-wrap gap-2">
-          <a [routerLink]="['/ledger/schools', s.id]" class="inline-flex h-10 items-center rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">{{ 'ledger.link' | translate }}</a>
-          <app-button variant="secondary" (clicked)="editRequested.emit()">{{ 'school.edit.button' | translate }}</app-button>
-          <app-button variant="secondary" (clicked)="openStatus()">
-            {{ (s.status === 'ACTIVE' ? 'school.deactivate.button' : 'school.activate.button') | translate }}
-          </app-button>
-        </div>
+        <app-party-ledger-summary party="schools" [id]="s.id" [opening]="s.openingBalanceAmount" />
       }
-      <app-close-button [label]="'school.close' | translate" (clicked)="closed.emit()" />
-    </div>
+    </section>
 
-    <app-card>
-      <dl class="grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
-        <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.name' | translate }}</dt><dd class="mt-1 text-base font-semibold">{{ s.name }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.code' | translate }}</dt><dd class="mt-1 font-mono">{{ s.code }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.state' | translate }}</dt><dd class="mt-1">{{ s.state }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.sessionType' | translate }}</dt><dd class="mt-1">{{ 'school.sessionType.' + s.sessionType | translate }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.saleType' | translate }}</dt><dd class="mt-1">{{ 'school.saleType.' + s.saleType | translate }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.openingBalance' | translate }}</dt><dd class="mt-1">{{ s.openingBalanceAmount | number: '1.2-2' }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.gstDefault' | translate }}</dt><dd class="mt-1">{{ (s.isGstDefault ? 'school.yes' : 'school.no') | translate }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.contactPerson' | translate }}</dt><dd class="mt-1">{{ s.contactPerson || '-' }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.mobile' | translate }}</dt><dd class="mt-1">{{ s.mobile || '-' }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.email' | translate }}</dt><dd class="mt-1">{{ s.email || '-' }}</dd></div>
-        <div><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.gstin' | translate }}</dt><dd class="mt-1">{{ s.gstin || '-' }}</dd></div>
-        <div class="sm:col-span-2 lg:col-span-3"><dt class="text-xs font-semibold uppercase tracking-[0.06em] text-charcoal-500">{{ 'school.fields.address' | translate }}</dt><dd class="mt-1">{{ s.address || '-' }}</dd></div>
+    <section class="overflow-hidden rounded-[10px] border border-neutral-200 bg-white dark:border-charcoal-700 dark:bg-charcoal-800">
+      <div class="flex gap-6 border-b border-neutral-200 px-4 dark:border-charcoal-700" role="tablist">
+        @for (t of tabs; track t) {
+          <button type="button" role="tab" (click)="tab.set(t)" [attr.aria-selected]="tab() === t"
+            class="-mb-px border-b-2 py-3 text-sm font-semibold transition-colors"
+            [ngClass]="tab() === t ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'school.tabs.' + t | translate }}</button>
+        }
+      </div>
+      <div class="p-4">
+    @if (tab() === 'profile') {
+      <dl class="grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.state' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ s.state }}</dd></div>
+        <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.gstDefault' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ (s.isGstDefault ? 'school.yes' : 'school.no') | translate }}</dd></div>
+        <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.openingBalance' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg"><span class="font-mono">{{ s.openingBalanceAmount | number: '1.2-2' }}</span></dd></div>
+        <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.email' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ s.email || '-' }}</dd></div>
+        <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.contactPerson' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ s.contactPerson || '-' }}</dd></div>
+        <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.mobile' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ s.mobile || '-' }}</dd></div>
+        <div class="sm:col-span-2 lg:col-span-3"><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'school.fields.address' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ s.address || '-' }}</dd></div>
       </dl>
-    </app-card>
+    }
 
-    <app-card>
-      <h2 class="mb-3 text-lg font-semibold text-primary-fg">{{ 'school.classes.title' | translate }}</h2>
+    @if (tab() === 'ledger' && canEdit) {
+      <app-ledger-statement party="schools" [id]="s.id" />
+    }
+
+    @if (tab() === 'classes') {
+    <section class="rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800">
+      <h2 class="mb-2 text-sm font-semibold text-primary-fg">{{ 'school.classes.title' | translate }}</h2>
       @if (classesError()) {
         <p class="mb-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600" role="alert">{{ classesError() }}</p>
       }
@@ -86,7 +109,11 @@
           </div>
         }
       }
-    </app-card>
+    </section>
+    }
+
+      </div>
+    </section>
 
     @if (canEdit) {
       <app-modal [open]="statusOpen()" [title]="(s.status === 'ACTIVE' ? 'school.deactivate.title' : 'school.activate.title') | translate" (closed)="statusOpen.set(false)">

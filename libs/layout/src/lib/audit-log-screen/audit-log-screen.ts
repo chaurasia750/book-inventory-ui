@@ -6,7 +6,7 @@ import { AuthService } from '@org/auth';
 import { CompanyService, CoreAuditService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { AuditEntry, CompanySummary, PagedList } from '@org/shared-models';
-import { ButtonComponent, CardComponent, PaginationComponent } from '@org/ui';
+import { ButtonComponent, CardComponent, DatePickerComponent, PaginationComponent } from '@org/ui';
 
 const PAGE_SIZE = 20;
 const FIELD_CLASS = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -29,7 +29,7 @@ interface ValueRow {
 @Component({
   selector: 'app-audit-log-screen',
   standalone: true,
-  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, PaginationComponent],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, PaginationComponent, DatePickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="space-y-6">
@@ -52,8 +52,8 @@ interface ValueRow {
           </select>
           <input formControlName="entityId" [placeholder]="'auditLog.entityId' | translate" class="${FIELD_CLASS} w-full sm:w-72" />
           <input formControlName="userId" [placeholder]="'auditLog.userId' | translate" class="${FIELD_CLASS} w-full sm:w-72" />
-          <input type="date" formControlName="from" [attr.aria-label]="'auditLog.from' | translate" class="${FIELD_CLASS}" />
-          <input type="date" formControlName="to" [attr.aria-label]="'auditLog.to' | translate" class="${FIELD_CLASS}" />
+          <app-date-picker formControlName="from" [attr.aria-label]="'auditLog.from' | translate" />
+          <app-date-picker formControlName="to" [attr.aria-label]="'auditLog.to' | translate" />
           <app-button type="submit" size="sm" class="ml-auto">{{ 'auditLog.search' | translate }}</app-button>
         </form>
 

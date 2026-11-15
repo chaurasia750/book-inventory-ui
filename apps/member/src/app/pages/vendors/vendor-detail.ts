@@ -1,22 +1,34 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { VendorService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { VendorDetail } from '@org/shared-models';
 import { vendorStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { LedgerStatementComponent } from '../ledger/ledger-statement';
+import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 
 /**
- * One vendor (vendor spec R2-R7): the master data with the generated code read-only, the bank details in full (the Owner's
+ * One vendor's profile (vendor spec R2-R7; finance section 6): tabs Profile and Ledger and the balance in the header. The master data with the generated code read-only, the bank details in full (the Owner's
  * view, R5) and activate / deactivate. The edit form opens in the panel through the page (`editRequested`). The API enforces
  * every rule again; its catalogue message is shown on a refusal.
  */
 @Component({
   selector: 'app-vendor-detail',
   standalone: true,
-  imports: [DecimalPipe, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
+  imports: [
+    DecimalPipe,
+    NgClass,
+    TranslatePipe,
+    ButtonComponent,
+    CardComponent,
+    CloseButtonComponent,
+    ModalComponent,
+    SkeletonLoaderComponent,
+    LedgerStatementComponent,
+    PartyLedgerSummaryComponent,
+  ],
   templateUrl: './vendor-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,6 +45,10 @@ export class VendorDetailComponent {
   private readonly vendors = inject(VendorService);
   private readonly translate = inject(TranslateService);
 
+  /** Finance section 6: the profile tabs; the later vendor documents become further tabs. */
+  readonly tab = signal<'profile' | 'ledger'>('profile');
+  readonly tabs: readonly ('profile' | 'ledger')[] = ['profile', 'ledger'];
+
   readonly vendor = signal<VendorDetail | null>(null);
   readonly loading = signal(true);
   readonly loadError = signal('');
@@ -46,7 +62,10 @@ export class VendorDetailComponent {
   constructor() {
     effect(() => {
       this.id();
-      untracked(() => this.load());
+      untracked(() => {
+        this.tab.set('profile');
+        this.load();
+      });
     });
   }
 

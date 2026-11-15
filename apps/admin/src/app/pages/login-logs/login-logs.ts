@@ -4,7 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IamLoginLogService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { AppRole, LOGIN_RESULTS, LoginLogItem, LoginLogSearchParams, LoginResult, PagedList } from '@org/shared-models';
-import { ButtonComponent, CardComponent, PaginationComponent } from '@org/ui';
+import { ButtonComponent, CardComponent, DatePickerComponent, PaginationComponent } from '@org/ui';
 import { LoginLogTableComponent } from './login-log-table';
 
 const PAGE_SIZE = 20;
@@ -18,7 +18,7 @@ const SELECT_CLASS = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 tex
 @Component({
   selector: 'app-login-logs',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, PaginationComponent, LoginLogTableComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, PaginationComponent, LoginLogTableComponent, DatePickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="space-y-6">
@@ -45,8 +45,8 @@ const SELECT_CLASS = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 tex
           </select>
           <input formControlName="ipAddress" [placeholder]="'loginLogs.ip' | translate" class="${SELECT_CLASS} w-36" />
           <input formControlName="userId" [placeholder]="'loginLogs.userId' | translate" class="${SELECT_CLASS} w-40" />
-          <input type="date" formControlName="from" [attr.aria-label]="'loginLogs.from' | translate" class="${SELECT_CLASS}" />
-          <input type="date" formControlName="to" [attr.aria-label]="'loginLogs.to' | translate" class="${SELECT_CLASS}" />
+          <app-date-picker formControlName="from" [attr.aria-label]="'loginLogs.from' | translate" />
+          <app-date-picker formControlName="to" [attr.aria-label]="'loginLogs.to' | translate" />
           <app-button type="submit" size="sm" class="ml-auto">{{ 'loginLogs.search' | translate }}</app-button>
         </form>
 

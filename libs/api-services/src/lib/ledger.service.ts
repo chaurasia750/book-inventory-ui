@@ -13,6 +13,12 @@ export class LedgerService {
     return this.api.get<LedgerStatement>(`/${party}/${partyId}/ledger`, { ...params } as QueryParams);
   }
 
+  /** R17: the balances of the listed schools or vendors (at most 100 ids), by id. */
+  balances(party: 'schools' | 'vendors', ids: readonly string[]): Observable<Record<string, number>> {
+    const query = ids.map((id) => `ids=${encodeURIComponent(id)}`).join('&');
+    return this.api.get<Record<string, number>>(`/ledger/balances/${party}?${query}`);
+  }
+
   /** R11: the outstanding list of all schools or all vendors. */
   outstanding(party: 'schools' | 'vendors', params: OutstandingParams): Observable<OutstandingPage> {
     return this.api.get<OutstandingPage>(`/ledger/outstanding/${party}`, { ...params } as QueryParams);
