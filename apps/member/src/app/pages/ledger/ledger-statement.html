@@ -33,7 +33,13 @@
     @if (filters.controls.kind.value !== 'ALL') {
       <app-button type="submit" [loading]="loading()">{{ 'ledger.filter.apply' | translate }}</app-button>
     }
+    @if (statement(); as shown) {
+      <app-button class="sm:ml-auto" variant="secondary" [loading]="pdfBusy()" (clicked)="downloadPdf(shown.partyCode)">{{ 'ledger.statement.downloadPdf' | translate }}</app-button>
+    }
   </form>
+  @if (pdfError()) {
+    <p class="m-0 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-600" role="alert">{{ pdfError() }}</p>
+  }
 
   @if (loadError()) {
     <div class="flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
@@ -68,11 +74,19 @@
               <td class="whitespace-nowrap px-3 py-2 text-gray-600">{{ r.date | date: 'dd MMM yy' }}</td>
               <td class="whitespace-nowrap px-3 py-2">
                 <span class="font-medium text-primary-fg">{{ 'ledger.documentType.' + r.documentType | translate }}</span>
-                <span class="ml-1 font-mono text-gray-500">{{ r.documentNumber }}</span>
+                @if (documentLinkable(r) && !unresolved().has(r.documentNumber)) {
+                  <button type="button" (click)="openDocument(r)" class="ml-1 border-0 bg-transparent p-0 font-mono text-brand-700 underline-offset-2 hover:underline focus-visible:underline">{{ r.documentNumber }}</button>
+                } @else {
+                  <span class="ml-1 font-mono text-gray-500">{{ r.documentNumber }}</span>
+                }
                 @if (r.postingKind === 'REVERSAL') { <span class="ml-1 text-red-600">({{ 'ledger.statement.cancelled' | translate }})</span> }
               </td>
               <td class="px-3 py-2 text-gray-500" [class.line-through]="r.postingKind === 'REVERSAL'">
-                {{ r.narration || '' }}@if (r.session) { <span>{{ r.narration ? ' · ' : '' }}{{ 'ledger.filter.session' | translate }} {{ r.session }}</span> }
+                @if (orderNumber(r); as order) {
+                  <button type="button" (click)="openOrder(order)" class="border-0 bg-transparent p-0 font-mono text-brand-700 underline-offset-2 hover:underline focus-visible:underline">{{ order }}</button>
+                } @else {
+                  {{ r.narration || '' }}
+                }@if (r.session) { <span>{{ r.narration ? ' · ' : '' }}{{ 'ledger.filter.session' | translate }} {{ r.session }}</span> }
               </td>
               <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.debitAmount ? (r.debitAmount | number: '1.2-2') : '' }}</td>
               <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.creditAmount ? (r.creditAmount | number: '1.2-2') : '' }}</td>

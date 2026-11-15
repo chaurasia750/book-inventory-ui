@@ -2,9 +2,10 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { LedgerService } from '@org/api-services';
+import { Router } from '@angular/router';
+import { LedgerService, PaymentService, SalesService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
-import { LedgerStatement, LedgerStatementParams } from '@org/shared-models';
+import { LedgerStatement, LedgerStatementParams, LedgerStatementRow } from '@org/shared-models';
 import { ButtonComponent, DatePickerComponent, SkeletonLoaderComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -31,6 +32,9 @@ export class LedgerStatementComponent {
 
   private readonly ledger = inject(LedgerService);
   private readonly translate = inject(TranslateService);
+  private readonly router = inject(Router);
+  private readonly sales = inject(SalesService);
+  private readonly payments = inject(PaymentService);
 
   readonly field = FIELD;
 
@@ -48,6 +52,80 @@ export class LedgerStatementComponent {
   readonly statement = signal<LedgerStatement | null>(null);
   readonly loading = signal(true);
   readonly loadError = signal('');
+
+  /** Finance R19: numbers that no longer find their document; they are shown as plain text from then on. */
+  readonly unresolved = signal<ReadonlySet<string>>(new Set());
+
+  /** Finance R19: a school's invoice row links to the invoice, a receipt row to the receipt; the opening balance row and a vendor's rows have no link. */
+  documentLinkable(row: LedgerStatementRow): boolean {
+    return this.party() === 'schools' && (row.documentType === 'SCHOOL_INVOICE' || row.documentType === 'PAYMENT_RECEIPT' || this.chequeReceiptNumber(row) !== null);
+  }
+
+  /** Finance R19: the order number printed in the detail of an invoice row (`ORD/2026-27/0001`). */
+  orderNumber(row: LedgerStatementRow): string | null {
+    const text = row.narration?.trim() ?? '';
+    return this.party() === 'schools' && row.documentType === 'SCHOOL_INVOICE' && /^ORD\/\S+$/.test(text) && !this.unresolved().has(text) ? text : null;
+  }
+
+  /** Finance R19: the receipt a cheque cleared or bounced row belongs to is named at the start of its detail (`RCP/2026-27/0005: Cheque ...`). */
+  chequeReceiptNumber(row: LedgerStatementRow): string | null {
+    const cheque = row.documentType === 'CHEQUE_CLEARED' || row.documentType === 'CHEQUE_BOUNCED';
+    const match = cheque ? /^(RCP\/\S+?):/.exec(row.narration?.trim() ?? '') : null;
+    return match && !this.unresolved().has(match[1]) ? match[1] : null;
+  }
+
+  /** Finance R19: opens the invoice or the receipt (beside the school's Payments tab) of a row. */
+  openDocument(row: LedgerStatementRow): void {
+    const schoolId = this.id();
+    if (row.documentType === 'SCHOOL_INVOICE') {
+      void this.router.navigate(['/invoices', row.documentId]);
+    } else if (row.documentType === 'PAYMENT_RECEIPT') {
+      void this.router.navigate(['/schools', schoolId, 'payments', row.documentId]);
+    } else {
+      const number = this.chequeReceiptNumber(row);
+      if (number) {
+        this.openReceiptByNumber(number);
+      }
+    }
+  }
+
+  /** Finance R19: finds the order by its number and opens it; a number that finds nothing becomes plain text. */
+  openOrder(number: string): void {
+    this.sales.orders({ search: number, schoolId: this.id(), pageIndex: 1, pageSize: 5 }).subscribe({
+      next: (page) => {
+        const order = page.items.find((o) => o.number === number);
+        if (order) {
+          void this.router.navigate(['/school-orders', order.id]);
+        } else {
+          this.markUnresolved(number);
+        }
+      },
+      error: () => this.markUnresolved(number),
+    });
+  }
+
+  private openReceiptByNumber(number: string): void {
+    this.payments.list({ search: number, schoolId: this.id(), pageIndex: 1, pageSize: 5 }).subscribe({
+      next: (page) => {
+        const receipt = page.items.find((r) => r.number === number);
+        if (receipt) {
+          void this.router.navigate(['/schools', this.id(), 'payments', receipt.id]);
+        } else {
+          this.markUnresolved(number);
+        }
+      },
+      error: () => this.markUnresolved(number),
+    });
+  }
+
+  private markUnresolved(number: string): void {
+    this.unresolved.update((set) => new Set([...set, number]));
+  }
+
+  /** Finance R18: the filter of the statement on screen, so the PDF has exactly the rows that are shown. */
+  private shownParams: LedgerStatementParams = {};
+  readonly pdfBusy = signal(false);
+  readonly pdfError = signal('');
 
   constructor() {
     effect(() => {
@@ -74,15 +152,38 @@ export class LedgerStatementComponent {
   load(): void {
     this.loading.set(true);
     this.loadError.set('');
-    this.ledger.statement(this.party(), this.id(), this.params()).subscribe({
+    const params = this.params();
+    this.ledger.statement(this.party(), this.id(), params).subscribe({
       next: (statement) => {
         this.loading.set(false);
+        this.shownParams = params;
         this.statement.set(statement);
       },
       error: (error: unknown) => {
         this.loading.set(false);
         this.statement.set(null);
         this.loadError.set(messageForError(error, this.translate));
+      },
+    });
+  }
+
+  /** Finance R18: downloads the statement on screen as a PDF named after the party. */
+  downloadPdf(partyCode: string): void {
+    this.pdfBusy.set(true);
+    this.pdfError.set('');
+    this.ledger.statementPdf(this.party(), this.id(), this.shownParams).subscribe({
+      next: (blob) => {
+        this.pdfBusy.set(false);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${partyCode}-ledger.pdf`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      },
+      error: (error: unknown) => {
+        this.pdfBusy.set(false);
+        this.pdfError.set(messageForError(error, this.translate));
       },
     });
   }

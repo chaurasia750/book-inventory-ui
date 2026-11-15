@@ -1470,6 +1470,7 @@
       "apply": "Show statement"
     },
     "statement": {
+      "downloadPdf": "Download PDF",
       "title": "Statement",
       "close": "Close statement",
       "date": "Date",
