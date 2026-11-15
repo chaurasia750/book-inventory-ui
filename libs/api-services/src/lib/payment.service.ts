@@ -70,6 +70,11 @@ export class PaymentService {
     return this.api.delete<void>(`/receipts/${receiptId}/proofs/${proofId}`);
   }
 
+  /** R17: the receipt as an A5 PDF. */
+  receiptPdf(id: string): Observable<Blob> {
+    return this.api.getBlob(`/receipts/${id}/pdf`);
+  }
+
   /** R4-R9: records a payment; the same `clientRequestId` returns the receipt already recorded. */
   record(request: RecordReceiptRequest): Observable<ReceiptDetail> {
     return this.api.post<ReceiptDetail>('/receipts', request);

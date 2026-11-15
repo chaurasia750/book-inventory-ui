@@ -40,7 +40,12 @@ function todayIso(): string {
             <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold" [class]="r.summary.status === 'CANCELLED' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'">{{ 'payment.status.' + r.summary.status | translate }}</span>
             <span class="text-gray-600">{{ r.summary.receiptDate | date: 'dd MMM yyyy' }}</span>
             <span class="text-gray-600">{{ r.summary.schoolName }} <span class="font-mono text-xs">{{ r.summary.schoolCode }}</span></span>
+            <span class="ml-auto flex gap-2">
+              <app-button size="sm" variant="secondary" [loading]="pdfBusy()" (clicked)="print(r)">{{ 'payment.detail.print' | translate }}</app-button>
+              <app-button size="sm" [loading]="pdfBusy()" (clicked)="download(r)">{{ 'payment.detail.downloadPdf' | translate }}</app-button>
+            </span>
           </div>
+          @if (pdfError()) { <p class="m-0 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-600" role="alert">{{ pdfError() }}</p> }
           <table class="w-full text-left text-xs">
             <thead class="text-[11px] uppercase tracking-[0.05em] text-gray-500">
               <tr>
@@ -149,6 +154,8 @@ export class ReceiptDetailDialogComponent {
   readonly actionError = signal('');
   readonly actionDate = new FormControl(todayIso(), { nonNullable: true });
   readonly actionReason = new FormControl('', { nonNullable: true });
+  readonly pdfBusy = signal(false);
+  readonly pdfError = signal('');
   /** Payment R13, R14: the advance or cancel panel under the receipt, if one is open. */
   readonly panel = signal<'adjust' | 'cancel' | null>(null);
 
@@ -157,6 +164,48 @@ export class ReceiptDetailDialogComponent {
       if (this.receiptId() !== null) {
         untracked(() => this.load());
       }
+    });
+  }
+
+  /** R17: the PDF saved as a file named after the receipt. */
+  download(r: ReceiptDetail): void {
+    this.withPdf(r, (url) => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = r.summary.number.split('/').join('-') + '.pdf';
+      link.click();
+    });
+  }
+
+  /** R17: the PDF opens in a new tab for the browser's print dialog; the tab is opened first so a pop-up blocker allows it. */
+  print(r: ReceiptDetail): void {
+    const tab = window.open('', '_blank');
+    this.withPdf(
+      r,
+      (url) => {
+        if (tab) {
+          tab.location.href = url;
+        }
+      },
+      () => tab?.close(),
+    );
+  }
+
+  private withPdf(r: ReceiptDetail, use: (objectUrl: string) => void, onError?: () => void): void {
+    this.pdfBusy.set(true);
+    this.pdfError.set('');
+    this.payments.receiptPdf(r.summary.id).subscribe({
+      next: (blob) => {
+        this.pdfBusy.set(false);
+        const url = URL.createObjectURL(blob);
+        use(url);
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      },
+      error: (e: unknown) => {
+        this.pdfBusy.set(false);
+        this.pdfError.set(messageForError(e, this.translate));
+        onError?.();
+      },
     });
   }
 
@@ -209,6 +258,7 @@ export class ReceiptDetailDialogComponent {
 
     this.loading.set(true);
     this.error.set('');
+    this.pdfError.set('');
     this.panel.set(null);
     this.receipt.set(null);
     this.payments.get(id).subscribe({
