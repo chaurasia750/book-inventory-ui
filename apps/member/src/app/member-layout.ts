@@ -47,7 +47,7 @@ export class MemberLayoutComponent {
     {
       name: 'Items',
       icon: SETTINGS_ICON,
-      section: 'ITEMS',
+      section: 'BUSINESS',
       subItems: [
         { name: 'Item list', path: '/items' },
         { name: 'Prices', path: '/prices' },
@@ -61,7 +61,7 @@ export class MemberLayoutComponent {
     {
       name: 'Vendors',
       icon: TREE_ICON,
-      section: 'VENDORS',
+      section: 'BUSINESS',
       subItems: [
         { name: 'Vendor list', path: '/vendors' },
         { name: 'Vendor ledger', path: '/ledger/vendors' },
@@ -71,8 +71,8 @@ export class MemberLayoutComponent {
 
   /** R66: the Owner manages the Staff of their own company and reads the audit log of it (core A7). */
   private readonly ownerNavItems: SidebarNavItem[] = [
-    { name: 'Staff', icon: MEMBERS_ICON, section: 'TEAM', path: '/staff' },
-    { name: 'Audit log', icon: SETTINGS_ICON, section: 'LOGS', path: '/audit' },
+    { name: 'Staff', icon: MEMBERS_ICON, section: 'SETTINGS', path: '/staff' },
+    { name: 'Audit log', icon: SETTINGS_ICON, section: 'SETTINGS', path: '/audit' },
   ];
 
   /**
@@ -84,20 +84,21 @@ export class MemberLayoutComponent {
         {
           name: 'Schools',
           icon: TREE_ICON,
-          section: 'SCHOOLS',
+          section: 'BUSINESS',
           subItems: [
             { name: 'School list', path: '/schools' },
             { name: 'School ledger', path: '/ledger/schools' },
           ],
         },
       ]
-    : [{ name: 'Schools', icon: TREE_ICON, section: 'SCHOOLS', path: '/schools' }];
+    : [{ name: 'Schools', icon: TREE_ICON, section: 'BUSINESS', path: '/schools' }];
 
   readonly navItems: SidebarNavItem[] = [
     ...(FEATURES.iam ? this.iamNavItems : []),
+    // Menu layout (owner's choice, 2026-11-15): MAIN, BUSINESS (each module with its ledger and later documents inside), SETTINGS.
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.schoolNavItems : []),
-    ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.itemNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.vendorNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.itemNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];
 
