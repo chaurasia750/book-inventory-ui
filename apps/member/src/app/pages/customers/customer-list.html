@@ -1,0 +1,121 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'customer.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'customer.subtitle' | translate }}</p>
+    </div>
+    <app-button (clicked)="openAdd()">{{ 'customer.add.button' | translate }}</app-button>
+  </div>
+
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'customer.title' | translate" [detailLabel]="'customer.panelLabel' | translate">
+    <div list>
+      <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
+        <input type="search" [formControl]="search" [placeholder]="'customer.filters.search' | translate" [attr.aria-label]="'customer.filters.search' | translate"
+          class="h-10 min-w-[12rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+        @if (!hasPanel()) {
+          <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'customer.columns.status' | translate" [class]="select">
+            <option value="">{{ 'customer.filters.allStatuses' | translate }}</option>
+            @for (s of statuses; track s) { <option [value]="s">{{ 'customer.status.' + s | translate }}</option> }
+          </select>
+          <select (change)="setSchool($any($event.target).value)" [attr.aria-label]="'customer.fields.school' | translate" [class]="select">
+            <option value="">{{ 'customer.filters.allSchools' | translate }}</option>
+            @for (school of schools(); track school.id) { <option [value]="school.id">{{ school.name }}</option> }
+          </select>
+        }
+      </div>
+
+      @if (loadError()) {
+        <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+          <span>{{ loadError() }}</span>
+          <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+        </div>
+      }
+
+      @if (hasPanel()) {
+        <ul class="m-0 list-none divide-y divide-neutral-100 p-0 dark:divide-charcoal-700">
+          @if (loading() && !result()) {
+            @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
+          } @else {
+            @for (customer of result()?.items ?? []; track customer.id) {
+              <li>
+                <button type="button" (click)="openView(customer.id)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700"
+                  [class.bg-gold-50]="customer.id === selectedId()" [attr.aria-current]="customer.id === selectedId() ? 'true' : null">
+                  <span class="min-w-0 flex-1">
+                    <span class="block truncate text-sm font-medium text-primary-fg">{{ customer.name }}</span>
+                    <span class="block font-mono text-xs text-gray-500">{{ customer.code }}</span>
+                  </span>
+                  <span class="rounded-full px-2 py-0.5 text-[11px] font-medium" [class]="statusClass(customer.status)">{{ 'customer.status.' + customer.status | translate }}</span>
+                </button>
+              </li>
+            } @empty {
+              @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'customer.empty' | translate }}</li> }
+            }
+          }
+        </ul>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">{{ 'customer.columns.code' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'customer.columns.name' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'customer.columns.mobile' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'customer.columns.school' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'customer.columns.status' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @if (loading() && !result()) {
+                @for (i of skeletonRows; track i) {
+                  <tr>
+                    <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="10rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                  </tr>
+                }
+              } @else {
+                @for (customer of result()?.items ?? []; track customer.id) {
+                  <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="openView(customer.id)" (keydown.enter)="openView(customer.id)" tabindex="0">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ customer.code }}</td>
+                    <td class="px-4 py-3 font-medium text-primary-fg">{{ customer.name }}</td>
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ customer.mobile }}</td>
+                    <td class="px-4 py-3 text-gray-600"><div>{{ customer.schoolName || '-' }}</div><div class="text-xs text-gray-500">{{ customer.className || '' }}</div></td>
+                    <td class="px-4 py-3">
+                      <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(customer.status)">{{ 'customer.status.' + customer.status | translate }}</span>
+                    </td>
+                  </tr>
+                } @empty {
+                  @if (!loadError()) {
+                    <tr><td [attr.colspan]="5" class="py-10 text-center text-sm text-gray-400">{{ 'customer.empty' | translate }}</td></tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+    </div>
+
+    <div detail>
+      @switch (panel().mode) {
+        @case ('new') {
+          <app-customer-add (created)="openCreated($event)" (closed)="closePanel()" />
+        }
+        @case ('edit') {
+          @if (selectedId(); as id) {
+            <app-customer-edit [id]="id" (saved)="afterEdit(id)" (closed)="openView(id)" />
+          }
+        }
+        @default {
+          @if (selectedId(); as id) {
+            <app-customer-detail [id]="id" (closed)="closePanel()" (changed)="load()" (editRequested)="openEdit(id)" />
+          }
+        }
+      }
+    </div>
+  </app-list-detail>
+</div>

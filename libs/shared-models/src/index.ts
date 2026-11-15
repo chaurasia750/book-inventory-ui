@@ -16,6 +16,7 @@ export * from './lib/user-admin.model';
 export * from './lib/company.model';
 export * from './lib/school.model';
 export * from './lib/vendor.model';
+export * from './lib/customer.model';
 export * from './lib/item.model';
 export * from './lib/price.model';
 export * from './lib/stock.model';

@@ -66,6 +66,9 @@ export class MemberLayoutComponent {
     },
   ];
 
+  /** Customer spec R9, platform U14: the Owner and Staff both see the customers (Staff add but never edit); its ledger joins the group later. */
+  private readonly customerNavItems: SidebarNavItem[] = [{ name: 'Customers', icon: MEMBERS_ICON, section: 'BUSINESS', path: '/customers' }];
+
   /** Sales R19, platform U14: the Owner and Staff place and follow orders from one Orders menu (the school profile keeps its tabs). */
   private readonly ordersNavItems: SidebarNavItem[] = [
     {
@@ -95,6 +98,7 @@ export class MemberLayoutComponent {
     // Menu layout (owner's choice, 2026-11-15): MAIN, BUSINESS (each module with its ledger and later documents inside), SETTINGS.
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.schoolNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.vendorNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.customerNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.itemNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.ordersNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
