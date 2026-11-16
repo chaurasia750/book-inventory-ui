@@ -3,6 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslatePipe } from '@ngx-translate/core';
 import { PAYMENT_TYPES, PaymentType, SALE_TYPES, SCHOOL_STATES, SESSION_TYPES, SaleType, SchoolDetail, SchoolFields, SessionType } from '@org/shared-models';
 import { ButtonComponent } from '@org/ui';
+import { MoneyPrefixComponent } from '../counters/money-prefix';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 
@@ -15,7 +16,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
 @Component({
   selector: 'app-school-form',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, MoneyPrefixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
@@ -53,7 +54,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
         </div>
         <div>
           <label for="sf-balance" class="mb-1 block text-sm font-semibold">{{ 'school.fields.openingBalance' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          <input id="sf-balance" type="number" step="0.01" min="0" formControlName="openingBalanceAmount" class="${FIELD}" />
+          <app-money-prefix><input id="sf-balance" type="number" step="0.01" min="0" formControlName="openingBalanceAmount" class="${FIELD}" /></app-money-prefix>
         </div>
         <div>
           <label for="sf-contact" class="mb-1 block text-sm font-semibold">{{ 'school.fields.contactPerson' | translate }}</label>

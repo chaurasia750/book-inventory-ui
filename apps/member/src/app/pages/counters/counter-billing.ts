@@ -1,4 +1,4 @@
-import { DecimalPipe, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -23,6 +23,9 @@ import { ItemEntryComponent } from '../sales/item-entry';
 import { SaleTotalsComponent } from '../sales/sale-totals';
 import { computeCounterTotals, gstModeOf } from './counter-calc';
 import { CounterStudentBoxComponent, StudentSelection } from './counter-student-box';
+import { IndianCurrencyPipe } from './indian-currency.pipe';
+import { MoneyPipe } from './money.pipe';
+import { MoneyPrefixComponent } from './money-prefix';
 
 /** One editable line of the bill; the server merges the same item and version (R43). */
 interface BillLine {
@@ -57,16 +60,7 @@ const CATEGORY_PAGE = 100;
 @Component({
   selector: 'app-counter-billing',
   standalone: true,
-  imports: [
-    DecimalPipe,
-    TranslatePipe,
-    ButtonComponent,
-    SidePanelComponent,
-    SkeletonLoaderComponent,
-    ItemEntryComponent,
-    SaleTotalsComponent,
-    CounterStudentBoxComponent,
-  ],
+  imports: [TranslatePipe, ButtonComponent, SidePanelComponent, SkeletonLoaderComponent, ItemEntryComponent, SaleTotalsComponent, CounterStudentBoxComponent, MoneyPipe, IndianCurrencyPipe, MoneyPrefixComponent],
   templateUrl: './counter-billing.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

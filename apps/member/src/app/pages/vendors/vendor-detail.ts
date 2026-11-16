@@ -1,4 +1,4 @@
-import { DecimalPipe, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -9,6 +9,7 @@ import { vendorStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
 import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /**
  * One vendor's profile (vendor spec R2-R7; finance section 6): tabs Profile and Ledger and the balance in the header. The master data with the generated code read-only, the bank details in full (the Owner's
@@ -18,19 +19,7 @@ import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 @Component({
   selector: 'app-vendor-detail',
   standalone: true,
-  imports: [
-    DecimalPipe,
-    NgClass,
-    RouterLink,
-    TranslatePipe,
-    ButtonComponent,
-    CardComponent,
-    CloseButtonComponent,
-    ModalComponent,
-    SkeletonLoaderComponent,
-    LedgerStatementComponent,
-    PartyLedgerSummaryComponent,
-  ],
+  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, LedgerStatementComponent, PartyLedgerSummaryComponent, MoneyPipe],
   templateUrl: './vendor-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

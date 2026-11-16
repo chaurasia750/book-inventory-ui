@@ -96,7 +96,7 @@
                     <td class="px-4 py-3">
                       <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(vendor.status)">{{ 'vendor.status.' + vendor.status | translate }}</span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="(balances()[vendor.id] ?? 0) < 0">{{ (balances()[vendor.id] ?? 0) | number: '1.2-2' }}</td>
+                    <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="(balances()[vendor.id] ?? 0) < 0">{{ (balances()[vendor.id] ?? 0) | inr }}</td>
                   </tr>
                 } @empty {
                   @if (!loadError()) {

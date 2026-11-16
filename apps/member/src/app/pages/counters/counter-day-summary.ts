@@ -5,7 +5,7 @@ import { CounterService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { Counter, CounterDaySummary } from '@org/shared-models';
 import { ButtonComponent, DatePickerComponent, SkeletonLoaderComponent } from '@org/ui';
-import { IndianCurrencyPipe } from './indian-currency.pipe';
+import { MoneyPipe } from './money.pipe';
 
 const CHOICES = 200;
 const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -18,7 +18,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
 @Component({
   selector: 'app-counter-day-summary',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SkeletonLoaderComponent, IndianCurrencyPipe],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SkeletonLoaderComponent, MoneyPipe],
   templateUrl: './counter-day-summary.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

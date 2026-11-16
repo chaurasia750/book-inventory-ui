@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { ReturnService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { CreditNoteSummary, PagedList, Refund } from '@org/shared-models';
 import { ButtonComponent, SkeletonLoaderComponent } from '@org/ui';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 const SHOWN = 20;
 
@@ -20,7 +21,7 @@ const SHOWN = 20;
 @Component({
   selector: 'app-school-returns-tab',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent],
+  imports: [DatePipe, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-4">
@@ -49,7 +50,7 @@ const SHOWN = 20;
                     <td class="px-3 py-2"><a [routerLink]="['/returns', n.id]" class="font-mono font-medium text-brand-700 hover:underline">{{ n.number }}</a></td>
                     <td class="whitespace-nowrap px-3 py-2">{{ n.noteDate | date: 'dd MMM yy' }}</td>
                     <td class="px-3 py-2">{{ 'returns.reason.' + n.reason | translate }}</td>
-                    <td class="px-3 py-2 text-right font-mono" [class.line-through]="n.status === 'CANCELLED'">{{ n.grandTotal | number: '1.2-2' }}</td>
+                    <td class="px-3 py-2 text-right font-mono" [class.line-through]="n.status === 'CANCELLED'">{{ n.grandTotal | inr }}</td>
                   </tr>
                 } @empty { <tr><td colspan="4" class="py-6 text-center text-gray-400">{{ 'returns.empty' | translate }}</td></tr> }
               }
@@ -68,7 +69,7 @@ const SHOWN = 20;
                   <th class="px-3 py-2 font-semibold">{{ 'returns.columns.number' | translate }}</th>
                   <th class="px-3 py-2 font-semibold">{{ 'returns.columns.date' | translate }}</th>
                   <th class="px-3 py-2 font-semibold">{{ 'refunds.fields.mode' | translate }}</th>
-                  <th class="px-3 py-2 text-right font-semibold">{{ 'refunds.fields.amount' | translate }}</th>
+                  <th class="px-3 py-2 text-right font-semibold">{{ 'refunds.fields.amount' | translate }} (₹)</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
@@ -79,7 +80,7 @@ const SHOWN = 20;
                       <td class="px-3 py-2"><a [routerLink]="['/refunds', r.id]" class="font-mono font-medium text-brand-700 hover:underline">{{ r.number }}</a></td>
                       <td class="whitespace-nowrap px-3 py-2">{{ r.refundDate | date: 'dd MMM yy' }}</td>
                       <td class="px-3 py-2">{{ 'refunds.mode.' + r.mode | translate }}</td>
-                      <td class="px-3 py-2 text-right font-mono" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | number: '1.2-2' }}</td>
+                      <td class="px-3 py-2 text-right font-mono" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | inr }}</td>
                     </tr>
                   } @empty { <tr><td colspan="4" class="py-6 text-center text-gray-400">{{ 'refunds.empty' | translate }}</td></tr> }
                 }

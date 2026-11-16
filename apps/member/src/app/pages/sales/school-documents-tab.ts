@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -9,6 +9,8 @@ import { SalesService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { InvoiceSummary, SchoolOrderStatus, SchoolOrderSummary } from '@org/shared-models';
 import { ButtonComponent, PaginationComponent, SkeletonLoaderComponent } from '@org/ui';
+import { downloadPdf } from '../returns/pdf-delivery';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 type Row = { id: string; number: string; date: string; status: string; total: number; extra: string; school: string };
 const PAGE_SIZE = 10;
@@ -22,7 +24,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
 @Component({
   selector: 'app-school-documents-tab',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, PaginationComponent, SkeletonLoaderComponent],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, PaginationComponent, SkeletonLoaderComponent, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
@@ -55,11 +57,12 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
               <th class="px-3 py-2 font-semibold">{{ (kind() === 'orders' ? 'sales.columns.session' : 'sales.columns.order') | translate }}</th>
               <th class="px-3 py-2 font-semibold">{{ 'sales.columns.status' | translate }}</th>
               <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.total' | translate }}</th>
+              @if (kind() === 'invoices') { <th class="px-3 py-2"><span class="sr-only">{{ 'sales.invoice.downloadPdf' | translate }}</span></th> }
             </tr>
           </thead>
           <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
             @if (loading()) {
-              <tr><td colspan="6" class="px-3 py-3"><app-skeleton-loader width="100%" /></td></tr>
+              <tr><td colspan="7" class="px-3 py-3"><app-skeleton-loader width="100%" /></td></tr>
             } @else {
               @for (r of rows(); track r.id) {
                 <tr class="cursor-pointer hover:bg-neutral-50 dark:hover:bg-charcoal-700" tabindex="0" (click)="open(r.id)" (keydown.enter)="open(r.id)">
@@ -68,10 +71,15 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
                   <td class="whitespace-nowrap px-3 py-2 text-gray-600">{{ r.date | date: 'dd MMM yy' }}</td>
                   <td class="whitespace-nowrap px-3 py-2 text-gray-600">{{ r.extra }}</td>
                   <td class="px-3 py-2"><span class="rounded-full px-2 py-0.5 text-[11px] font-semibold" [class]="statusClass(r.status)">{{ 'sales.status.' + r.status | translate }}</span></td>
-                  <td class="whitespace-nowrap px-3 py-2 text-right font-mono" [class.line-through]="r.status === 'CANCELLED'">{{ r.total | number: '1.2-2' }}</td>
+                  <td class="whitespace-nowrap px-3 py-2 text-right font-mono" [class.line-through]="r.status === 'CANCELLED'">{{ r.total | inr }}</td>
+                  @if (kind() === 'invoices') {
+                    <td class="whitespace-nowrap px-3 py-2 text-right" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
+                      <app-button size="sm" variant="secondary" [loading]="pdfId() === r.id" [disabled]="pdfId() !== null" (clicked)="download(r)">{{ 'sales.invoice.downloadPdf' | translate }}</app-button>
+                    </td>
+                  }
                 </tr>
               } @empty {
-                <tr><td colspan="6" class="py-6 text-center text-sm text-gray-400">{{ emptyKey() | translate }}</td></tr>
+                <tr><td colspan="7" class="py-6 text-center text-sm text-gray-400">{{ emptyKey() | translate }}</td></tr>
               }
             }
           </tbody>
@@ -100,6 +108,8 @@ export class SchoolDocumentsTabComponent {
   readonly rows = signal<Row[]>([]);
   readonly loading = signal(true);
   readonly error = signal('');
+  /** The invoice whose PDF is being made; only its button spins, the others wait (sales R33: the file is named after the invoice). */
+  readonly pdfId = signal<string | null>(null);
 
   constructor() {
     effect(() => {
@@ -149,6 +159,14 @@ export class SchoolDocumentsTabComponent {
 
   open(id: string): void {
     void this.router.navigate([this.kind() === 'orders' ? '/school-orders' : '/invoices', id]);
+  }
+
+  /** The invoice's PDF in the school's own layout, saved straight from the list without opening the invoice. */
+  download(row: Row): void {
+    downloadPdf(this.sales.invoicePdf(row.id), row.number, {
+      busy: (value) => this.pdfId.set(value ? row.id : null),
+      failed: (error) => this.error.set(messageForError(error, this.translate)),
+    });
   }
 
   newOrder(): void {

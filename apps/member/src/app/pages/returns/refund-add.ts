@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -7,6 +6,8 @@ import { LedgerService, ReturnService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { CreditNoteSummary, REFUND_MODES, RefundMade, RefundMode } from '@org/shared-models';
 import { ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent, SchoolSelectComponent } from '@org/ui';
+import { MoneyPipe } from '../counters/money.pipe';
+import { MoneyPrefixComponent } from '../counters/money-prefix';
 
 const FIELD = 'h-10 w-full rounded-lg border border-gray-300 bg-white px-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20';
 const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500';
@@ -20,7 +21,7 @@ const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] 
 @Component({
   selector: 'app-refund-add',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent, SchoolSelectComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent, SchoolSelectComponent, MoneyPipe, MoneyPrefixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-5">
@@ -36,14 +37,14 @@ const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] 
               [searchPlaceholder]="'counter.fields.searchSchool' | translate" [emptyLabel]="'counter.fields.noSchoolFound' | translate" (picked)="schoolChosen()" />
             @if (school.value) {
               <p class="mt-1 text-xs" [class.text-emerald-700]="credit() > 0" [class.text-gray-500]="credit() <= 0">
-                {{ (credit() > 0 ? 'refunds.fields.credit' : 'refunds.fields.noCredit') | translate }}@if (credit() > 0) { <span class="font-mono font-semibold"> {{ credit() | number: '1.2-2' }}</span> }
+                {{ (credit() > 0 ? 'refunds.fields.credit' : 'refunds.fields.noCredit') | translate }}@if (credit() > 0) { <span class="font-mono font-semibold"> {{ credit() | money }}</span> }
               </p>
             }
           </div>
           <div class="grid gap-3 sm:grid-cols-2">
             <div>
               <label for="rf-amount" class="${LABEL}">{{ 'refunds.fields.amount' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-              <input id="rf-amount" type="number" min="0" step="0.01" [formControl]="amount" class="${FIELD}" />
+              <app-money-prefix><input id="rf-amount" type="number" min="0" step="0.01" [formControl]="amount" class="${FIELD}" /></app-money-prefix>
             </div>
             <div>
               <label for="rf-mode" class="${LABEL}">{{ 'refunds.fields.mode' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
@@ -67,7 +68,7 @@ const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] 
               <label for="rf-note" class="${LABEL}">{{ 'refunds.fields.creditNote' | translate }}</label>
               <select id="rf-note" [formControl]="creditNote" class="${FIELD}" [disabled]="!school.value">
                 <option value="">{{ 'refunds.fields.noCreditNote' | translate }}</option>
-                @for (n of notes(); track n.id) { <option [value]="n.id">{{ n.number }} · {{ n.noteDate }} · {{ n.grandTotal | number: '1.2-2' }}</option> }
+                @for (n of notes(); track n.id) { <option [value]="n.id">{{ n.number }} · {{ n.noteDate }} · {{ n.grandTotal | money }}</option> }
               </select>
             </div>
             <div>

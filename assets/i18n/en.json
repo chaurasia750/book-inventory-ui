@@ -1031,7 +1031,7 @@
       "balance": "Balance",
       "advanceHint": "the school has paid in advance",
       "noOpen": "No open invoices: the whole payment will be an advance.",
-      "due": "Due",
+      "due": "Due (₹)",
       "applied": "Applied",
       "byHand": "Choose the amount for each invoice myself (otherwise the oldest invoice is paid first)",
       "modes": "How the money came",
@@ -1250,9 +1250,9 @@
       "itemCode": "Code",
       "version": "Version",
       "effectiveFrom": "Effective from",
-      "mrp": "MRP",
-      "sale": "Sale price",
-      "purchase": "Purchase price",
+      "mrp": "MRP (₹)",
+      "sale": "Sale price (₹)",
+      "purchase": "Purchase price (₹)",
       "actions": "Actions"
     },
     "fields": {
@@ -1480,9 +1480,9 @@
       "date": "Date",
       "document": "Document",
       "detail": "Detail",
-      "debit": "Debit",
-      "credit": "Credit",
-      "balance": "Balance",
+      "debit": "Debit (₹)",
+      "credit": "Credit (₹)",
+      "balance": "Balance (₹)",
       "opening": "Opening balance",
       "totals": "Totals and closing balance",
       "empty": "No entries in this filter.",
@@ -1503,7 +1503,7 @@
       "SCRATCH": "Test posting"
     },
     "withBalanceOnly": "With a balance only",
-    "balanceColumn": "Balance",
+    "balanceColumn": "Balance (₹)",
     "balance": {
       "school": "Balance due",
       "vendor": "To pay"
@@ -1529,13 +1529,13 @@
       "session": "Session",
       "order": "Order",
       "status": "Status",
-      "total": "Total",
+      "total": "Total (₹)",
       "item": "Item",
       "version": "Price version",
       "rate": "Rate",
       "qty": "Qty",
       "discount": "Discount",
-      "amount": "Amount",
+      "amount": "Amount (₹)",
       "remaining": "Remaining"
     },
     "discount": {
@@ -1705,7 +1705,7 @@
       "gstExempted": "GST Exempted",
       "gstSummary": "GST summary",
       "gstRate": "GST rate",
-      "totalGst": "Total GST",
+      "totalGst": "Total GST (₹)",
       "amountInWords": "Amount in words",
       "downloadPdf": "Download PDF",
       "print": "Print"
@@ -1990,7 +1990,7 @@
       "noneItem": "Search a book above to add it to the return.",
       "sold": "Sold",
       "returnable": "Can return",
-      "rate": "Rate",
+      "rate": "Rate (₹)",
       "rateAuto": "last rate",
       "condition": "Condition",
       "remove": "Remove the line"

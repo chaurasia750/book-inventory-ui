@@ -73,7 +73,7 @@
         <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
           <tr class="bg-neutral-50 font-semibold dark:bg-charcoal-900">
             <td class="px-3 py-2" colspan="5">{{ 'ledger.statement.opening' | translate }}</td>
-            <td class="px-3 py-2 text-right font-mono" [class.text-red-600]="s.openingBalance < 0">{{ s.openingBalance | number: '1.2-2' }}</td>
+            <td class="px-3 py-2 text-right font-mono" [class.text-red-600]="s.openingBalance < 0">{{ s.openingBalance | inr }}</td>
           </tr>
           @for (r of s.rows; track $index) {
             <tr [class.bg-red-50]="r.postingKind === 'REVERSAL'">
@@ -94,18 +94,18 @@
                   {{ r.narration || '' }}
                 }@if (r.session) { <span>{{ r.narration ? ' · ' : '' }}{{ 'ledger.filter.session' | translate }} {{ r.session }}</span> }
               </td>
-              <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.debitAmount ? (r.debitAmount | number: '1.2-2') : '' }}</td>
-              <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.creditAmount ? (r.creditAmount | number: '1.2-2') : '' }}</td>
-              <td class="whitespace-nowrap px-3 py-2 text-right font-mono font-semibold" [class.text-red-600]="r.balance < 0">{{ r.balance | number: '1.2-2' }}</td>
+              <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.debitAmount ? (r.debitAmount | inr) : '' }}</td>
+              <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.creditAmount ? (r.creditAmount | inr) : '' }}</td>
+              <td class="whitespace-nowrap px-3 py-2 text-right font-mono font-semibold" [class.text-red-600]="r.balance < 0">{{ r.balance | inr }}</td>
             </tr>
           } @empty {
             <tr><td colspan="6" class="py-6 text-center text-sm text-gray-400">{{ 'ledger.statement.empty' | translate }}</td></tr>
           }
           <tr class="bg-neutral-50 font-semibold dark:bg-charcoal-900">
             <td class="px-3 py-2" colspan="3">{{ 'ledger.statement.totals' | translate }}</td>
-            <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ s.totalDebit | number: '1.2-2' }}</td>
-            <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ s.totalCredit | number: '1.2-2' }}</td>
-            <td class="whitespace-nowrap px-3 py-2 text-right font-mono" [class]="s.closingBalance > 0 ? 'text-red-700' : 'text-green-700'">{{ s.closingBalance | number: '1.2-2' }}</td>
+            <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ s.totalDebit | inr }}</td>
+            <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ s.totalCredit | inr }}</td>
+            <td class="whitespace-nowrap px-3 py-2 text-right font-mono" [class]="s.closingBalance > 0 ? 'text-red-700' : 'text-green-700'">{{ s.closingBalance | inr }}</td>
           </tr>
         </tbody>
       </table>

@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe, Location, NgClass } from '@angular/common';
+import { DatePipe, Location, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -10,6 +10,8 @@ import { InvoiceDetail, InvoiceGroupView, InvoiceLayout } from '@org/shared-mode
 import { ButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { SaleTotalsComponent } from './sale-totals';
 import { InvoiceReturnsComponent } from '../returns/invoice-returns';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /**
  * One invoice (sales spec R8-R13, R26, the owner's document pattern): a header card with its number, status and money story (issued,
@@ -20,7 +22,7 @@ import { InvoiceReturnsComponent } from '../returns/invoice-returns';
 @Component({
   selector: 'app-invoice-view',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, NgClass, ReactiveFormsModule, RouterLink, TranslatePipe, ButtonComponent, ModalComponent, SkeletonLoaderComponent, SaleTotalsComponent, InvoiceReturnsComponent],
+  imports: [DatePipe, NgClass, ReactiveFormsModule, RouterLink, TranslatePipe, ButtonComponent, ModalComponent, SkeletonLoaderComponent, SaleTotalsComponent, InvoiceReturnsComponent, MoneyPipe, IndianCurrencyPipe],
   template: `
     <div class="flex flex-col gap-3">
       @if (invoice(); as inv) {
@@ -56,10 +58,10 @@ import { InvoiceReturnsComponent } from '../returns/invoice-returns';
             </div>
           </div>
           @if (paid(); as p) {
-            <p class="m-0 text-xs text-gray-600">{{ 'payment.invoice.paid' | translate }}: <span class="font-mono">{{ p.allocated | number: '1.2-2' }}</span> · {{ 'payment.invoice.due' | translate }}: <span class="font-mono font-semibold">{{ p.due | number: '1.2-2' }}</span></p>
+            <p class="m-0 text-xs text-gray-600">{{ 'payment.invoice.paid' | translate }}: <span class="font-mono">{{ p.allocated | money }}</span> · {{ 'payment.invoice.due' | translate }}: <span class="font-mono font-semibold">{{ p.due | money }}</span></p>
           }
           <ol class="flex flex-wrap gap-4 text-xs">
-            <li class="flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-700 text-white">&#10003;</span>{{ 'sales.story.issued' | translate }} <span class="font-mono font-semibold">{{ inv.totals.grandTotal | number: '1.2-2' }}</span></li>
+            <li class="flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-700 text-white">&#10003;</span>{{ 'sales.story.issued' | translate }} <span class="font-mono font-semibold">{{ inv.totals.grandTotal | money }}</span></li>
             <li class="flex items-center gap-2">
               <span class="flex h-6 w-6 items-center justify-center rounded-full" [class]="inv.summary.status === 'CANCELLED' ? 'bg-red-600 text-white' : 'bg-neutral-200 text-gray-500'">2</span>
               {{ (inv.summary.status === 'CANCELLED' ? 'sales.story.cancelled' : 'sales.story.notCancelled') | translate }}
@@ -75,10 +77,10 @@ import { InvoiceReturnsComponent } from '../returns/invoice-returns';
                 <tr>
                   <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
                   <th class="px-3 py-2 font-semibold">HSN</th>
-                  <th class="px-3 py-2 text-right font-semibold">MRP</th>
-                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }}</th>
+                  <th class="px-3 py-2 text-right font-semibold">MRP (₹)</th>
+                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }} (₹)</th>
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
-                  @if (showDiscount()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }}</th> }
+                  @if (showDiscount()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }} (₹)</th> }
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
                 </tr>
               </thead>
@@ -93,17 +95,17 @@ import { InvoiceReturnsComponent } from '../returns/invoice-returns';
                     <tr>
                       <td class="px-3 py-2"><span class="font-medium text-primary-fg">{{ l.item.name }}</span> <span class="font-mono text-gray-500">{{ l.item.code }}</span></td>
                       <td class="px-3 py-2 font-mono">{{ l.item.hsnCode || '-' }}</td>
-                      <td class="px-3 py-2 text-right font-mono">{{ l.price.mrp | number: '1.2-2' }}</td>
-                      <td class="px-3 py-2 text-right font-mono">{{ l.price.rate | number: '1.2-2' }}</td>
+                      <td class="px-3 py-2 text-right font-mono">{{ l.price.mrp | inr }}</td>
+                      <td class="px-3 py-2 text-right font-mono">{{ l.price.rate | inr }}</td>
                       <td class="px-3 py-2 text-right">{{ l.quantity }}</td>
-                      @if (showDiscount()) { <td class="px-3 py-2 text-right font-mono">{{ l.amounts.itemDiscount | number: '1.2-2' }}</td> }
-                      <td class="px-3 py-2 text-right font-mono">{{ l.amounts.lineAmount | number: '1.2-2' }}</td>
+                      @if (showDiscount()) { <td class="px-3 py-2 text-right font-mono">{{ l.amounts.itemDiscount | inr }}</td> }
+                      <td class="px-3 py-2 text-right font-mono">{{ l.amounts.lineAmount | inr }}</td>
                     </tr>
                   }
                   @if (inv.layout === 'BY_CLASS') {
                     <tr>
                       <td [attr.colspan]="showDiscount() ? 6 : 5" class="px-3 py-1.5 text-right text-[11px] font-semibold text-gray-500">{{ 'sales.layout.subtotal' | translate }}</td>
-                      <td class="px-3 py-1.5 text-right font-mono font-semibold">{{ groupAmount(g) | number: '1.2-2' }}</td>
+                      <td class="px-3 py-1.5 text-right font-mono font-semibold">{{ groupAmount(g) | inr }}</td>
                     </tr>
                   }
                 }
@@ -124,11 +126,11 @@ import { InvoiceReturnsComponent } from '../returns/invoice-returns';
                 <tr>
                   <th class="px-3 py-2 font-semibold">HSN</th>
                   <th class="px-3 py-2 font-semibold">{{ 'sales.invoice.gstRate' | translate }}</th>
-                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.totals.taxable' | translate }}</th>
+                  <th class="px-3 py-2 text-right font-semibold">{{ 'sales.totals.taxable' | translate }} (₹)</th>
                   @if (inv.gstMode === 'SAME_STATE') {
-                    <th class="px-3 py-2 text-right font-semibold">CGST</th><th class="px-3 py-2 text-right font-semibold">SGST</th>
+                    <th class="px-3 py-2 text-right font-semibold">CGST (₹)</th><th class="px-3 py-2 text-right font-semibold">SGST (₹)</th>
                   } @else {
-                    <th class="px-3 py-2 text-right font-semibold">IGST</th>
+                    <th class="px-3 py-2 text-right font-semibold">IGST (₹)</th>
                   }
                   <th class="px-3 py-2 text-right font-semibold">{{ 'sales.invoice.totalGst' | translate }}</th>
                 </tr>
@@ -138,13 +140,13 @@ import { InvoiceReturnsComponent } from '../returns/invoice-returns';
                   <tr>
                     <td class="px-3 py-2 font-mono">{{ r.hsnCode || '-' }}</td>
                     <td class="px-3 py-2">{{ r.ratePercent }} %</td>
-                    <td class="px-3 py-2 text-right font-mono">{{ r.taxable | number: '1.2-2' }}</td>
+                    <td class="px-3 py-2 text-right font-mono">{{ r.taxable | inr }}</td>
                     @if (inv.gstMode === 'SAME_STATE') {
-                      <td class="px-3 py-2 text-right font-mono">{{ r.cgst | number: '1.2-2' }}</td><td class="px-3 py-2 text-right font-mono">{{ r.sgst | number: '1.2-2' }}</td>
+                      <td class="px-3 py-2 text-right font-mono">{{ r.cgst | inr }}</td><td class="px-3 py-2 text-right font-mono">{{ r.sgst | inr }}</td>
                     } @else {
-                      <td class="px-3 py-2 text-right font-mono">{{ r.igst | number: '1.2-2' }}</td>
+                      <td class="px-3 py-2 text-right font-mono">{{ r.igst | inr }}</td>
                     }
-                    <td class="px-3 py-2 text-right font-mono">{{ r.tax | number: '1.2-2' }}</td>
+                    <td class="px-3 py-2 text-right font-mono">{{ r.tax | inr }}</td>
                   </tr>
                 }
               </tbody>

@@ -14,6 +14,8 @@ import { ClassSetDialogComponent } from './class-set-dialog';
 import { ItemEntryComponent } from './item-entry';
 import { MakeInvoiceComponent } from './make-invoice';
 import { SaleTotalsComponent } from './sale-totals';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /** One editable line; `lineId` and `invoiced` come from the server on a saved order (R20). */
 interface EditLine {
@@ -40,10 +42,7 @@ const FIELD = 'h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-
 @Component({
   selector: 'app-order-editor',
   standalone: true,
-  imports: [
-    DecimalPipe, ReactiveFormsModule, RouterLink, TranslatePipe, ButtonComponent, DatePickerComponent, ModalComponent, SkeletonLoaderComponent,
-    ItemEntryComponent, MakeInvoiceComponent, SaleTotalsComponent, BulkItemPickerComponent, ClassSetDialogComponent,
-  ],
+  imports: [DecimalPipe, ReactiveFormsModule, RouterLink, TranslatePipe, ButtonComponent, DatePickerComponent, ModalComponent, SkeletonLoaderComponent, ItemEntryComponent, MakeInvoiceComponent, SaleTotalsComponent, BulkItemPickerComponent, ClassSetDialogComponent, MoneyPipe, IndianCurrencyPipe],
   templateUrl: './order-editor.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

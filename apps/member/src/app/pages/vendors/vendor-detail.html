@@ -54,7 +54,7 @@
       <div class="p-4">
         @if (tab() === 'profile') {
           <dl class="grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'vendor.fields.openingBalance' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg"><span class="font-mono">{{ v.openingBalanceAmount | number: '1.2-2' }}</span></dd></div>
+          <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'vendor.fields.openingBalance' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg"><span class="font-mono">{{ v.openingBalanceAmount | money }}</span></dd></div>
           <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'vendor.fields.email' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ v.email || '-' }}</dd></div>
           <div><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'vendor.fields.state' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ v.state || '-' }}</dd></div>
           <div class="sm:col-span-2 lg:col-span-3"><dt class="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'vendor.fields.address' | translate }}</dt><dd class="mt-0.5 text-[13px] text-primary-fg">{{ v.address || '-' }}</dd></div>

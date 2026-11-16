@@ -1,9 +1,9 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ReturnService } from '@org/api-services';
 import { InvoiceReturns } from '@org/shared-models';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /**
  * The "Returns" block of an invoice's detail (sales spec R54, R61): the credit notes made against the invoice and, for each line,
@@ -12,7 +12,7 @@ import { InvoiceReturns } from '@org/shared-models';
 @Component({
   selector: 'app-invoice-returns',
   standalone: true,
-  imports: [DecimalPipe, RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, MoneyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (returns(); as r) {
@@ -24,7 +24,7 @@ import { InvoiceReturns } from '@org/shared-models';
               <li class="flex items-center justify-between gap-3 py-1.5">
                 <a [routerLink]="['/returns', n.id]" class="font-mono text-xs font-medium text-brand-700 hover:underline">{{ n.number }}</a>
                 <span class="text-xs text-gray-500">{{ n.noteDate }} · {{ 'returns.reason.' + n.reason | translate }}</span>
-                <span class="font-mono" [class.line-through]="n.status === 'CANCELLED'">{{ n.grandTotal | number: '1.2-2' }}</span>
+                <span class="font-mono" [class.line-through]="n.status === 'CANCELLED'">{{ n.grandTotal | money }}</span>
               </li>
             }
           </ul>

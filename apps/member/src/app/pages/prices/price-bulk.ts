@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,6 +16,7 @@ import {
   PriceChangeKind,
 } from '@org/shared-models';
 import { BackButtonComponent, ButtonComponent, CardComponent, ModalComponent, PaginationComponent, SkeletonLoaderComponent } from '@org/ui';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 const PREVIEW_PAGE_SIZE = 50;
 const VALUE_PATTERN = /^\d+(\.\d{1,2})?$/;
@@ -31,17 +31,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
 @Component({
   selector: 'app-price-bulk',
   standalone: true,
-  imports: [
-    DecimalPipe,
-    ReactiveFormsModule,
-    TranslatePipe,
-    BackButtonComponent,
-    ButtonComponent,
-    CardComponent,
-    ModalComponent,
-    PaginationComponent,
-    SkeletonLoaderComponent,
-  ],
+  imports: [ReactiveFormsModule, TranslatePipe, BackButtonComponent, ButtonComponent, CardComponent, ModalComponent, PaginationComponent, SkeletonLoaderComponent, IndianCurrencyPipe],
   templateUrl: './price-bulk.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

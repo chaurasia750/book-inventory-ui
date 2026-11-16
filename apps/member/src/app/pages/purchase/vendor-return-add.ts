@@ -7,6 +7,7 @@ import { messageForError } from '@org/interceptors';
 import { ItemSummary, RETURN_STOCK_SOURCES, ReturnStockSource, VendorReturnLineRequest, VendorReturnMade, VendorSummary } from '@org/shared-models';
 import { ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent } from '@org/ui';
 import { ItemEntryComponent } from '../sales/item-entry';
+import { MoneyPrefixComponent } from '../counters/money-prefix';
 
 const FIELD = 'h-10 w-full rounded-lg border border-gray-300 bg-white px-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20';
 const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500';
@@ -31,7 +32,7 @@ interface ReturnRow {
 @Component({
   selector: 'app-vendor-return-add',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent, ItemEntryComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent, ItemEntryComponent, MoneyPrefixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-5">
@@ -66,7 +67,7 @@ interface ReturnRow {
                     <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
                     <th class="w-32 px-3 py-2 font-semibold">{{ 'purchase.lines.source' | translate }}</th>
                     <th class="w-24 px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
-                    <th class="w-28 px-3 py-2 text-right font-semibold">{{ 'purchase.lines.rate' | translate }}</th>
+                    <th class="w-28 px-3 py-2 text-right font-semibold">{{ 'purchase.lines.rate' | translate }} (₹)</th>
                     <th class="w-8"></th>
                   </tr>
                 </thead>
@@ -80,7 +81,7 @@ interface ReturnRow {
                         </select>
                       </td>
                       <td class="px-3 py-2 text-right"><input type="number" min="1" step="1" [value]="row.quantity" [attr.aria-label]="'sales.columns.qty' | translate" (input)="patch(row.itemId, { quantity: $any($event.target).value })" class="h-9 w-20 rounded-lg border border-gray-300 px-2 text-right text-sm" /></td>
-                      <td class="px-3 py-2 text-right"><input type="number" min="0" step="0.01" [value]="row.rate" [placeholder]="'purchase.lines.rateAuto' | translate" [attr.aria-label]="'purchase.lines.rate' | translate" (input)="patch(row.itemId, { rate: $any($event.target).value })" class="h-9 w-24 rounded-lg border border-gray-300 px-2 text-right text-sm" /></td>
+                      <td class="px-3 py-2 text-right"><app-money-prefix [inline]="true"><input type="number" min="0" step="0.01" [value]="row.rate" [placeholder]="'purchase.lines.rateAuto' | translate" [attr.aria-label]="'purchase.lines.rate' | translate" (input)="patch(row.itemId, { rate: $any($event.target).value })" class="h-9 w-24 rounded-lg border border-gray-300 px-2 text-right text-sm" /></app-money-prefix></td>
                       <td class="px-1"><button type="button" class="text-gray-400 hover:text-red-600" [attr.aria-label]="'purchase.lines.remove' | translate" (click)="remove(row.itemId)">✕</button></td>
                     </tr>
                   }

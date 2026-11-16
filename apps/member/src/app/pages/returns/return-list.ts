@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +12,8 @@ import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SchoolSelectComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
 import { CreditNoteAddComponent } from './credit-note-add';
 import { CreditNoteDetailComponent } from './credit-note-detail';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 const PAGE_SIZE = 20;
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -24,7 +26,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
 @Component({
   selector: 'app-return-list',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SchoolSelectComponent, SkeletonLoaderComponent, CreditNoteAddComponent, CreditNoteDetailComponent],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SchoolSelectComponent, SkeletonLoaderComponent, CreditNoteAddComponent, CreditNoteDetailComponent, MoneyPipe, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-4">
@@ -70,7 +72,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
                   <li [class.bg-gold-50]="n.id === selectedId()">
                     <button type="button" (click)="openView(n.id)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700" [attr.aria-current]="n.id === selectedId() ? 'true' : null">
                       <span class="min-w-0 flex-1"><span class="block whitespace-nowrap font-mono text-xs font-medium text-primary-fg">{{ n.number }}</span><span class="block truncate text-xs text-gray-500">{{ n.schoolName }}</span></span>
-                      <span class="shrink-0 text-right"><span class="block font-mono text-sm" [class.line-through]="n.status === 'CANCELLED'">{{ n.grandTotal | number: '1.2-2' }}</span><span class="block text-[11px] text-gray-500">{{ n.noteDate | date: 'dd MMM yy' }}</span></span>
+                      <span class="shrink-0 text-right"><span class="block font-mono text-sm" [class.line-through]="n.status === 'CANCELLED'">{{ n.grandTotal | money }}</span><span class="block text-[11px] text-gray-500">{{ n.noteDate | date: 'dd MMM yy' }}</span></span>
                     </button>
                   </li>
                 } @empty { @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'returns.empty' | translate }}</li> } }
@@ -102,7 +104,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
                         <td class="whitespace-nowrap px-4 py-3 text-gray-600">{{ n.noteDate | date: 'dd MMM yy' }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ 'returns.reason.' + n.reason | translate }}</td>
                         <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(n.status)">{{ 'returns.status.' + n.status | translate }}</span></td>
-                        <td class="whitespace-nowrap px-4 py-3 text-right font-mono" [class.line-through]="n.status === 'CANCELLED'">{{ n.grandTotal | number: '1.2-2' }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-right font-mono" [class.line-through]="n.status === 'CANCELLED'">{{ n.grandTotal | inr }}</td>
                       </tr>
                     } @empty { @if (!loadError()) { <tr><td colspan="7" class="py-10 text-center text-sm text-gray-400">{{ 'returns.empty' | translate }}</td></tr> } }
                   }

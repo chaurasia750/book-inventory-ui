@@ -180,12 +180,12 @@
                     {{ 'price.bulk.skip.' + row.skipped | translate }}
                   </td>
                 } @else if (row.old; as old) {
-                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.mrpAmount | number: '1.2-2' }}</td>
-                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.mrpAmount | number: '1.2-2' }}</td>
-                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.saleAmount | number: '1.2-2' }}</td>
-                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.saleAmount | number: '1.2-2' }}</td>
-                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.purchaseAmount | number: '1.2-2' }}</td>
-                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.purchaseAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.mrpAmount | inr }}</td>
+                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.mrpAmount | inr }}</td>
+                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.saleAmount | inr }}</td>
+                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.saleAmount | inr }}</td>
+                  <td class="px-3 py-3 text-right font-mono text-gray-500">{{ old.purchaseAmount | inr }}</td>
+                  <td class="px-3 py-3 text-right font-mono font-semibold">{{ row.new?.purchaseAmount | inr }}</td>
                 }
               </tr>
             } @empty {

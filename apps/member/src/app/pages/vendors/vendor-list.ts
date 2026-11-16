@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -14,6 +13,7 @@ import { OutstandingTableComponent } from '../ledger/outstanding-table';
 import { VendorAddComponent } from './vendor-add';
 import { VendorDetailComponent } from './vendor-detail';
 import { VendorEditComponent } from './vendor-edit';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 const PAGE_SIZE = 20;
 const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -26,19 +26,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
 @Component({
   selector: 'app-vendor-list',
   standalone: true,
-  imports: [
-    DecimalPipe,
-    OutstandingTableComponent,
-    ReactiveFormsModule,
-    TranslatePipe,
-    ButtonComponent,
-    ListDetailComponent,
-    PaginationComponent,
-    SkeletonLoaderComponent,
-    VendorAddComponent,
-    VendorDetailComponent,
-    VendorEditComponent,
-  ],
+  imports: [OutstandingTableComponent, ReactiveFormsModule, TranslatePipe, ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, VendorAddComponent, VendorDetailComponent, VendorEditComponent, IndianCurrencyPipe],
   templateUrl: './vendor-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

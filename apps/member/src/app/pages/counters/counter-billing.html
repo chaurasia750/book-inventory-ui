@@ -21,7 +21,7 @@
     <section class="rounded-[10px] border border-emerald-200 bg-emerald-50 p-4" role="status">
       <p class="m-0 text-sm font-semibold text-emerald-800">{{ 'counter.billing.saved' | translate }}</p>
       <p class="m-0 mt-1 font-mono text-lg font-semibold text-primary-fg">{{ bill.number }}</p>
-      <p class="m-0 mt-0.5 text-sm text-gray-600">{{ 'sales.totals.grandTotal' | translate }}: <span class="font-mono font-semibold">{{ bill.grandTotal | number: '1.2-2' }}</span></p>
+      <p class="m-0 mt-0.5 text-sm text-gray-600">{{ 'sales.totals.grandTotal' | translate }}: <span class="font-mono font-semibold">{{ bill.grandTotal | money }}</span></p>
       @if (madeWarning().length) {
         <div class="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800" role="alert">
           <p class="m-0 font-semibold">{{ 'counter.billing.stockWarning' | translate }}</p>
@@ -82,9 +82,9 @@
             <thead class="bg-neutral-50 text-[11px] uppercase tracking-[0.05em] text-gray-500 dark:bg-charcoal-900">
               <tr>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
-                <th class="px-3 py-2 text-right font-semibold">MRP</th>
+                <th class="px-3 py-2 text-right font-semibold">MRP (₹)</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
-                @if (usesItemDiscount()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }}</th> }
+                @if (usesItemDiscount()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }} (₹)</th> }
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
                 <th class="px-3 py-2"></th>
               </tr>
@@ -97,7 +97,7 @@
                     <span class="ml-1 font-mono text-gray-500">{{ line.code }}</span>
                     <span class="block text-[11px] text-gray-400">{{ line.versionName }}</span>
                   </td>
-                  <td class="px-3 py-2 text-right font-mono">{{ line.mrp | number: '1.2-2' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ line.mrp | inr }}</td>
                   <td class="px-3 py-2 text-right">
                     <input type="number" min="1" step="1" [value]="line.quantity" (input)="setQuantity(i, $any($event.target).value)"
                       class="w-16 rounded-lg border border-gray-300 px-2 py-1 text-right text-xs" [attr.aria-label]="'sales.columns.qty' | translate" />
@@ -115,7 +115,7 @@
                       </div>
                     </td>
                   }
-                  <td class="px-3 py-2 text-right font-mono">{{ calc().lines[i].lineAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ calc().lines[i].lineAmount | inr }}</td>
                   <td class="px-3 py-2 text-right">
                     <button type="button" (click)="removeLine(i)" class="text-xs text-red-600 hover:underline">{{ 'counter.billing.remove' | translate }}</button>
                   </td>
@@ -161,11 +161,11 @@
           <div class="space-y-2">
             <div class="flex items-center gap-2">
               <label for="cb-cash" class="w-16 text-sm">{{ 'counter.billing.cash' | translate }}</label>
-              <input id="cb-cash" type="number" min="0" step="0.01" [value]="cash()" (input)="cash.set(num($event))" class="flex-1 rounded-lg border border-gray-300 px-2 py-1 text-right text-sm" />
+              <app-money-prefix><input id="cb-cash" type="number" min="0" step="0.01" [value]="cash()" (input)="cash.set(num($event))" class="w-full rounded-lg border border-gray-300 px-2 py-1 text-right text-sm" /></app-money-prefix>
             </div>
             <div class="flex items-center gap-2">
               <label for="cb-upi" class="w-16 text-sm">{{ 'counter.billing.upi' | translate }}</label>
-              <input id="cb-upi" type="number" min="0" step="0.01" [value]="upi()" (input)="upi.set(num($event))" class="flex-1 rounded-lg border border-gray-300 px-2 py-1 text-right text-sm" />
+              <app-money-prefix><input id="cb-upi" type="number" min="0" step="0.01" [value]="upi()" (input)="upi.set(num($event))" class="w-full rounded-lg border border-gray-300 px-2 py-1 text-right text-sm" /></app-money-prefix>
             </div>
             @if (upi() > 0) {
               <div class="flex items-center gap-2">
@@ -176,9 +176,9 @@
             @if (lines().length > 0) {
               <p class="m-0 text-sm" [class]="difference() === 0 ? 'text-emerald-700' : 'text-amber-700'" role="status">
                 @if (difference() > 0.004) {
-                  {{ 'counter.billing.short' | translate }}: <span class="font-mono font-semibold">{{ difference() | number: '1.2-2' }}</span>
+                  {{ 'counter.billing.short' | translate }}: <span class="font-mono font-semibold">{{ difference() | money }}</span>
                 } @else if (difference() < -0.004) {
-                  {{ 'counter.billing.excess' | translate }}: <span class="font-mono font-semibold">{{ -difference() | number: '1.2-2' }}</span>
+                  {{ 'counter.billing.excess' | translate }}: <span class="font-mono font-semibold">{{ -difference() | money }}</span>
                 } @else {
                   {{ 'counter.billing.paidInFull' | translate }}
                 }
@@ -210,7 +210,7 @@
           <thead class="sticky top-0 bg-neutral-50 text-[11px] uppercase tracking-[0.05em] text-gray-500 dark:bg-charcoal-900">
             <tr>
               <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
-              <th class="px-3 py-2 text-right font-semibold">MRP</th>
+              <th class="px-3 py-2 text-right font-semibold">MRP (₹)</th>
               <th class="px-3 py-2"></th>
             </tr>
           </thead>
@@ -218,7 +218,7 @@
             @for (row of shownCategoryRows(); track row.item.id) {
               <tr>
                 <td class="px-3 py-1.5"><span class="font-medium text-primary-fg">{{ row.item.name }}</span> <span class="ml-1 font-mono text-gray-500">{{ row.item.code }}</span></td>
-                <td class="px-3 py-1.5 text-right font-mono">{{ row.mrp === null ? '-' : (row.mrp | number: '1.2-2') }}</td>
+                <td class="px-3 py-1.5 text-right font-mono">{{ row.mrp === null ? '-' : (row.mrp | inr) }}</td>
                 <td class="px-3 py-1.5 text-right">
                   <button type="button" (click)="pickCategoryItem(row)" [disabled]="row.mrp === null"
                     class="rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40">{{ 'counter.billing.add' | translate }}</button>

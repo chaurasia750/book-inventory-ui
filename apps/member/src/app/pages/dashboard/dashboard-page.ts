@@ -7,7 +7,7 @@ import { DashboardService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { Dashboard, DashboardOwedGroup } from '@org/shared-models';
 import { ButtonComponent, SkeletonLoaderComponent } from '@org/ui';
-import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 const CARD = 'rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800';
 const TITLE = 'm-0 mb-3 text-sm font-semibold uppercase tracking-[0.05em] text-gray-500';
@@ -27,7 +27,7 @@ const CHART_HEIGHT = 56;
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, IndianCurrencyPipe],
+  imports: [DatePipe, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, MoneyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-4">
@@ -65,14 +65,14 @@ const CHART_HEIGHT = 56;
             <section class="${CARD}" aria-labelledby="db-pay">
               <h2 id="db-pay" class="${TITLE}">{{ 'dashboard.payments.title' | translate }}</h2>
               @if (part.data; as p) {
-                <p class="${BIG}">{{ p.received.total | inr }}</p>
+                <p class="${BIG}">{{ p.received.total | money }}</p>
                 <p class="m-0 mb-2 text-xs text-gray-500">{{ 'dashboard.payments.received' | translate }} · {{ p.received.receipts }} {{ 'dashboard.payments.receipts' | translate }}</p>
-                @for (m of p.received.byMode; track m.mode) { <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.payments.mode.' + m.mode | translate }}</span><span class="font-mono">{{ m.amount | inr }}</span></div> }
+                @for (m of p.received.byMode; track m.mode) { <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.payments.mode.' + m.mode | translate }}</span><span class="font-mono">{{ m.amount | money }}</span></div> }
                 <div class="mt-2 border-t border-neutral-200 pt-2 dark:border-charcoal-700">
-                  <div class="${ROW}"><span>{{ 'dashboard.payments.earlier' | translate }}</span><span class="font-mono font-semibold">{{ p.earlierSessions.amount | inr }}</span></div>
-                  <p class="m-0 text-xs text-gray-500">{{ p.earlierSessions.schools }} {{ 'dashboard.payments.schools' | translate }} · {{ 'dashboard.payments.stillDue' | translate }} {{ p.earlierSessions.stillDue | inr }}</p>
+                  <div class="${ROW}"><span>{{ 'dashboard.payments.earlier' | translate }}</span><span class="font-mono font-semibold">{{ p.earlierSessions.amount | money }}</span></div>
+                  <p class="m-0 text-xs text-gray-500">{{ p.earlierSessions.schools }} {{ 'dashboard.payments.schools' | translate }} · {{ 'dashboard.payments.stillDue' | translate }} {{ p.earlierSessions.stillDue | money }}</p>
                 </div>
-                <div class="${ROW} mt-1"><span>{{ 'dashboard.payments.pending' | translate }} ({{ p.pendingCheques.count }})</span><span class="font-mono">{{ p.pendingCheques.amount | inr }}</span></div>
+                <div class="${ROW} mt-1"><span>{{ 'dashboard.payments.pending' | translate }} ({{ p.pendingCheques.count }})</span><span class="font-mono">{{ p.pendingCheques.amount | money }}</span></div>
               } @else { <p class="m-0 text-sm text-red-600" role="alert">{{ 'dashboard.partFailed' | translate }}</p> }
             </section>
           }
@@ -80,9 +80,9 @@ const CHART_HEIGHT = 56;
           <section class="${CARD}" aria-labelledby="db-ord">
             <h2 id="db-ord" class="${TITLE}">{{ 'dashboard.orders.title' | translate }}</h2>
             @if (d.orders.data; as o) {
-              @for (s of o.byStatus; track s.status) { <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.orders.' + s.status | translate }} ({{ s.count }})</span><span class="font-mono">{{ s.total | inr }}</span></div> }
+              @for (s of o.byStatus; track s.status) { <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.orders.' + s.status | translate }} ({{ s.count }})</span><span class="font-mono">{{ s.total | money }}</span></div> }
               <div class="mt-2 border-t border-neutral-200 pt-2 dark:border-charcoal-700">
-                <div class="${ROW}"><span>{{ 'dashboard.orders.invoices' | translate }} ({{ o.invoicesLive }})</span><span class="font-mono font-semibold">{{ o.invoicesTotal | inr }}</span></div>
+                <div class="${ROW}"><span>{{ 'dashboard.orders.invoices' | translate }} ({{ o.invoicesLive }})</span><span class="font-mono font-semibold">{{ o.invoicesTotal | money }}</span></div>
                 <p class="m-0 text-xs text-gray-500">{{ o.invoicesCancelled }} {{ 'dashboard.orders.cancelled' | translate }} · {{ o.stillToInvoiceQuantity }} {{ 'dashboard.orders.stillToInvoice' | translate }}</p>
               </div>
             } @else { <p class="m-0 text-sm text-red-600" role="alert">{{ 'dashboard.partFailed' | translate }}</p> }
@@ -92,10 +92,10 @@ const CHART_HEIGHT = 56;
             <h2 id="db-sales" class="${TITLE}">{{ 'dashboard.sales.title' | translate }}</h2>
             @if (d.sales.data; as s) {
               <div class="grid grid-cols-2 gap-3">
-                <div class="${TILE}"><p class="m-0 text-xs text-gray-500">{{ 'dashboard.sales.today' | translate }}</p><p class="${BIG}">{{ s.today.total | inr }}</p></div>
-                <div class="${TILE}"><p class="m-0 text-xs text-gray-500">{{ 'dashboard.sales.session' | translate }}</p><p class="${BIG}">{{ s.session.total | inr }}</p></div>
+                <div class="${TILE}"><p class="m-0 text-xs text-gray-500">{{ 'dashboard.sales.today' | translate }}</p><p class="${BIG}">{{ s.today.total | money }}</p></div>
+                <div class="${TILE}"><p class="m-0 text-xs text-gray-500">{{ 'dashboard.sales.session' | translate }}</p><p class="${BIG}">{{ s.session.total | money }}</p></div>
               </div>
-              <p class="m-0 mt-2 text-xs text-gray-500">{{ 'dashboard.sales.invoices' | translate }} {{ s.session.invoicesTotal | inr }} · {{ 'dashboard.sales.counter' | translate }} {{ s.session.counterTotal | inr }}</p>
+              <p class="m-0 mt-2 text-xs text-gray-500">{{ 'dashboard.sales.invoices' | translate }} {{ s.session.invoicesTotal | money }} · {{ 'dashboard.sales.counter' | translate }} {{ s.session.counterTotal | money }}</p>
               @if (line(); as points) {
                 <svg class="mt-2 h-14 w-full" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" preserveAspectRatio="none" role="img" [attr.aria-label]="'dashboard.sales.line' | translate"><polyline [attr.points]="points" fill="none" stroke="currentColor" class="text-brand-600" stroke-width="2" vector-effect="non-scaling-stroke" /></svg>
               }
@@ -106,9 +106,9 @@ const CHART_HEIGHT = 56;
             <section class="${CARD}" aria-labelledby="db-ret">
               <h2 id="db-ret" class="${TITLE}">{{ 'dashboard.returns.title' | translate }}</h2>
               @if (part.data; as r) {
-                <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.returns.creditNotes' | translate }} ({{ r.creditNotes }})</span><span class="font-mono">{{ r.creditNotesTotal | inr }}</span></div>
-                <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.returns.refunds' | translate }} ({{ r.refunds }})</span><span class="font-mono">{{ r.refundsTotal | inr }}</span></div>
-                <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.returns.vendorReturns' | translate }} ({{ r.vendorReturns }})</span><span class="font-mono">{{ r.vendorReturnsTotal | inr }}</span></div>
+                <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.returns.creditNotes' | translate }} ({{ r.creditNotes }})</span><span class="font-mono">{{ r.creditNotesTotal | money }}</span></div>
+                <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.returns.refunds' | translate }} ({{ r.refunds }})</span><span class="font-mono">{{ r.refundsTotal | money }}</span></div>
+                <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.returns.vendorReturns' | translate }} ({{ r.vendorReturns }})</span><span class="font-mono">{{ r.vendorReturnsTotal | money }}</span></div>
               } @else { <p class="m-0 text-sm text-red-600" role="alert">{{ 'dashboard.partFailed' | translate }}</p> }
             </section>
           }
@@ -119,8 +119,8 @@ const CHART_HEIGHT = 56;
               @if (part.data; as w) {
                 @for (g of groups(w); track g.key) {
                   <div class="mb-2">
-                    <div class="${ROW}"><span class="font-medium">{{ 'dashboard.owed.' + g.key | translate }} ({{ g.group.count }})</span><span class="font-mono font-semibold">{{ g.group.total | inr }}</span></div>
-                    @for (row of g.group.largest; track row.partyId) { <div class="flex justify-between text-xs text-gray-500"><span class="truncate">{{ row.name }}</span><span class="font-mono">{{ row.balance | inr }}</span></div> }
+                    <div class="${ROW}"><span class="font-medium">{{ 'dashboard.owed.' + g.key | translate }} ({{ g.group.count }})</span><span class="font-mono font-semibold">{{ g.group.total | money }}</span></div>
+                    @for (row of g.group.largest; track row.partyId) { <div class="flex justify-between text-xs text-gray-500"><span class="truncate">{{ row.name }}</span><span class="font-mono">{{ row.balance | money }}</span></div> }
                   </div>
                 }
               } @else { <p class="m-0 text-sm text-red-600" role="alert">{{ 'dashboard.partFailed' | translate }}</p> }
@@ -134,7 +134,7 @@ const CHART_HEIGHT = 56;
               <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.stock.negative' | translate }}</span><span class="font-mono">{{ k.belowZero }}</span></div>
               <div class="${ROW}"><span class="text-gray-500">{{ 'dashboard.stock.damaged' | translate }}</span><span class="font-mono">{{ k.damagedPieces }}</span></div>
               @if (k.value !== null) {
-                <div class="${ROW} mt-1 border-t border-neutral-200 pt-2 dark:border-charcoal-700"><span>{{ 'dashboard.stock.value' | translate }}</span><span class="font-mono font-semibold">{{ k.value | inr }}</span></div>
+                <div class="${ROW} mt-1 border-t border-neutral-200 pt-2 dark:border-charcoal-700"><span>{{ 'dashboard.stock.value' | translate }}</span><span class="font-mono font-semibold">{{ k.value | money }}</span></div>
                 @if (k.itemsWithoutPrice) { <p class="m-0 text-xs text-gray-500">{{ k.itemsWithoutPrice }} {{ 'dashboard.stock.withoutPrice' | translate }}</p> }
               }
             } @else { <p class="m-0 text-sm text-red-600" role="alert">{{ 'dashboard.partFailed' | translate }}</p> }
