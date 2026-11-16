@@ -17,10 +17,7 @@
             <option value="">{{ 'customer.filters.allStatuses' | translate }}</option>
             @for (s of statuses; track s) { <option [value]="s">{{ 'customer.status.' + s | translate }}</option> }
           </select>
-          <select (change)="setSchool($any($event.target).value)" [attr.aria-label]="'customer.fields.school' | translate" [class]="select">
-            <option value="">{{ 'customer.filters.allSchools' | translate }}</option>
-            @for (school of schools(); track school.id) { <option [value]="school.id">{{ school.name }}</option> }
-          </select>
+          <div class="w-56"><app-school-select [allLabel]="'customer.filters.allSchools' | translate" [placeholder]="'customer.filters.allSchools' | translate" [activeOnly]="false" (picked)="setSchool($event?.id ?? '')" /></div>
         }
       </div>
 

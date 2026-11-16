@@ -5,19 +5,19 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { CounterService, SchoolService } from '@org/api-services';
+import { CounterService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
-import { COUNTER_BILL_STATUSES, Counter, CounterBillStatus, CounterBillSummary, PagedList, SchoolSummary } from '@org/shared-models';
+import { COUNTER_BILL_STATUSES, Counter, CounterBillStatus, CounterBillSummary, PagedList } from '@org/shared-models';
 import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
 import { CounterBillDetailComponent } from './counter-bill-detail';
 
 const PAGE_SIZE = 20;
 const CHOICES = 200;
-const SELECT = 'h-10 w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
+const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
 
 /**
- * The company's counter bills (sales spec R47, R49): search by number and student name, filters by counter, school, class, status and
+ * The company's counter bills (sales spec R47, R49): search by number and student name, filters by counter, status and
  * date range, paging, newest first. A bill opens in the panel beside the list (platform U10) with the Owner's Cancel. A student's
  * bills are listed together through the `studentId` query filter the bill's panel sets. The Owner and Staff reach it (the route is
  * guarded); only the Owner cancels (R48).
@@ -31,7 +31,6 @@ const SELECT = 'h-10 w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50
 })
 export class CounterBillsComponent {
   private readonly counters = inject(CounterService);
-  private readonly schoolService = inject(SchoolService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly translate = inject(TranslateService);
@@ -47,14 +46,11 @@ export class CounterBillsComponent {
   readonly search = new FormControl('', { nonNullable: true });
   readonly from = new FormControl('', { nonNullable: true });
   readonly to = new FormControl('', { nonNullable: true });
-  readonly className = signal('');
   readonly status = signal<CounterBillStatus | ''>('');
   readonly counterId = signal('');
-  readonly schoolId = signal('');
   readonly studentId = signal(this.route.snapshot.queryParamMap.get('studentId') ?? '');
 
   readonly countersList = signal<Counter[]>([]);
-  readonly schools = signal<SchoolSummary[]>([]);
   readonly page = signal(1);
   readonly pageSize = PAGE_SIZE;
 
@@ -76,7 +72,6 @@ export class CounterBillsComponent {
       }
     });
     this.counters.list({ orderBy: 'CreatedAt DESC', pageIndex: 1, pageSize: CHOICES }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: (p) => this.countersList.set(p.items), error: () => this.countersList.set([]) });
-    this.schoolService.list({ orderBy: 'Name ASC', pageIndex: 1, pageSize: CHOICES }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: (p) => this.schools.set(p.items), error: () => this.schools.set([]) });
     this.load();
   }
 
@@ -92,11 +87,6 @@ export class CounterBillsComponent {
 
   setCounter(value: string): void {
     this.counterId.set(value);
-    this.applyFilters();
-  }
-
-  setSchool(value: string): void {
-    this.schoolId.set(value);
     this.applyFilters();
   }
 
@@ -133,8 +123,6 @@ export class CounterBillsComponent {
       .bills({
         search: this.search.value.trim() || undefined,
         counterId: this.counterId() || undefined,
-        schoolId: this.schoolId() || undefined,
-        className: this.className().trim() || undefined,
         studentId: this.studentId() || undefined,
         status: this.status() || undefined,
         from: this.from.value || undefined,

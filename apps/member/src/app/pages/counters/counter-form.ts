@@ -2,13 +2,11 @@ import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { SalesService, SchoolService } from '@org/api-services';
-import { messageForError } from '@org/interceptors';
+import { SalesService } from '@org/api-services';
 import { Counter, CounterFields, SchoolSummary } from '@org/shared-models';
-import { ButtonComponent, DatePickerComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent, SchoolSelectComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
-const SCHOOL_CHOICES = 200;
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
@@ -23,7 +21,7 @@ function today(): string {
 @Component({
   selector: 'app-counter-form',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SchoolSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
@@ -36,10 +34,8 @@ function today(): string {
       <div class="grid gap-4 sm:grid-cols-2">
         <div class="sm:col-span-2">
           <label for="ctf-school" class="mb-1 block text-sm font-semibold">{{ 'counter.fields.school' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          <select id="ctf-school" formControlName="schoolId" (change)="schoolChanged()" class="${FIELD} disabled:cursor-not-allowed disabled:bg-gray-100">
-            <option value="">{{ 'counter.fields.noSchool' | translate }}</option>
-            @for (school of schools(); track school.id) { <option [value]="school.id">{{ school.name }}</option> }
-          </select>
+          <app-school-select inputId="ctf-school" formControlName="schoolId" excludeSaleType="SCHOOL_ORDER" [placeholder]="'counter.fields.noSchool' | translate" [searchPlaceholder]="'counter.fields.searchSchool' | translate"
+            [emptyLabel]="'counter.fields.noSchoolFound' | translate" (picked)="schoolPicked($event)" />
           @if (schoolLocked()) {
             <p class="mt-1 text-xs text-gray-500">{{ 'counter.fields.schoolLocked' | translate }}</p>
           }
@@ -75,7 +71,6 @@ function today(): string {
   `,
 })
 export class CounterFormComponent {
-  private readonly schoolService = inject(SchoolService);
   private readonly sales = inject(SalesService);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
@@ -89,7 +84,8 @@ export class CounterFormComponent {
   submitted = output<CounterFields>();
   cancelled = output<void>();
 
-  readonly schools = signal<SchoolSummary[]>([]);
+  /** The chosen school's name, for the suggested counter name. */
+  private schoolName = '';
   readonly sessions = signal<string[]>([]);
   readonly loadError = signal('');
 
@@ -108,7 +104,6 @@ export class CounterFormComponent {
   readonly schoolLocked = signal(false);
 
   constructor() {
-    this.loadSchools();
     effect(() => {
       const c = this.counter();
       untracked(() => this.fill(c));
@@ -135,11 +130,13 @@ export class CounterFormComponent {
     } else {
       this.form.controls.schoolId.enable();
     }
+    this.schoolName = c?.schoolName ?? '';
     this.suggestion = c?.name ?? '';
     this.loadSessions(c?.session ?? '');
   }
 
-  schoolChanged(): void {
+  schoolPicked(school: SchoolSummary | null): void {
+    this.schoolName = school?.name ?? '';
     this.loadSessions('');
   }
 
@@ -169,17 +166,6 @@ export class CounterFormComponent {
       session: v.session || undefined,
       endDate: v.endDate || undefined,
     });
-  }
-
-  /** R38: only active schools whose sale type is `COUNTER_SALE` or `BOTH` can have a counter. */
-  private loadSchools(): void {
-    this.schoolService
-      .list({ status: 'ACTIVE', orderBy: 'Name ASC', pageIndex: 1, pageSize: SCHOOL_CHOICES })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (page) => this.schools.set(page.items.filter((s) => s.saleType !== 'SCHOOL_ORDER')),
-        error: (error: unknown) => this.loadError.set(messageForError(error, this.translate)),
-      });
   }
 
   /** R38: the session is the school's session on the start date unless the Owner chooses the one before or after it (school R18). */
@@ -216,9 +202,8 @@ export class CounterFormComponent {
   private suggestName(): void {
     const schoolId = this.form.controls.schoolId.value;
     const session = this.form.controls.session.value;
-    const school = this.schools().find((s) => s.id === schoolId);
-    if (!school) return;
-    const next = session ? `${school.name} Counter ${session}` : `${school.name} Counter`;
+    if (!schoolId || !this.schoolName) return;
+    const next = session ? `${this.schoolName} Counter ${session}` : `${this.schoolName} Counter`;
     if (!this.nameTouched && (this.form.controls.name.value === '' || this.form.controls.name.value === this.suggestion)) {
       this.form.controls.name.setValue(next);
     }

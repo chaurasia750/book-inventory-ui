@@ -4,16 +4,9 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslatePipe } from '@ngx-translate/core';
 import { SchoolService } from '@org/api-services';
 import { CustomerDetail, CustomerFields } from '@org/shared-models';
-import { ButtonComponent } from '@org/ui';
+import { ButtonComponent, SchoolSelectComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
-const SCHOOL_CHOICES = 200;
-
-/** A school offered in the school select: the active schools, plus the customer's own school when it was deactivated later (customer spec R4). */
-interface SchoolChoice {
-  id: string;
-  name: string;
-}
 
 /**
  * The customer master data form (customer spec R2-R7) shared by the add and the edit panel. There is no code field: the code is
@@ -24,7 +17,7 @@ interface SchoolChoice {
 @Component({
   selector: 'app-customer-form',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, SchoolSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
@@ -46,10 +39,8 @@ interface SchoolChoice {
         </div>
         <div>
           <label for="cf-school" class="mb-1 block text-sm font-semibold">{{ 'customer.fields.school' | translate }}</label>
-          <select id="cf-school" formControlName="schoolId" (change)="schoolChanged()" class="${FIELD}">
-            <option value="">{{ 'customer.fields.noSchool' | translate }}</option>
-            @for (school of schools(); track school.id) { <option [value]="school.id">{{ school.name }}</option> }
-          </select>
+          <app-school-select inputId="cf-school" formControlName="schoolId" [placeholder]="'customer.fields.noSchool' | translate" [searchPlaceholder]="'counter.fields.searchSchool' | translate"
+            [emptyLabel]="'counter.fields.noSchoolFound' | translate" [allLabel]="'customer.fields.noSchool' | translate" (picked)="schoolChanged()" />
         </div>
         <div>
           <label for="cf-class" class="mb-1 block text-sm font-semibold">{{ 'customer.fields.className' | translate }}</label>
@@ -93,7 +84,6 @@ export class CustomerFormComponent {
   submitted = output<CustomerFields>();
   cancelled = output<void>();
 
-  readonly schools = signal<SchoolChoice[]>([]);
   readonly classes = signal<string[]>([]);
 
   readonly form = new FormGroup({
@@ -107,7 +97,6 @@ export class CustomerFormComponent {
   });
 
   constructor() {
-    this.loadSchools();
     effect(() => {
       const c = this.customer();
       untracked(() => this.fill(c));
@@ -128,7 +117,6 @@ export class CustomerFormComponent {
           }
         : { name: '', mobile: '', address: '', schoolId: '', className: '', openingBalanceAmount: 0, creditLimitAmount: null },
     );
-    this.keepOwnSchool(c);
     this.loadClasses(c?.className ?? '');
   }
 
@@ -154,26 +142,6 @@ export class CustomerFormComponent {
       className: v.schoolId ? v.className : undefined,
       creditLimitAmount: v.creditLimitAmount === null ? undefined : Math.round(v.creditLimitAmount * 100) / 100,
     });
-  }
-
-  private loadSchools(): void {
-    this.schoolService
-      .list({ status: 'ACTIVE', orderBy: 'Name ASC', pageIndex: 1, pageSize: SCHOOL_CHOICES })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (page) => {
-          const own = this.schools().filter((s) => !page.items.some((i) => i.id === s.id));
-          this.schools.set([...page.items.map((s) => ({ id: s.id, name: s.name })), ...own]);
-        },
-        error: () => this.schools.update((list) => list),
-      });
-  }
-
-  /** The customer's own school stays choosable when it was deactivated after the customer was saved (customer spec R4). */
-  private keepOwnSchool(customer: CustomerDetail | null): void {
-    if (customer?.schoolId && customer.schoolName && !this.schools().some((s) => s.id === customer.schoolId)) {
-      this.schools.update((list) => [...list, { id: customer.schoolId as string, name: customer.schoolName as string }]);
-    }
   }
 
   private loadClasses(selected: string): void {

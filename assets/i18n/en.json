@@ -1736,6 +1736,8 @@
     },
     "fields": {
       "name": "Name",
+      "searchSchool": "Search name or code",
+      "noSchoolFound": "No school found",
       "school": "School",
       "noSchool": "Choose a school",
       "schoolLocked": "The school cannot change once the counter has a bill.",

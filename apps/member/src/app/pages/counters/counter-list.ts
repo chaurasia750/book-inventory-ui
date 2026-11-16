@@ -6,17 +6,16 @@ import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuthService } from '@org/auth';
-import { CounterService, SchoolService } from '@org/api-services';
+import { CounterService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
-import { COUNTER_STATUSES, Counter, CounterStatus, PagedList, SchoolSummary } from '@org/shared-models';
+import { COUNTER_STATUSES, Counter, CounterStatus, PagedList } from '@org/shared-models';
 import { counterStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
+import { ButtonComponent, SchoolSelectComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
 import { CounterAddComponent } from './counter-add';
 import { CounterDetailComponent } from './counter-detail';
 import { CounterEditComponent } from './counter-edit';
 
 const PAGE_SIZE = 20;
-const SCHOOL_CHOICES = 200;
 const SESSION_SCAN = 200;
 const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
 
@@ -33,6 +32,7 @@ const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gra
     ReactiveFormsModule,
     TranslatePipe,
     ButtonComponent,
+    SchoolSelectComponent,
     ListDetailComponent,
     PaginationComponent,
     SkeletonLoaderComponent,
@@ -45,7 +45,6 @@ const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gra
 })
 export class CounterListComponent {
   private readonly counters = inject(CounterService);
-  private readonly schoolService = inject(SchoolService);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
@@ -66,7 +65,6 @@ export class CounterListComponent {
   readonly sessions = signal<string[]>([]);
   readonly status = signal<CounterStatus | ''>('');
   readonly schoolId = signal('');
-  readonly schools = signal<SchoolSummary[]>([]);
   readonly page = signal(1);
   readonly pageSize = PAGE_SIZE;
 
@@ -79,10 +77,6 @@ export class CounterListComponent {
     this.search.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.applyFilters());
-    this.schoolService
-      .list({ orderBy: 'Name ASC', pageIndex: 1, pageSize: SCHOOL_CHOICES })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (page) => this.schools.set(page.items), error: () => this.schools.set([]) });
     this.loadSessions();
     this.load();
   }

@@ -16,26 +16,19 @@
       }
 
       @if (!hasPanel()) {
-        <div class="grid gap-3 border-b border-neutral-200 p-4 sm:grid-cols-2 lg:grid-cols-4 dark:border-charcoal-700">
+        <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
           <input type="search" [formControl]="search" [placeholder]="'counter.bills.search' | translate" [attr.aria-label]="'counter.bills.search' | translate"
-            class="h-10 w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100 lg:col-span-2" />
-          <select (change)="setCounter($any($event.target).value)" [attr.aria-label]="'counter.bills.counter' | translate" [class]="select">
+            class="h-10 min-w-[14rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+          <div class="w-48"><select (change)="setCounter($any($event.target).value)" [attr.aria-label]="'counter.bills.counter' | translate" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
             <option value="">{{ 'counter.bills.allCounters' | translate }}</option>
             @for (counter of countersList(); track counter.id) { <option [value]="counter.id">{{ counter.name }}</option> }
-          </select>
-          <select (change)="setSchool($any($event.target).value)" [attr.aria-label]="'counter.fields.school' | translate" [class]="select">
-            <option value="">{{ 'counter.filters.allSchools' | translate }}</option>
-            @for (school of schools(); track school.id) { <option [value]="school.id">{{ school.name }}</option> }
-          </select>
-          <input type="text" [value]="className()" (input)="className.set($any($event.target).value)" [placeholder]="'counter.bills.class' | translate"
-            [attr.aria-label]="'counter.bills.class' | translate"
-            class="h-10 w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
-          <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'counter.bill.status' | translate" [class]="select">
+          </select></div>
+          <div class="w-40"><select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'counter.bill.status' | translate" class="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100">
             <option value="">{{ 'counter.bills.allStatuses' | translate }}</option>
             @for (s of statuses; track s) { <option [value]="s">{{ 'counter.billStatus.' + s | translate }}</option> }
-          </select>
-          <app-date-picker [formControl]="from" [placeholder]="'counter.bills.from' | translate" inputId="cb-from" />
-          <app-date-picker [formControl]="to" [placeholder]="'counter.bills.to' | translate" inputId="cb-to" />
+          </select></div>
+          <div class="w-40"><app-date-picker [formControl]="from" [placeholder]="'counter.bills.from' | translate" inputId="cb-from" /></div>
+          <div class="w-40"><app-date-picker [formControl]="to" [placeholder]="'counter.bills.to' | translate" inputId="cb-to" /></div>
         </div>
       }
 
