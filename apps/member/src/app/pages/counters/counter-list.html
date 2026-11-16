@@ -1,0 +1,133 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'counter.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'counter.subtitle' | translate }}</p>
+    </div>
+    @if (canEdit) {
+      <app-button (clicked)="openAdd()">{{ 'counter.add.button' | translate }}</app-button>
+    }
+  </div>
+
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'counter.title' | translate" [detailLabel]="'counter.panelLabel' | translate">
+    <div list>
+      <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
+        <input type="search" [formControl]="search" [placeholder]="'counter.filters.search' | translate" [attr.aria-label]="'counter.filters.search' | translate"
+          class="h-10 min-w-[12rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+        @if (!hasPanel()) {
+          <input type="text" [formControl]="session" [placeholder]="'counter.filters.session' | translate" [attr.aria-label]="'counter.filters.session' | translate"
+            class="h-10 w-32 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+          <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'counter.columns.status' | translate" [class]="select">
+            <option value="">{{ 'counter.filters.allStatuses' | translate }}</option>
+            @for (s of statuses; track s) { <option [value]="s">{{ 'counter.status.' + s | translate }}</option> }
+          </select>
+          <select (change)="setSchool($any($event.target).value)" [attr.aria-label]="'counter.fields.school' | translate" [class]="select">
+            <option value="">{{ 'counter.filters.allSchools' | translate }}</option>
+            @for (school of schools(); track school.id) { <option [value]="school.id">{{ school.name }}</option> }
+          </select>
+        }
+      </div>
+
+      @if (loadError()) {
+        <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+          <span>{{ loadError() }}</span>
+          <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+        </div>
+      }
+
+      @if (hasPanel()) {
+        <ul class="m-0 list-none divide-y divide-neutral-100 p-0 dark:divide-charcoal-700">
+          @if (loading() && !result()) {
+            @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
+          } @else {
+            @for (counter of result()?.items ?? []; track counter.id) {
+              <li class="flex items-center gap-2 px-4 py-3 transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700" [class.bg-gold-50]="counter.id === selectedId()">
+                <button type="button" (click)="openView(counter.id)" class="flex min-w-0 flex-1 items-center gap-3 text-left" [attr.aria-current]="counter.id === selectedId() ? 'true' : null">
+                  <span class="min-w-0 flex-1">
+                    <span class="block truncate text-sm font-medium text-primary-fg">{{ counter.name }}</span>
+                    <span class="block truncate text-xs text-gray-500">{{ counter.schoolName || '-' }} · <span class="font-mono">{{ counter.session }}</span></span>
+                  </span>
+                  <span class="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium" [class]="statusClass(counter.status)">{{ 'counter.status.' + counter.status | translate }}</span>
+                </button>
+                <app-button size="sm" variant="secondary" (clicked)="openBilling(counter.id)">{{ 'counter.openBilling' | translate }}</app-button>
+              </li>
+            } @empty {
+              @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'counter.empty' | translate }}</li> }
+            }
+          }
+        </ul>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.columns.name' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.columns.school' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.columns.session' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.columns.startDate' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.columns.endDate' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.columns.status' | translate }}</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @if (loading() && !result()) {
+                @for (i of skeletonRows; track i) {
+                  <tr>
+                    <td class="px-4 py-3"><app-skeleton-loader width="10rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                    <td class="px-4 py-3"></td>
+                  </tr>
+                }
+              } @else {
+                @for (counter of result()?.items ?? []; track counter.id) {
+                  <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="openView(counter.id)" (keydown.enter)="openView(counter.id)" tabindex="0">
+                    <td class="px-4 py-3 font-medium text-primary-fg">{{ counter.name }}</td>
+                    <td class="px-4 py-3 text-gray-600"><div>{{ counter.schoolName || '-' }}</div><div class="font-mono text-xs text-gray-500">{{ counter.schoolCode || '' }}</div></td>
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ counter.session }}</td>
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ counter.startDate }}</td>
+                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ counter.endDate || '-' }}</td>
+                    <td class="px-4 py-3">
+                      <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(counter.status)">{{ 'counter.status.' + counter.status | translate }}</span>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                      <app-button size="sm" variant="secondary" (clicked)="openBilling(counter.id); $event.stopPropagation()">{{ 'counter.openBilling' | translate }}</app-button>
+                    </td>
+                  </tr>
+                } @empty {
+                  @if (!loadError()) {
+                    <tr><td [attr.colspan]="7" class="py-10 text-center text-sm text-gray-400">{{ 'counter.empty' | translate }}</td></tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+    </div>
+
+    <div detail>
+      @switch (panel().mode) {
+        @case ('new') {
+          <app-counter-add (created)="openCreated($event)" (closed)="closePanel()" />
+        }
+        @case ('edit') {
+          @if (selectedId(); as id) {
+            <app-counter-edit [id]="id" (saved)="afterEdit(id)" (closed)="openView(id)" />
+          }
+        }
+        @default {
+          @if (selectedId(); as id) {
+            <app-counter-detail [id]="id" (closed)="closePanel()" (changed)="load()" (editRequested)="openEdit(id)" (billRequested)="openBilling(id)" />
+          }
+        }
+      }
+    </div>
+  </app-list-detail>
+</div>

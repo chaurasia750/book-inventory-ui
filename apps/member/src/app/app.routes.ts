@@ -127,6 +127,37 @@ export const appRoutes: Route[] = [
         ],
       },
       {
+        // Sales R49: the bills list with a bill's detail panel; it sits before `counters` so `bills` is not read as a counter id.
+        path: 'counters/bills',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/counters/counter-bills').then((m) => m.CounterBillsComponent),
+        // One bill opens beside the list (platform U10); the id is the bill's.
+        children: [{ path: ':id', children: [] }],
+      },
+      {
+        // Sales R42-R46: the counter's billing screen, full width (platform U14); it sits before `counters` so `:id/bill` is not read as a counter id.
+        path: 'counters/:id/bill',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/counters/counter-billing').then((m) => m.CounterBillingComponent),
+      },
+      {
+        // Sales R50: the read-only day summary; it sits before `counters` so `day-summary` is not read as a counter id.
+        path: 'counters/day-summary',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/counters/counter-day-summary').then((m) => m.CounterDaySummaryComponent),
+      },
+      {
+        path: 'counters',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/counters/counter-list').then((m) => m.CounterListComponent),
+        // The counter, the form for a new one and the edit form open beside the list (platform U10); only the Owner writes (sales R48).
+        children: [
+          { path: 'new', canActivate: [appRoleGuard(['OWNER'])], children: [] },
+          { path: ':id/edit', canActivate: [appRoleGuard(['OWNER'])], children: [] },
+          { path: ':id', children: [] },
+        ],
+      },
+      {
         path: 'schools',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/schools/school-list').then((m) => m.SchoolListComponent),
