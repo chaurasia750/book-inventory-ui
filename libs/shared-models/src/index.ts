@@ -26,3 +26,4 @@ export * from './lib/ledger.model';
 export * from './lib/sales.model';
 export * from './lib/planning.model';
 export * from './lib/payment.model';
+export * from './lib/return.model';

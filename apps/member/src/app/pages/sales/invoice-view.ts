@@ -9,6 +9,7 @@ import { messageForError } from '@org/interceptors';
 import { InvoiceDetail, InvoiceGroupView, InvoiceLayout } from '@org/shared-models';
 import { ButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { SaleTotalsComponent } from './sale-totals';
+import { InvoiceReturnsComponent } from '../returns/invoice-returns';
 
 /**
  * One invoice (sales spec R8-R13, R26, the owner's document pattern): a header card with its number, status and money story (issued,
@@ -19,7 +20,7 @@ import { SaleTotalsComponent } from './sale-totals';
 @Component({
   selector: 'app-invoice-view',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, NgClass, ReactiveFormsModule, RouterLink, TranslatePipe, ButtonComponent, ModalComponent, SkeletonLoaderComponent, SaleTotalsComponent],
+  imports: [DatePipe, DecimalPipe, NgClass, ReactiveFormsModule, RouterLink, TranslatePipe, ButtonComponent, ModalComponent, SkeletonLoaderComponent, SaleTotalsComponent, InvoiceReturnsComponent],
   template: `
     <div class="flex flex-col gap-3">
       @if (invoice(); as inv) {
@@ -113,6 +114,8 @@ import { SaleTotalsComponent } from './sale-totals';
             <app-sale-totals [totals]="inv.totals" [gstMode]="inv.gstMode" />
           </aside>
         </div>
+
+        <app-invoice-returns [invoiceId]="inv.summary.id" />
 
         @if (inv.gstSummary.length) {
           <section class="overflow-x-auto rounded-[10px] border border-neutral-200 bg-white dark:border-charcoal-700 dark:bg-charcoal-800" [attr.aria-label]="'sales.invoice.gstSummary' | translate">

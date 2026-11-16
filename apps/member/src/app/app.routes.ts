@@ -158,6 +158,26 @@ export const appRoutes: Route[] = [
         ],
       },
       {
+        // Sales R53-R61: the credit notes (school returns) with a credit note's panel and the form for a new one beside the list (platform U10).
+        path: 'returns',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/returns/return-list').then((m) => m.ReturnListComponent),
+        children: [
+          { path: 'new', children: [] },
+          { path: ':id', children: [] },
+        ],
+      },
+      {
+        // Sales R64-R69: the refunds; only the Owner records and cancels them (R67).
+        path: 'refunds',
+        canActivate: [appRoleGuard(['OWNER'])],
+        loadComponent: () => import('./pages/returns/refund-list').then((m) => m.RefundListComponent),
+        children: [
+          { path: 'new', children: [] },
+          { path: ':id', children: [] },
+        ],
+      },
+      {
         path: 'schools',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/schools/school-list').then((m) => m.SchoolListComponent),
