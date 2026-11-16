@@ -18,7 +18,7 @@ import {
   PriceVersion,
   SchoolDetail,
 } from '@org/shared-models';
-import { ButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { ButtonComponent, SidePanelComponent, SkeletonLoaderComponent } from '@org/ui';
 import { ItemEntryComponent } from '../sales/item-entry';
 import { SaleTotalsComponent } from '../sales/sale-totals';
 import { computeCounterTotals, gstModeOf } from './counter-calc';
@@ -61,7 +61,7 @@ const CATEGORY_PAGE = 100;
     DecimalPipe,
     TranslatePipe,
     ButtonComponent,
-    ModalComponent,
+    SidePanelComponent,
     SkeletonLoaderComponent,
     ItemEntryComponent,
     SaleTotalsComponent,
