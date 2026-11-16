@@ -48,8 +48,8 @@ import { InvoiceReturnsComponent } from '../returns/invoice-returns';
                   <button type="button" (click)="switchTo(l)" class="rounded-md px-2.5 py-1 font-semibold" [ngClass]="inv.layout === l ? 'bg-primary-fg text-white' : 'text-gray-600 hover:text-primary-fg'">{{ 'sales.layout.' + l | translate }}</button>
                 }
               </div>
-              <app-button size="sm" variant="secondary" [loading]="busy()" (clicked)="print(inv)">{{ 'sales.invoice.print' | translate }}</app-button>
-              <app-button size="sm" [loading]="busy()" (clicked)="download(inv)">{{ 'sales.invoice.downloadPdf' | translate }}</app-button>
+              <app-button size="sm" variant="secondary" [loading]="pdfAction() === 'print'" [disabled]="pdfAction() !== null" (clicked)="print(inv)">{{ 'sales.invoice.print' | translate }}</app-button>
+              <app-button size="sm" [loading]="pdfAction() === 'download'" [disabled]="pdfAction() !== null" (clicked)="download(inv)">{{ 'sales.invoice.downloadPdf' | translate }}</app-button>
               @if (isOwner && inv.summary.status === 'ISSUED') {
                 <app-button size="sm" variant="secondary" (clicked)="cancelOpen.set(true)">{{ 'sales.invoices.cancel' | translate }}</app-button>
               }
@@ -200,7 +200,8 @@ export class InvoiceViewComponent {
   readonly cancelOpen = signal(false);
   readonly cancelError = signal('');
   readonly reason = new FormControl('', { nonNullable: true });
-  readonly busy = signal(false);
+  /** Which PDF action is running; only that button spins, the other one waits. */
+  readonly pdfAction = signal<'print' | 'download' | null>(null);
   readonly actionError = signal('');
 
   /** R26: the layout chosen on this screen; empty opens in the school's default. */
@@ -244,7 +245,7 @@ export class InvoiceViewComponent {
 
   /** R33: the PDF in the layout on screen, saved as a file named after the invoice. */
   download(inv: InvoiceDetail): void {
-    this.withPdf(inv, (url) => {
+    this.withPdf(inv, 'download', (url) => {
       const link = document.createElement('a');
       link.href = url;
       link.download = inv.summary.number.split('/').join('-') + '.pdf';
@@ -255,25 +256,25 @@ export class InvoiceViewComponent {
   /** R33: the PDF opens in a new tab for the browser's print dialog; the tab is opened first so a pop-up blocker allows it. */
   print(inv: InvoiceDetail): void {
     const tab = window.open('', '_blank');
-    this.withPdf(inv, (url) => {
+    this.withPdf(inv, 'print', (url) => {
       if (tab) {
         tab.location.href = url;
       }
     }, () => tab?.close());
   }
 
-  private withPdf(inv: InvoiceDetail, use: (objectUrl: string) => void, onError?: () => void): void {
-    this.busy.set(true);
+  private withPdf(inv: InvoiceDetail, action: 'print' | 'download', use: (objectUrl: string) => void, onError?: () => void): void {
+    this.pdfAction.set(action);
     this.actionError.set('');
     this.sales.invoicePdf(this.id, inv.layout).subscribe({
       next: (blob) => {
-        this.busy.set(false);
+        this.pdfAction.set(null);
         const url = URL.createObjectURL(blob);
         use(url);
         setTimeout(() => URL.revokeObjectURL(url), 60_000);
       },
       error: (e: unknown) => {
-        this.busy.set(false);
+        this.pdfAction.set(null);
         this.actionError.set(messageForError(e, this.translate));
         onError?.();
       },

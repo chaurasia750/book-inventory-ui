@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, effect, inject, input, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CompanyService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
@@ -47,6 +47,9 @@ export class CompanyImagesComponent implements OnDestroy {
   readonly logoUrl = input<string | null>(null);
   readonly signatureUrl = input<string | null>(null);
 
+  /** A picture was saved or removed; the screen reads the settings again so another tab or a later visit shows it. */
+  readonly saved = output<void>();
+
   private readonly companies = inject(CompanyService);
   private readonly translate = inject(TranslateService);
 
@@ -89,6 +92,7 @@ export class CompanyImagesComponent implements OnDestroy {
       next: () => {
         this.setPreview(kind, URL.createObjectURL(file));
         this.show(this.translate.instant('companyProfile.saved'), false);
+        this.saved.emit();
       },
       error: (e: unknown) => this.show(messageForError(e, this.translate), true),
     });
@@ -99,6 +103,7 @@ export class CompanyImagesComponent implements OnDestroy {
       next: () => {
         this.setPreview(kind, null);
         this.show(this.translate.instant('companyProfile.saved'), false);
+        this.saved.emit();
       },
       error: (e: unknown) => this.show(messageForError(e, this.translate), true),
     });

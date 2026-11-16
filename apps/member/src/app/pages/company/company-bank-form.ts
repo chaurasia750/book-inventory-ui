@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CompanyService } from '@org/api-services';
@@ -47,6 +47,9 @@ export class CompanyBankFormComponent {
   readonly companyId = input.required<string>();
   readonly bank = input.required<CompanyBankDetails>();
 
+  /** The bank account was saved; the screen reads it again so another tab or a later visit shows the saved values. */
+  readonly saved = output<void>();
+
   private readonly companies = inject(CompanyService);
   private readonly translate = inject(TranslateService);
 
@@ -89,6 +92,7 @@ export class CompanyBankFormComponent {
       next: () => {
         this.saving.set(false);
         this.show(this.translate.instant('companyProfile.saved'), false);
+        this.saved.emit();
       },
       error: (e: unknown) => {
         this.saving.set(false);

@@ -40,19 +40,19 @@ type CompanyTab = 'details' | 'images' | 'bank' | 'settings' | 'cutoffs';
         </section>
 
         <section class="overflow-hidden rounded-[10px] border border-neutral-200 bg-white dark:border-charcoal-700 dark:bg-charcoal-800">
-          <div class="flex gap-6 overflow-x-auto border-b border-neutral-200 px-4 dark:border-charcoal-700" role="tablist">
+          <div class="flex gap-6 overflow-x-auto overflow-y-hidden border-b border-neutral-200 px-4 dark:border-charcoal-700" role="tablist">
             @for (t of tabs; track t) {
               <a role="tab" [routerLink]="tabLink(t)" [attr.aria-selected]="tab() === t"
-                class="-mb-px whitespace-nowrap border-b-2 py-3 text-sm font-semibold transition-colors"
+                class="-mb-px shrink-0 whitespace-nowrap border-b-2 py-3 text-sm font-semibold transition-colors"
                 [ngClass]="tab() === t ? 'border-gold-500 text-primary-fg' : 'border-transparent text-gray-500 hover:text-primary-fg'">{{ 'companyProfile.tabs.' + t | translate }}</a>
             }
           </div>
           <div class="p-4">
             @switch (tab()) {
-              @case ('details') { <app-company-details-form [companyId]="id()" [profile]="profile()!" /> }
-              @case ('images') { <app-company-images [companyId]="id()" [logoUrl]="ident.logoUrl" [signatureUrl]="ident.signatureUrl" /> }
-              @case ('bank') { <app-company-bank-form [companyId]="id()" [bank]="ident.bank" /> }
-              @case ('settings') { <app-company-invoice-settings [companyId]="id()" [settings]="ident.invoice" /> }
+              @case ('details') { <app-company-details-form [companyId]="id()" [profile]="profile()!" (saved)="refresh()" /> }
+              @case ('images') { <app-company-images [companyId]="id()" [logoUrl]="ident.logoUrl" [signatureUrl]="ident.signatureUrl" (saved)="refresh()" /> }
+              @case ('bank') { <app-company-bank-form [companyId]="id()" [bank]="ident.bank" (saved)="refresh()" /> }
+              @case ('settings') { <app-company-invoice-settings [companyId]="id()" [settings]="ident.invoice" (saved)="refresh()" /> }
               @case ('cutoffs') { <app-session-cut-offs /> }
             }
           </div>
@@ -83,6 +83,16 @@ export class CompanyProfileComponent {
 
   constructor() {
     this.load();
+  }
+
+  /** After a section was saved: read the profile and the invoice identity again, without the loading skeleton, so the next visit of any tab shows the saved values. */
+  refresh(): void {
+    forkJoin({ profile: this.companies.profile(), identity: this.companies.invoiceIdentity() }).subscribe({
+      next: (r) => {
+        this.profile.set(r.profile);
+        this.identity.set(r.identity);
+      },
+    });
   }
 
   load(): void {
