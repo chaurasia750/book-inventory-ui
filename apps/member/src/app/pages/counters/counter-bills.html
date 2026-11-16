@@ -46,51 +46,76 @@
         </div>
       }
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
-            <tr>
-              <th class="px-4 py-3 font-semibold">{{ 'counter.bill.number' | translate }}</th>
-              <th class="px-4 py-3 font-semibold">{{ 'counter.bill.date' | translate }}</th>
-              <th class="px-4 py-3 font-semibold">{{ 'counter.bill.student' | translate }}</th>
-              <th class="px-4 py-3 font-semibold">{{ 'counter.bills.counter' | translate }}</th>
-              <th class="px-4 py-3 text-right font-semibold">{{ 'sales.totals.grandTotal' | translate }}</th>
-              <th class="px-4 py-3 font-semibold">{{ 'counter.bill.status' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            @if (loading() && !result()) {
-              @for (i of skeletonRows; track i) {
-                <tr>
-                  <td class="px-4 py-3"><app-skeleton-loader width="9rem" /></td>
-                  <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
-                  <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
-                  <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
-                  <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
-                  <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
-                </tr>
-              }
-            } @else {
-              @for (bill of result()?.items ?? []; track bill.id) {
-                <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" [class.bg-gold-50]="bill.id === selectedId()" (click)="openView(bill.id)" (keydown.enter)="openView(bill.id)" tabindex="0">
-                  <td class="px-4 py-3 font-mono text-xs font-medium text-primary-fg">{{ bill.number }}</td>
-                  <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ bill.billDate }}</td>
-                  <td class="px-4 py-3 text-gray-700"><div>{{ bill.studentName }}</div><div class="text-xs text-gray-500">{{ bill.className }}</div></td>
-                  <td class="px-4 py-3 text-gray-600"><div>{{ bill.schoolName }}</div></td>
-                  <td class="px-4 py-3 text-right font-mono">{{ bill.grandTotal | number: '1.2-2' }}</td>
-                  <td class="px-4 py-3">
-                    <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(bill.status)">{{ 'counter.billStatus.' + bill.status | translate }}</span>
-                  </td>
-                </tr>
-              } @empty {
-                @if (!loadError()) {
-                  <tr><td [attr.colspan]="6" class="py-10 text-center text-sm text-gray-400">{{ 'counter.bills.empty' | translate }}</td></tr>
+      @if (hasPanel()) {
+        <ul class="m-0 list-none divide-y divide-neutral-100 p-0 dark:divide-charcoal-700">
+          @if (loading() && !result()) {
+            @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
+          } @else {
+            @for (bill of result()?.items ?? []; track bill.id) {
+              <li [class.bg-gold-50]="bill.id === selectedId()">
+                <button type="button" (click)="openView(bill.id)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700" [attr.aria-current]="bill.id === selectedId() ? 'true' : null">
+                  <span class="min-w-0 flex-1">
+                    <span class="block whitespace-nowrap font-mono text-xs font-medium text-primary-fg">{{ bill.number }}</span>
+                    <span class="block truncate text-xs text-gray-500">{{ bill.studentName }} · {{ bill.className }}</span>
+                  </span>
+                  <span class="shrink-0 text-right">
+                    <span class="block font-mono text-sm" [class.line-through]="bill.status === 'CANCELLED'">{{ bill.grandTotal | number: '1.2-2' }}</span>
+                    <span class="block text-[11px] text-gray-500">{{ bill.billDate | date: 'dd MMM yy' }}</span>
+                  </span>
+                </button>
+              </li>
+            } @empty {
+              @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'counter.bills.empty' | translate }}</li> }
+            }
+          }
+        </ul>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.bill.number' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.bill.student' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.bills.counter' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.bill.date' | translate }}</th>
+                <th class="px-4 py-3 font-semibold">{{ 'counter.bill.status' | translate }}</th>
+                <th class="px-4 py-3 text-right font-semibold">{{ 'sales.totals.grandTotal' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @if (loading() && !result()) {
+                @for (i of skeletonRows; track i) {
+                  <tr>
+                    <td class="px-4 py-3"><app-skeleton-loader width="9rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                    <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                  </tr>
+                }
+              } @else {
+                @for (bill of result()?.items ?? []; track bill.id) {
+                  <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="openView(bill.id)" (keydown.enter)="openView(bill.id)" tabindex="0">
+                    <td class="whitespace-nowrap px-4 py-3 font-mono text-xs font-medium text-primary-fg">{{ bill.number }}</td>
+                    <td class="px-4 py-3 text-gray-700"><div>{{ bill.studentName }}</div><div class="text-xs text-gray-500">{{ bill.className }}</div></td>
+                    <td class="px-4 py-3 text-gray-600">{{ bill.schoolName }}</td>
+                    <td class="whitespace-nowrap px-4 py-3 text-gray-600">{{ bill.billDate | date: 'dd MMM yy' }}</td>
+                    <td class="px-4 py-3">
+                      <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(bill.status)">{{ 'counter.billStatus.' + bill.status | translate }}</span>
+                    </td>
+                    <td class="whitespace-nowrap px-4 py-3 text-right font-mono" [class.line-through]="bill.status === 'CANCELLED'">{{ bill.grandTotal | number: '1.2-2' }}</td>
+                  </tr>
+                } @empty {
+                  @if (!loadError()) {
+                    <tr><td [attr.colspan]="6" class="py-10 text-center text-sm text-gray-400">{{ 'counter.bills.empty' | translate }}</td></tr>
+                  }
                 }
               }
-            }
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      }
 
       <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
     </div>

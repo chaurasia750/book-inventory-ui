@@ -118,6 +118,13 @@ export class CounterBillingComponent {
   readonly categoryOpen = signal<ItemCategory | null>(null);
   readonly categoryRows = signal<CategoryRow[]>([]);
   readonly categoryLoading = signal(false);
+  /** The search box of the category dialog and how many items were added since it opened (the dialog stays open for the next one). */
+  readonly categoryQuery = signal('');
+  readonly categoryAdded = signal(0);
+  readonly shownCategoryRows = computed(() => {
+    const needle = this.categoryQuery().trim().toLowerCase();
+    return needle ? this.categoryRows().filter((r) => r.item.name.toLowerCase().includes(needle) || r.item.code.toLowerCase().includes(needle)) : this.categoryRows();
+  });
 
   readonly closed = computed(() => this.counter()?.status === 'CLOSED');
   readonly classNames = computed(() => this.school()?.classes.map((c) => c.name) ?? []);
@@ -239,6 +246,8 @@ export class CounterBillingComponent {
   /** R43: the category buttons list the active items of one category (the ones without a barcode); a click adds one. */
   openCategory(category: ItemCategory): void {
     this.categoryOpen.set(category);
+    this.categoryQuery.set('');
+    this.categoryAdded.set(0);
     this.categoryRows.set([]);
     this.categoryLoading.set(true);
     forkJoin({
@@ -259,8 +268,12 @@ export class CounterBillingComponent {
   }
 
   pickCategoryItem(row: CategoryRow): void {
-    this.categoryOpen.set(null);
+    this.categoryAdded.update((n) => n + 1);
     this.addItem(row.item);
+  }
+
+  closeCategory(): void {
+    this.categoryOpen.set(null);
   }
 
   /** R43, AC38: the whole class book list of the student's class, one line per book with its per-student quantity. */

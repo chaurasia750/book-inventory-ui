@@ -41,13 +41,16 @@
       }
     </section>
   } @else {
-    @if (counter(); as c) {
-      <section class="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-[10px] border border-neutral-200 bg-white px-4 py-3 text-sm dark:border-charcoal-700 dark:bg-charcoal-800">
-        <span class="font-semibold text-primary-fg">{{ c.name }}</span>
-        <span class="text-gray-500">{{ c.schoolName || '-' }}</span>
-        <span class="text-gray-500">{{ 'counter.fields.session' | translate }}: <span class="font-mono">{{ c.session }}</span></span>
-      </section>
-    }
+    <section class="rounded-[10px] border border-neutral-200 bg-white px-4 py-3 dark:border-charcoal-700 dark:bg-charcoal-800">
+      @if (counter(); as c) {
+        <div class="mb-3 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm">
+          <span class="font-semibold text-primary-fg">{{ c.name }}</span>
+          <span class="text-gray-500">{{ c.schoolName || '-' }}</span>
+          <span class="text-gray-500">{{ 'counter.fields.session' | translate }}: <span class="font-mono">{{ c.session }}</span></span>
+        </div>
+      }
+      <app-counter-student-box [schoolId]="counter()?.schoolId ?? ''" [classes]="classNames()" (changed)="onStudent($event)" />
+    </section>
 
     @if (error()) {
       <p class="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">{{ error() }}</p>
@@ -55,11 +58,6 @@
     @if (notice()) {
       <p class="rounded-xl border border-brand-200 bg-brand-50 p-3 text-sm text-brand-700" role="status">{{ notice() }}</p>
     }
-
-    <section class="rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800">
-      <h2 class="m-0 mb-3 text-sm font-semibold text-primary-fg">{{ 'counter.student.title' | translate }}</h2>
-      <app-counter-student-box [schoolId]="counter()?.schoolId ?? ''" [classes]="classNames()" (changed)="onStudent($event)" />
-    </section>
 
     <div class="grid gap-3 lg:grid-cols-[1fr_320px]">
       <div class="flex flex-col gap-3">
@@ -96,7 +94,7 @@
                 <tr>
                   <td class="px-3 py-2">
                     <span class="font-medium text-primary-fg">{{ line.name }}</span>
-                    <span class="font-mono text-gray-500">{{ line.code }}</span>
+                    <span class="ml-1 font-mono text-gray-500">{{ line.code }}</span>
                     <span class="block text-[11px] text-gray-400">{{ line.versionName }}</span>
                   </td>
                   <td class="px-3 py-2 text-right font-mono">{{ line.mrp | number: '1.2-2' }}</td>
@@ -136,7 +134,7 @@
         </section>
       </div>
 
-      <aside class="flex flex-col gap-3">
+      <aside class="flex flex-col gap-3 lg:sticky lg:top-4 lg:self-start">
         <section class="rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800">
           <app-sale-totals [totals]="calc().totals" [gstMode]="gstMode()" />
 
@@ -175,15 +173,17 @@
                 <input id="cb-upi-ref" type="text" maxlength="50" [value]="upiRef()" (input)="upiRef.set($any($event.target).value)" class="flex-1 rounded-lg border border-gray-300 px-2 py-1 text-sm" />
               </div>
             }
-            <p class="m-0 text-sm" [class]="difference() === 0 ? 'text-emerald-700' : 'text-amber-700'" role="status">
-              @if (difference() > 0.004) {
-                {{ 'counter.billing.short' | translate }}: <span class="font-mono font-semibold">{{ difference() | number: '1.2-2' }}</span>
-              } @else if (difference() < -0.004) {
-                {{ 'counter.billing.excess' | translate }}: <span class="font-mono font-semibold">{{ -difference() | number: '1.2-2' }}</span>
-              } @else {
-                {{ 'counter.billing.paidInFull' | translate }}
-              }
-            </p>
+            @if (lines().length > 0) {
+              <p class="m-0 text-sm" [class]="difference() === 0 ? 'text-emerald-700' : 'text-amber-700'" role="status">
+                @if (difference() > 0.004) {
+                  {{ 'counter.billing.short' | translate }}: <span class="font-mono font-semibold">{{ difference() | number: '1.2-2' }}</span>
+                } @else if (difference() < -0.004) {
+                  {{ 'counter.billing.excess' | translate }}: <span class="font-mono font-semibold">{{ -difference() | number: '1.2-2' }}</span>
+                } @else {
+                  {{ 'counter.billing.paidInFull' | translate }}
+                }
+              </p>
+            }
           </div>
           <app-button class="mt-3 block" [loading]="saving()" [disabled]="!canSave()" (clicked)="save()">{{ 'counter.billing.save' | translate }}</app-button>
         </section>
@@ -192,23 +192,45 @@
   }
 </div>
 
-<app-modal [open]="categoryOpen() !== null" [title]="'counter.billing.pickCategory' | translate" (closed)="categoryOpen.set(null)">
-  @if (categoryLoading()) {
-    <div class="space-y-2"><app-skeleton-loader width="100%" /><app-skeleton-loader width="80%" /></div>
-  } @else {
-    <ul class="m-0 max-h-96 list-none divide-y divide-neutral-100 overflow-auto p-0 dark:divide-charcoal-700">
-      @for (row of categoryRows(); track row.item.id) {
-        <li class="flex items-center gap-3 py-2">
-          <span class="min-w-0 flex-1">
-            <span class="block truncate text-sm font-medium text-primary-fg">{{ row.item.name }}</span>
-            <span class="font-mono text-xs text-gray-500">{{ row.item.code }}</span>
-          </span>
-          <span class="font-mono text-sm">{{ row.mrp === null ? '-' : (row.mrp | number: '1.2-2') }}</span>
-          <app-button size="sm" (clicked)="pickCategoryItem(row)">{{ 'counter.billing.add' | translate }}</app-button>
-        </li>
-      } @empty {
-        <li class="py-8 text-center text-sm text-gray-400">{{ 'counter.billing.noCategoryItems' | translate }}</li>
+<app-modal size="wide" [open]="categoryOpen() !== null" [title]="categoryOpen() ? (('item.category.' + categoryOpen()) | translate) : ''" (closed)="closeCategory()">
+  <div class="space-y-3">
+    <div class="flex flex-wrap items-center gap-2">
+      <input type="search" autocomplete="off" [value]="categoryQuery()" (input)="categoryQuery.set($any($event.target).value)"
+        [placeholder]="'counter.billing.searchCategory' | translate" [attr.aria-label]="'counter.billing.searchCategory' | translate"
+        class="h-10 min-w-[10rem] flex-1 rounded-lg border border-gray-300 bg-white px-2 text-sm focus:border-brand-500 focus:outline-none" />
+      @if (categoryAdded() > 0) {
+        <span class="text-xs font-semibold text-emerald-700" role="status">{{ 'counter.billing.addedCount' | translate: { n: categoryAdded() } }}</span>
       }
-    </ul>
-  }
+    </div>
+    @if (categoryLoading()) {
+      <div class="space-y-2"><app-skeleton-loader width="100%" /><app-skeleton-loader width="80%" /></div>
+    } @else {
+      <div class="max-h-96 overflow-auto rounded-lg border border-neutral-200 dark:border-charcoal-700">
+        <table class="w-full text-left text-xs">
+          <thead class="sticky top-0 bg-neutral-50 text-[11px] uppercase tracking-[0.05em] text-gray-500 dark:bg-charcoal-900">
+            <tr>
+              <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
+              <th class="px-3 py-2 text-right font-semibold">MRP</th>
+              <th class="px-3 py-2"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-neutral-100 dark:divide-charcoal-700">
+            @for (row of shownCategoryRows(); track row.item.id) {
+              <tr>
+                <td class="px-3 py-1.5"><span class="font-medium text-primary-fg">{{ row.item.name }}</span> <span class="ml-1 font-mono text-gray-500">{{ row.item.code }}</span></td>
+                <td class="px-3 py-1.5 text-right font-mono">{{ row.mrp === null ? '-' : (row.mrp | number: '1.2-2') }}</td>
+                <td class="px-3 py-1.5 text-right">
+                  <button type="button" (click)="pickCategoryItem(row)" [disabled]="row.mrp === null"
+                    class="rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40">{{ 'counter.billing.add' | translate }}</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="3" class="py-6 text-center text-sm text-gray-400">{{ 'counter.billing.noCategoryItems' | translate }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    <div class="flex justify-end"><app-button (clicked)="closeCategory()">{{ 'counter.billing.done' | translate }}</app-button></div>
+  </div>
 </app-modal>

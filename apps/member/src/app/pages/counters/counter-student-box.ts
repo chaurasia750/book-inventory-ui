@@ -13,6 +13,7 @@ export interface StudentSelection {
   displayName: string;
 }
 
+const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500';
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 const PAUSE_MS = 250;
 
@@ -27,9 +28,9 @@ const PAUSE_MS = 250;
   imports: [ReactiveFormsModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="grid gap-3 sm:grid-cols-2">
-      <div class="relative sm:col-span-2">
-        <label for="csb-name" class="mb-1 block text-sm font-semibold">{{ 'counter.student.name' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
+    <div class="grid gap-x-3 gap-y-2 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1.2fr]">
+      <div class="relative sm:col-span-2 lg:col-span-1">
+        <label for="csb-name" class="${LABEL}">{{ 'counter.student.name' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
         <input #box id="csb-name" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="csb-suggestions" [attr.aria-expanded]="suggestions().length > 0"
           [formControl]="name" (input)="onInput(box.value)" (keydown.escape)="close()" [placeholder]="'counter.student.nameHint' | translate" [class]="field" />
         @if (picked(); as p) {
@@ -56,22 +57,22 @@ const PAUSE_MS = 250;
 
       @if (!picked()) {
         <div>
-          <label for="csb-class" class="mb-1 block text-sm font-semibold">{{ 'counter.student.class' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
+          <label for="csb-class" class="${LABEL}">{{ 'counter.student.class' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
           <select id="csb-class" [formControl]="className" [class]="field">
             <option value="">{{ 'counter.student.noClass' | translate }}</option>
             @for (c of classes(); track c) { <option [value]="c">{{ c }}</option> }
           </select>
         </div>
         <div>
-          <label for="csb-section" class="mb-1 block text-sm font-semibold">{{ 'counter.student.section' | translate }}</label>
+          <label for="csb-section" class="${LABEL}">{{ 'counter.student.section' | translate }}</label>
           <input id="csb-section" type="text" [formControl]="section" [class]="field" />
         </div>
         <div>
-          <label for="csb-roll" class="mb-1 block text-sm font-semibold">{{ 'counter.student.roll' | translate }}</label>
+          <label for="csb-roll" class="${LABEL}">{{ 'counter.student.roll' | translate }}</label>
           <input id="csb-roll" type="text" [formControl]="roll" [class]="field" />
         </div>
         <div>
-          <label for="csb-mobile" class="mb-1 block text-sm font-semibold">{{ 'counter.student.parentMobile' | translate }}</label>
+          <label for="csb-mobile" class="${LABEL}">{{ 'counter.student.parentMobile' | translate }}</label>
           <input id="csb-mobile" type="tel" [formControl]="mobile" [class]="field" />
         </div>
       }

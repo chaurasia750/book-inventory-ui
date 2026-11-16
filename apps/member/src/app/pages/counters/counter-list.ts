@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -16,7 +17,7 @@ import { CounterEditComponent } from './counter-edit';
 
 const PAGE_SIZE = 20;
 const SCHOOL_CHOICES = 200;
-const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
+const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
 
 /**
  * The list of the company's counters (sales spec R38, R39, R49): search by name and school, filters by school, session and status,
@@ -27,6 +28,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
   selector: 'app-counter-list',
   standalone: true,
   imports: [
+    DatePipe,
     ReactiveFormsModule,
     TranslatePipe,
     ButtonComponent,

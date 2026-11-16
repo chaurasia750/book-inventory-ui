@@ -41,15 +41,14 @@
             @for (i of skeletonRows; track i) { <li class="px-4 py-3"><app-skeleton-loader width="100%" /></li> }
           } @else {
             @for (counter of result()?.items ?? []; track counter.id) {
-              <li class="flex items-center gap-2 px-4 py-3 transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700" [class.bg-gold-50]="counter.id === selectedId()">
-                <button type="button" (click)="openView(counter.id)" class="flex min-w-0 flex-1 items-center gap-3 text-left" [attr.aria-current]="counter.id === selectedId() ? 'true' : null">
+              <li [class.bg-gold-50]="counter.id === selectedId()">
+                <button type="button" (click)="openView(counter.id)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700" [attr.aria-current]="counter.id === selectedId() ? 'true' : null">
                   <span class="min-w-0 flex-1">
                     <span class="block truncate text-sm font-medium text-primary-fg">{{ counter.name }}</span>
                     <span class="block truncate text-xs text-gray-500">{{ counter.schoolName || '-' }} · <span class="font-mono">{{ counter.session }}</span></span>
                   </span>
                   <span class="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium" [class]="statusClass(counter.status)">{{ 'counter.status.' + counter.status | translate }}</span>
                 </button>
-                <app-button size="sm" variant="secondary" (clicked)="openBilling(counter.id)">{{ 'counter.openBilling' | translate }}</app-button>
               </li>
             } @empty {
               @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'counter.empty' | translate }}</li> }
@@ -67,7 +66,6 @@
                 <th class="px-4 py-3 font-semibold">{{ 'counter.columns.startDate' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'counter.columns.endDate' | translate }}</th>
                 <th class="px-4 py-3 font-semibold">{{ 'counter.columns.status' | translate }}</th>
-                <th class="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -80,7 +78,6 @@
                     <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
                     <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
                     <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
-                    <td class="px-4 py-3"></td>
                   </tr>
                 }
               } @else {
@@ -88,19 +85,16 @@
                   <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" (click)="openView(counter.id)" (keydown.enter)="openView(counter.id)" tabindex="0">
                     <td class="px-4 py-3 font-medium text-primary-fg">{{ counter.name }}</td>
                     <td class="px-4 py-3 text-gray-600"><div>{{ counter.schoolName || '-' }}</div><div class="font-mono text-xs text-gray-500">{{ counter.schoolCode || '' }}</div></td>
-                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ counter.session }}</td>
-                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ counter.startDate }}</td>
-                    <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ counter.endDate || '-' }}</td>
+                    <td class="whitespace-nowrap px-4 py-3 text-gray-600">{{ counter.session }}</td>
+                    <td class="whitespace-nowrap px-4 py-3 text-gray-600">{{ counter.startDate | date: 'dd MMM yy' }}</td>
+                    <td class="whitespace-nowrap px-4 py-3 text-gray-600">{{ counter.endDate ? (counter.endDate | date: 'dd MMM yy') : '-' }}</td>
                     <td class="px-4 py-3">
                       <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(counter.status)">{{ 'counter.status.' + counter.status | translate }}</span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <app-button size="sm" variant="secondary" (clicked)="openBilling(counter.id); $event.stopPropagation()">{{ 'counter.openBilling' | translate }}</app-button>
                     </td>
                   </tr>
                 } @empty {
                   @if (!loadError()) {
-                    <tr><td [attr.colspan]="7" class="py-10 text-center text-sm text-gray-400">{{ 'counter.empty' | translate }}</td></tr>
+                    <tr><td [attr.colspan]="6" class="py-10 text-center text-sm text-gray-400">{{ 'counter.empty' | translate }}</td></tr>
                   }
                 }
               }

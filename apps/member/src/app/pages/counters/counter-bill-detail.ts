@@ -91,7 +91,7 @@ import { SaleTotalsComponent } from '../sales/sale-totals';
             <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
               @for (line of b.lines; track line.itemId + line.priceVersionName) {
                 <tr>
-                  <td class="px-3 py-2"><span class="font-medium text-primary-fg">{{ line.itemName }}</span> <span class="font-mono text-gray-500">{{ line.itemCode }}</span></td>
+                  <td class="px-3 py-2"><span class="font-medium text-primary-fg">{{ line.itemName }}</span> <span class="ml-1 font-mono text-gray-500">{{ line.itemCode }}</span></td>
                   <td class="px-3 py-2 text-right font-mono">{{ line.mrpAmount | number: '1.2-2' }}</td>
                   <td class="px-3 py-2 text-right">{{ line.quantity }}</td>
                   <td class="px-3 py-2 text-right font-mono">{{ line.itemDiscountAmount | number: '1.2-2' }}</td>
