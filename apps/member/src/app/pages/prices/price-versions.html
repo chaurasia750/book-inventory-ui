@@ -58,10 +58,10 @@
                   }
                 </td>
                 <td class="px-4 py-3 text-gray-600">{{ v.effectiveFrom | date: 'dd MMM yyyy' }}</td>
-                <td class="px-4 py-3 text-right font-mono">{{ v.mrpAmount | number: '1.2-2' }}</td>
-                <td class="px-4 py-3 text-right font-mono">{{ v.saleAmount | number: '1.2-2' }}</td>
+                <td class="px-4 py-3 text-right font-mono">{{ v.mrpAmount | inr }}</td>
+                <td class="px-4 py-3 text-right font-mono">{{ v.saleAmount | inr }}</td>
                 @if (canEdit) {
-                  <td class="px-4 py-3 text-right font-mono">{{ (v.purchaseAmount ?? 0) | number: '1.2-2' }}</td>
+                  <td class="px-4 py-3 text-right font-mono">{{ (v.purchaseAmount ?? 0) | inr }}</td>
                   <td class="px-4 py-3">
                     <div class="flex justify-end gap-2">
                       <app-button size="sm" variant="secondary" (clicked)="openEdit(v)">{{ 'price.edit.button' | translate }}</app-button>

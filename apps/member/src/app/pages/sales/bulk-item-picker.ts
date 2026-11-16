@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { DecimalPipe } from '@angular/common';
 import { catchError, debounceTime, distinctUntilChanged, forkJoin, of } from 'rxjs';
 import { ItemService, PriceService, StockService, VendorService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ITEM_CATEGORIES, ItemCategory, ItemSummary, VendorSummary } from '@org/shared-models';
 import { ButtonComponent, ModalComponent } from '@org/ui';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 /** What the picker hands back: the ticked items and, when asked, one quantity and class for all of them. */
 export interface BulkPick {
@@ -27,7 +27,7 @@ const FIELD = 'h-10 rounded-lg border border-gray-300 bg-white px-2 text-sm focu
 @Component({
   selector: 'app-bulk-item-picker',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe, TranslatePipe, ButtonComponent, ModalComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, ModalComponent, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal size="wide" [open]="open()" [title]="'sales.bulk.title' | translate" (closed)="closed.emit()">
@@ -58,7 +58,7 @@ const FIELD = 'h-10 rounded-lg border border-gray-300 bg-white px-2 text-sm focu
                 <th class="px-3 py-2 font-semibold">{{ 'item.columns.className' | translate }}</th>
                 <th class="px-3 py-2 font-semibold">{{ 'item.columns.vendor' | translate }}</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'item.fields.gstRate' | translate }}</th>
-                <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }}</th>
+                <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }} (₹)</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.entry.stock' | translate }}</th>
               </tr>
             </thead>
@@ -71,7 +71,7 @@ const FIELD = 'h-10 rounded-lg border border-gray-300 bg-white px-2 text-sm focu
                   <td class="px-3 py-1.5 text-gray-600">{{ it.className || '-' }}</td>
                   <td class="px-3 py-1.5 text-gray-600">{{ it.vendorName || '-' }}</td>
                   <td class="px-3 py-1.5 text-right font-mono text-gray-600">{{ it.gstRatePercent }}%</td>
-                  <td class="px-3 py-1.5 text-right font-mono">{{ rateOf(it.id) === null ? '-' : (rateOf(it.id) | number: '1.2-2') }}</td>
+                  <td class="px-3 py-1.5 text-right font-mono">{{ rateOf(it.id) === null ? '-' : (rateOf(it.id) | inr) }}</td>
                   <td class="px-3 py-1.5 text-right font-mono" [class.text-red-600]="stockOf(it) !== null && stockOf(it)! <= 0">{{ stockOf(it) ?? '-' }}</td>
                 </tr>
               } @empty {

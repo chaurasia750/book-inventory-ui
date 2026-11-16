@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { catchError, concatMap, from, map, of, toArray } from 'rxjs';
@@ -17,6 +16,9 @@ import {
   proofFileError,
 } from '@org/shared-models';
 import { ButtonComponent, DatePickerComponent, SidePanelComponent } from '@org/ui';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
+import { MoneyPrefixComponent } from '../counters/money-prefix';
 
 interface ModeRow {
   type: PaymentModeType;
@@ -42,7 +44,7 @@ const money = (value: number): number => Math.round(value * 100) / 100;
 @Component({
   selector: 'app-receive-payment-dialog',
   standalone: true,
-  imports: [DecimalPipe, FormsModule, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SidePanelComponent],
+  imports: [FormsModule, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SidePanelComponent, MoneyPipe, IndianCurrencyPipe, MoneyPrefixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-side-panel [isOpen]="open()" panelWidth="min(760px, 100vw)" [title]="'payment.receive.title' | translate" (closed)="close()">
@@ -50,8 +52,8 @@ const money = (value: number): number => Math.round(value * 100) / 100;
         <div class="space-y-4 text-sm" role="status">
           <p class="m-0 font-semibold text-primary-fg">{{ 'payment.receive.done' | translate: { number: done.summary.number } }}</p>
           <p class="m-0 text-gray-600">
-            {{ 'payment.detail.total' | translate }}: <span class="font-mono">{{ done.summary.totalAmount | number: '1.2-2' }}</span>
-            · {{ 'payment.detail.advance' | translate }}: <span class="font-mono">{{ done.advanceAmount | number: '1.2-2' }}</span>
+            {{ 'payment.detail.total' | translate }}: <span class="font-mono">{{ done.summary.totalAmount | money }}</span>
+            · {{ 'payment.detail.advance' | translate }}: <span class="font-mono">{{ done.advanceAmount | money }}</span>
           </p>
           @if (proofFailures().length > 0) {
             <div class="rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700" role="alert">
@@ -73,7 +75,7 @@ const money = (value: number): number => Math.round(value * 100) / 100;
           <div class="rounded-lg border border-neutral-200 p-3 dark:border-charcoal-700">
             <p class="m-0 text-sm">
               {{ 'payment.receive.balance' | translate }}:
-              <span class="font-mono font-semibold" [class.text-green-700]="d.balance < 0">{{ d.balance | number: '1.2-2' }}</span>
+              <span class="font-mono font-semibold" [class.text-green-700]="d.balance < 0">{{ d.balance | money }}</span>
               @if (d.balance < 0) { <span class="text-xs text-gray-500">({{ 'payment.receive.advanceHint' | translate }})</span> }
             </p>
             @if (d.openInvoices.length === 0) {
@@ -93,14 +95,14 @@ const money = (value: number): number => Math.round(value * 100) / 100;
                     @for (o of d.openInvoices; track o.invoiceId) {
                       <tr>
                         <td class="py-1 pr-3 font-mono">{{ o.number }}</td>
-                        <td class="py-1 pr-3 text-right font-mono">{{ o.grandTotal | number: '1.2-2' }}</td>
-                        <td class="py-1 pr-3 text-right font-mono">{{ o.due | number: '1.2-2' }}</td>
+                        <td class="py-1 pr-3 text-right font-mono">{{ o.grandTotal | inr }}</td>
+                        <td class="py-1 pr-3 text-right font-mono">{{ o.due | inr }}</td>
                         <td class="py-1 text-right">
                           @if (manual()) {
-                            <input type="number" min="0" step="0.01" [value]="manualAmounts()[o.invoiceId] ?? ''" (input)="setManual(o.invoiceId, $any($event.target).value)"
-                              [attr.aria-label]="o.number" class="h-8 w-28 rounded border border-gray-300 px-2 text-right text-xs" />
+                            <app-money-prefix [inline]="true"><input type="number" min="0" step="0.01" [value]="manualAmounts()[o.invoiceId] ?? ''" (input)="setManual(o.invoiceId, $any($event.target).value)"
+                              [attr.aria-label]="o.number" class="h-8 w-28 rounded border border-gray-300 px-2 text-right text-xs" /></app-money-prefix>
                           } @else {
-                            <span class="font-mono">{{ preview()[o.invoiceId] ?? 0 | number: '1.2-2' }}</span>
+                            <span class="font-mono">{{ preview()[o.invoiceId] ?? 0 | inr }}</span>
                           }
                         </td>
                       </tr>
@@ -127,7 +129,7 @@ const money = (value: number): number => Math.round(value * 100) / 100;
                 </div>
                 <div>
                   <label [for]="'pm-amount-' + i" [class]="label">{{ 'payment.receive.amount' | translate }}</label>
-                  <input [id]="'pm-amount-' + i" type="number" min="0" step="0.01" [value]="m.amount" (input)="setMode(i, { amount: $any($event.target).value })" [class]="field + ' text-right'" />
+                  <app-money-prefix><input [id]="'pm-amount-' + i" type="number" min="0" step="0.01" [value]="m.amount" (input)="setMode(i, { amount: $any($event.target).value })" [class]="field + ' text-right'" /></app-money-prefix>
                 </div>
                 <div [class]="m.type === 'CHEQUE' ? 'grid gap-2 sm:grid-cols-3' : 'grid gap-2'">
                   @if (m.type === 'UPI' || m.type === 'BANK_TRANSFER') {
@@ -182,9 +184,9 @@ const money = (value: number): number => Math.round(value * 100) / 100;
           </div>
           <div class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-3 text-sm dark:border-charcoal-700">
             <div class="flex flex-wrap gap-x-5 gap-y-1">
-              <span>{{ 'payment.detail.total' | translate }}: <span class="font-mono font-semibold">{{ total() | number: '1.2-2' }}</span></span>
-              <span>{{ 'payment.receive.applied' | translate }}: <span class="font-mono">{{ applied() | number: '1.2-2' }}</span></span>
-              <span>{{ 'payment.detail.advance' | translate }}: <span class="font-mono" [class.text-red-600]="advance() < 0">{{ advance() | number: '1.2-2' }}</span></span>
+              <span>{{ 'payment.detail.total' | translate }}: <span class="font-mono font-semibold">{{ total() | money }}</span></span>
+              <span>{{ 'payment.receive.applied' | translate }}: <span class="font-mono">{{ applied() | money }}</span></span>
+              <span>{{ 'payment.detail.advance' | translate }}: <span class="font-mono" [class.text-red-600]="advance() < 0">{{ advance() | money }}</span></span>
             </div>
             <div class="flex gap-2">
               <app-button variant="secondary" (clicked)="close()">{{ 'users.cancel' | translate }}</app-button>

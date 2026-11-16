@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
@@ -9,6 +8,8 @@ import { CounterBill, SaleTotals } from '@org/shared-models';
 import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { SaleTotalsComponent } from '../sales/sale-totals';
+import { IndianCurrencyPipe } from './indian-currency.pipe';
+import { MoneyPipe } from './money.pipe';
 
 /**
  * One counter bill in the panel beside the bills list (sales spec R47, R49, R51): its number, date, counter, school, the student with
@@ -19,7 +20,7 @@ import { SaleTotalsComponent } from '../sales/sale-totals';
 @Component({
   selector: 'app-counter-bill-detail',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, SaleTotalsComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, SaleTotalsComponent, MoneyPipe, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
@@ -82,9 +83,9 @@ import { SaleTotalsComponent } from '../sales/sale-totals';
             <thead class="bg-neutral-50 text-[11px] uppercase tracking-[0.05em] text-gray-500 dark:bg-charcoal-900">
               <tr>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
-                <th class="px-3 py-2 text-right font-semibold">MRP</th>
+                <th class="px-3 py-2 text-right font-semibold">MRP (₹)</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
-                <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }}</th>
+                <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.discount' | translate }} (₹)</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
               </tr>
             </thead>
@@ -92,10 +93,10 @@ import { SaleTotalsComponent } from '../sales/sale-totals';
               @for (line of b.lines; track line.itemId + line.priceVersionName) {
                 <tr>
                   <td class="px-3 py-2"><span class="font-medium text-primary-fg">{{ line.itemName }}</span> <span class="ml-1 font-mono text-gray-500">{{ line.itemCode }}</span></td>
-                  <td class="px-3 py-2 text-right font-mono">{{ line.mrpAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ line.mrpAmount | inr }}</td>
                   <td class="px-3 py-2 text-right">{{ line.quantity }}</td>
-                  <td class="px-3 py-2 text-right font-mono">{{ line.itemDiscountAmount | number: '1.2-2' }}</td>
-                  <td class="px-3 py-2 text-right font-mono">{{ line.lineAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ line.itemDiscountAmount | inr }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ line.lineAmount | inr }}</td>
                 </tr>
               }
             </tbody>
@@ -112,7 +113,7 @@ import { SaleTotalsComponent } from '../sales/sale-totals';
               @for (payment of b.payments; track payment.mode) {
                 <div class="flex justify-between">
                   <dt class="text-gray-500">{{ 'counter.billing.' + (payment.mode === 'CASH' ? 'cash' : 'upi') | translate }}@if (payment.reference) { <span class="text-xs"> · {{ payment.reference }}</span> }</dt>
-                  <dd class="font-mono">{{ payment.amount | number: '1.2-2' }}</dd>
+                  <dd class="font-mono">{{ payment.amount | money }}</dd>
                 </div>
               }
             </dl>

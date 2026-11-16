@@ -45,7 +45,7 @@
                     <span class="block truncate text-sm font-medium text-primary-fg">{{ row.itemName }}</span>
                     <span class="block font-mono text-xs text-gray-500">{{ row.itemCode }}</span>
                   </span>
-                  <span class="font-mono text-xs text-gray-600">{{ row.defaultVersion ? (row.defaultVersion.saleAmount | number: '1.2-2') : '-' }}</span>
+                  <span class="font-mono text-xs text-gray-600">{{ row.defaultVersion ? (row.defaultVersion.saleAmount | money) : '-' }}</span>
                 </button>
               </li>
             } @empty {
@@ -89,10 +89,10 @@
                     <td class="px-4 py-3 font-medium text-primary-fg">{{ row.itemName }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ row.defaultVersion?.versionName || '-' }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ row.defaultVersion ? (row.defaultVersion.effectiveFrom | date: 'dd MMM yyyy') : '-' }}</td>
-                    <td class="px-4 py-3 text-right font-mono">{{ row.defaultVersion ? (row.defaultVersion.mrpAmount | number: '1.2-2') : '-' }}</td>
-                    <td class="px-4 py-3 text-right font-mono">{{ row.defaultVersion ? (row.defaultVersion.saleAmount | number: '1.2-2') : '-' }}</td>
+                    <td class="px-4 py-3 text-right font-mono">{{ row.defaultVersion ? (row.defaultVersion.mrpAmount | inr) : '-' }}</td>
+                    <td class="px-4 py-3 text-right font-mono">{{ row.defaultVersion ? (row.defaultVersion.saleAmount | inr) : '-' }}</td>
                     @if (canEdit) {
-                      <td class="px-4 py-3 text-right font-mono">{{ row.defaultVersion ? ((row.defaultVersion.purchaseAmount ?? 0) | number: '1.2-2') : '-' }}</td>
+                      <td class="px-4 py-3 text-right font-mono">{{ row.defaultVersion ? ((row.defaultVersion.purchaseAmount ?? 0) | inr) : '-' }}</td>
                     }
                   </tr>
                 } @empty {

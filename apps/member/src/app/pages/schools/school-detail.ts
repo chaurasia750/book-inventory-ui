@@ -1,4 +1,4 @@
-import { DecimalPipe, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -16,6 +16,7 @@ import { SchoolReturnsTabComponent } from '../returns/school-returns-tab';
 import { SchoolPaymentsTabComponent } from '../payment/school-payments-tab';
 import { InvoiceLayoutSettingComponent } from '../sales/invoice-layout-setting';
 import { BookListsTabComponent } from '../planning/book-lists-tab';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /** Planning section 6: the Book lists tab joins the profile tabs. */
 type ProfileTab = 'profile' | 'classes' | 'orders' | 'invoices' | 'payments' | 'bookLists' | 'ledger' | 'counters' | 'returns';
@@ -32,25 +33,7 @@ const tabPath = (tab: ProfileTab): string => (tab === 'bookLists' ? 'book-lists'
 @Component({
   selector: 'app-school-detail',
   standalone: true,
-  imports: [
-    DecimalPipe,
-    NgClass,
-    RouterLink,
-    TranslatePipe,
-    ButtonComponent,
-    CardComponent,
-    CloseButtonComponent,
-    ModalComponent,
-    SkeletonLoaderComponent,
-    LedgerStatementComponent,
-    PartyLedgerSummaryComponent,
-    SchoolDocumentsTabComponent,
-    SchoolCountersTabComponent,
-    SchoolReturnsTabComponent,
-    SchoolPaymentsTabComponent,
-    InvoiceLayoutSettingComponent,
-    BookListsTabComponent,
-  ],
+  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, LedgerStatementComponent, PartyLedgerSummaryComponent, SchoolDocumentsTabComponent, SchoolCountersTabComponent, SchoolReturnsTabComponent, SchoolPaymentsTabComponent, InvoiceLayoutSettingComponent, BookListsTabComponent, MoneyPipe],
   templateUrl: './school-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -25,6 +24,7 @@ import { OutstandingTableComponent } from '../ledger/outstanding-table';
 import { SchoolAddComponent } from './school-add';
 import { SchoolDetailComponent } from './school-detail';
 import { SchoolEditComponent } from './school-edit';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 const PAGE_SIZE = 20;
 const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -37,19 +37,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
 @Component({
   selector: 'app-school-list',
   standalone: true,
-  imports: [
-    DecimalPipe,
-    OutstandingTableComponent,
-    ReactiveFormsModule,
-    TranslatePipe,
-    ButtonComponent,
-    ListDetailComponent,
-    PaginationComponent,
-    SkeletonLoaderComponent,
-    SchoolAddComponent,
-    SchoolDetailComponent,
-    SchoolEditComponent,
-  ],
+  imports: [OutstandingTableComponent, ReactiveFormsModule, TranslatePipe, ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, SchoolAddComponent, SchoolDetailComponent, SchoolEditComponent, IndianCurrencyPipe],
   templateUrl: './school-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

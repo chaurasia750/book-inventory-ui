@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -9,6 +9,8 @@ import { ButtonComponent, DatePickerComponent, SidePanelComponent } from '@org/u
 import { AdjustAdvancePanelComponent } from './adjust-advance-panel';
 import { CancelReceiptPanelComponent } from './cancel-receipt-panel';
 import { ReceiptProofsComponent } from './receipt-proofs';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /** Today as `yyyy-MM-dd` in the browser's own time zone (the business date the Owner sees). */
 function todayIso(): string {
@@ -23,7 +25,7 @@ function todayIso(): string {
 @Component({
   selector: 'app-receipt-detail-dialog',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SidePanelComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent, ReceiptProofsComponent],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SidePanelComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent, ReceiptProofsComponent, MoneyPipe, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-side-panel [isOpen]="receiptId() !== null" panelWidth="min(760px, 100vw)" [title]="'payment.detail.title' | translate" (closed)="closed.emit()">
@@ -51,7 +53,7 @@ function todayIso(): string {
               <tr>
                 <th class="py-1 pr-3 font-semibold">{{ 'payment.receive.mode' | translate }}</th>
                 <th class="py-1 pr-3 font-semibold">{{ 'payment.detail.reference' | translate }}</th>
-                <th class="py-1 text-right font-semibold">{{ 'payment.receive.amount' | translate }}</th>
+                <th class="py-1 text-right font-semibold">{{ 'payment.receive.amount' | translate }} (₹)</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-neutral-100 dark:divide-charcoal-700">
@@ -70,7 +72,7 @@ function todayIso(): string {
                       }
                     } @else { {{ m.reference || '-' }} }
                   </td>
-                  <td class="py-1.5 text-right font-mono">{{ m.amount | number: '1.2-2' }}</td>
+                  <td class="py-1.5 text-right font-mono">{{ m.amount | inr }}</td>
                 </tr>
               }
             </tbody>
@@ -104,14 +106,14 @@ function todayIso(): string {
             } @else {
               <ul class="m-0 list-none space-y-0.5 p-0 text-xs">
                 @for (a of r.allocations; track a.invoiceId) {
-                  <li class="flex justify-between gap-3"><span class="font-mono">{{ a.invoiceNumber || a.invoiceId }}</span><span class="font-mono">{{ a.amount | number: '1.2-2' }}</span></li>
+                  <li class="flex justify-between gap-3"><span class="font-mono">{{ a.invoiceNumber || a.invoiceId }}</span><span class="font-mono">{{ a.amount | money }}</span></li>
                 }
               </ul>
             }
           </div>
           <div class="flex flex-wrap gap-x-6 gap-y-1 border-t border-neutral-200 pt-3 dark:border-charcoal-700">
-            <span>{{ 'payment.detail.total' | translate }}: <span class="font-mono font-semibold">{{ r.summary.totalAmount | number: '1.2-2' }}</span></span>
-            <span>{{ 'payment.detail.advance' | translate }}: <span class="font-mono">{{ r.advanceAmount | number: '1.2-2' }}</span></span>
+            <span>{{ 'payment.detail.total' | translate }}: <span class="font-mono font-semibold">{{ r.summary.totalAmount | money }}</span></span>
+            <span>{{ 'payment.detail.advance' | translate }}: <span class="font-mono">{{ r.advanceAmount | money }}</span></span>
           </div>
           @if (r.remark) { <p class="m-0 text-xs text-gray-600">{{ r.remark }}</p> }
           <app-receipt-proofs [receiptId]="r.summary.id" [proofs]="r.proofs" [canEdit]="r.summary.status === 'RECORDED'" (changed)="load()" />

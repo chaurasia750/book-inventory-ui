@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
@@ -8,6 +8,7 @@ import { messageForError } from '@org/interceptors';
 import { AuditEntry, ItemDetail, PriceVersion, PriceVersionFields } from '@org/shared-models';
 import { ButtonComponent, CardComponent, CloseButtonComponent, SkeletonLoaderComponent } from '@org/ui';
 import { PriceVersionFormComponent } from './price-version-form';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 /**
  * The prices of one item, shown in the panel beside the price list (price spec R3-R5, R15, platform U10): the versions newest
@@ -17,7 +18,7 @@ import { PriceVersionFormComponent } from './price-version-form';
 @Component({
   selector: 'app-price-versions',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, SkeletonLoaderComponent, PriceVersionFormComponent],
+  imports: [DatePipe, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, SkeletonLoaderComponent, PriceVersionFormComponent, IndianCurrencyPipe],
   templateUrl: './price-versions.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

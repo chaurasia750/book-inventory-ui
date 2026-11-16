@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +12,8 @@ import { ITEM_CATEGORIES, ItemCategory, PagedList, PriceListRow } from '@org/sha
 import { ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectSelectedId } from '@org/ui';
 import { PriceCopyComponent } from './price-copy';
 import { PriceVersionsComponent } from './price-versions';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 const PAGE_SIZE = 20;
 const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -24,18 +26,7 @@ const SELECT = 'h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm f
 @Component({
   selector: 'app-price-list',
   standalone: true,
-  imports: [
-    DatePipe,
-    DecimalPipe,
-    ReactiveFormsModule,
-    TranslatePipe,
-    ButtonComponent,
-    ListDetailComponent,
-    PaginationComponent,
-    SkeletonLoaderComponent,
-    PriceVersionsComponent,
-    PriceCopyComponent,
-  ],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, PriceVersionsComponent, PriceCopyComponent, MoneyPipe, IndianCurrencyPipe],
   templateUrl: './price-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

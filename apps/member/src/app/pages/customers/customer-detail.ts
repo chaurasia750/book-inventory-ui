@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
@@ -7,6 +6,7 @@ import { messageForError } from '@org/interceptors';
 import { CustomerDetail } from '@org/shared-models';
 import { customerStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /**
  * One customer's page (customer spec R2-R7, R9): the master data with the generated code read-only, the opening balance and the
@@ -16,7 +16,7 @@ import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, S
 @Component({
   selector: 'app-customer-detail',
   standalone: true,
-  imports: [DecimalPipe, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
+  imports: [TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, MoneyPipe],
   templateUrl: './customer-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -97,9 +97,9 @@
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns2.className' | translate }}</th>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.version' | translate }}</th>
-                <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }}</th>
+                <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }} (₹)</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
-                @if (showDiscount()) { <th class="px-3 py-2 font-semibold">{{ 'sales.columns.discount' | translate }}</th> }
+                @if (showDiscount()) { <th class="px-3 py-2 font-semibold">{{ 'sales.columns.discount' | translate }} (₹)</th> }
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
                 @if (!isDraft()) { <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns2.invoiced' | translate }}</th> }
                 @if (editable()) { <th class="px-3 py-2"><span class="sr-only">{{ 'sales.editor.remove' | translate }}</span></th> }
@@ -128,7 +128,7 @@
                       </select>
                     } @else { {{ s?.price?.versionName }} }
                   </td>
-                  <td class="px-3 py-2 text-right font-mono">{{ s ? (s.price.rate | number: '1.2-2') : '' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ s ? (s.price.rate | inr) : '' }}</td>
                   <td class="px-3 py-2 text-right">
                     @if (editable()) {
                       <input type="number" [min]="l.invoiced || 1" step="1" [value]="l.quantity" (change)="setLine(i, { quantity: +$any($event.target).value })" class="h-8 w-20 rounded border border-gray-300 px-2 text-right text-xs" [attr.aria-label]="'sales.columns.qty' | translate" />
@@ -148,7 +148,7 @@
                     } @else { {{ l.discKind === 'NONE' ? '-' : (l.discValue | number: '1.2-2') + (l.discKind === 'PERCENT' ? ' %' : '') }} }
                   </td>
                   }
-                  <td class="px-3 py-2 text-right font-mono">{{ s ? (s.amounts.lineAmount | number: '1.2-2') : '' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ s ? (s.amounts.lineAmount | inr) : '' }}</td>
                   @if (!isDraft()) { <td class="px-3 py-2 text-right">{{ l.invoiced }} / {{ l.quantity }}</td> }
                   @if (editable()) {
                     <td class="px-3 py-2 text-right">
@@ -189,7 +189,7 @@
             <h2 class="mb-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'sales.invoices.title' | translate }}</h2>
             @for (inv of order()?.invoices; track inv.id) {
               <a [routerLink]="['/invoices', inv.id]" class="flex justify-between py-1 text-xs hover:underline" [class.line-through]="inv.status === 'CANCELLED'">
-                <span class="font-mono">{{ inv.number }}</span><span class="font-mono">{{ inv.grandTotal | number: '1.2-2' }}</span>
+                <span class="font-mono">{{ inv.number }}</span><span class="font-mono">{{ inv.grandTotal | money }}</span>
               </a>
             }
           </div>

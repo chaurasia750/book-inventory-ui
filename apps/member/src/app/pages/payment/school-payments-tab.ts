@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -8,6 +8,7 @@ import { ReceiptSummary } from '@org/shared-models';
 import { ButtonComponent, PaginationComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
 import { ReceiptDetailDialogComponent } from './receipt-detail-dialog';
 import { ReceivePaymentDialogComponent } from './receive-payment-dialog';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 const PAGE_SIZE = 10;
 
@@ -18,7 +19,7 @@ const PAGE_SIZE = 10;
 @Component({
   selector: 'app-school-payments-tab',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, TranslatePipe, ButtonComponent, PaginationComponent, SkeletonLoaderComponent, ReceivePaymentDialogComponent, ReceiptDetailDialogComponent],
+  imports: [DatePipe, TranslatePipe, ButtonComponent, PaginationComponent, SkeletonLoaderComponent, ReceivePaymentDialogComponent, ReceiptDetailDialogComponent, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
@@ -41,7 +42,7 @@ const PAGE_SIZE = 10;
               <th class="px-3 py-2 font-semibold">{{ 'sales.columns.number' | translate }}</th>
               <th class="px-3 py-2 font-semibold">{{ 'sales.columns.date' | translate }}</th>
               <th class="px-3 py-2 font-semibold">{{ 'sales.columns.status' | translate }}</th>
-              <th class="px-3 py-2 text-right font-semibold">{{ 'payment.detail.total' | translate }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ 'payment.detail.total' | translate }} (₹)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-neutral-200 dark:divide-charcoal-700">
@@ -53,7 +54,7 @@ const PAGE_SIZE = 10;
                   <td class="whitespace-nowrap px-3 py-2 font-mono font-medium text-primary-fg" [class.line-through]="r.status === 'CANCELLED'">{{ r.number }}</td>
                   <td class="whitespace-nowrap px-3 py-2 text-gray-600">{{ r.receiptDate | date: 'dd MMM yy' }}</td>
                   <td class="px-3 py-2"><span class="rounded-full px-2 py-0.5 text-[11px] font-semibold" [class]="r.status === 'CANCELLED' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'">{{ 'payment.status.' + r.status | translate }}</span></td>
-                  <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.totalAmount | number: '1.2-2' }}</td>
+                  <td class="whitespace-nowrap px-3 py-2 text-right font-mono">{{ r.totalAmount | inr }}</td>
                 </tr>
               } @empty {
                 <tr><td colspan="4" class="py-6 text-center text-sm text-gray-400">{{ 'payment.tab.empty' | translate }}</td></tr>

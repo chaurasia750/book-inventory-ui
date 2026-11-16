@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
@@ -10,6 +9,8 @@ import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { SaleTotalsComponent } from '../sales/sale-totals';
 import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /**
  * One credit note in the panel beside the returns list (sales spec R57, R58, R61): its number, date, school, invoice, reason, the
@@ -19,7 +20,7 @@ import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
 @Component({
   selector: 'app-credit-note-detail',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, SaleTotalsComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, SaleTotalsComponent, MoneyPipe, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
@@ -69,7 +70,7 @@ import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
               <tr>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
                 <th class="px-3 py-2 font-semibold">{{ 'returns.lines.condition' | translate }}</th>
-                <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }}</th>
+                <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.rate' | translate }} (₹)</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
               </tr>
@@ -79,9 +80,9 @@ import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
                 <tr>
                   <td class="px-3 py-2"><span class="font-medium text-primary-fg">{{ line.itemName }}</span> <span class="ml-1 font-mono text-gray-500">{{ line.itemCode }}</span></td>
                   <td class="px-3 py-2">{{ 'returns.condition.' + line.condition | translate }}</td>
-                  <td class="px-3 py-2 text-right font-mono">{{ line.rateAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ line.rateAmount | inr }}</td>
                   <td class="px-3 py-2 text-right">{{ line.quantity }}</td>
-                  <td class="px-3 py-2 text-right font-mono">{{ line.lineAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ line.lineAmount | inr }}</td>
                 </tr>
               }
             </tbody>
@@ -93,7 +94,7 @@ import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
           <section class="rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800">
             <h2 class="m-0 mb-2 text-sm font-semibold text-primary-fg">{{ 'returns.detail.refunds' | translate }}</h2>
             @for (r of refunds(); track r.id) {
-              <p class="m-0 flex justify-between text-sm"><span class="font-mono text-xs">{{ r.number }} · {{ r.refundDate }}</span><span class="font-mono" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | number: '1.2-2' }}</span></p>
+              <p class="m-0 flex justify-between text-sm"><span class="font-mono text-xs">{{ r.number }} · {{ r.refundDate }}</span><span class="font-mono" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | money }}</span></p>
             } @empty { <p class="m-0 text-xs text-gray-500">{{ 'returns.detail.noRefunds' | translate }}</p> }
           </section>
         </div>

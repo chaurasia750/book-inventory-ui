@@ -1,10 +1,10 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, inject, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import { ItemService, PriceService, StockService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ItemSummary } from '@org/shared-models';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /** One suggestion: the item with its default sale price and Main stock (either is `null` when unknown or not tracked). */
 export interface ItemSuggestion {
@@ -25,7 +25,7 @@ const PAUSE_MS = 250;
 @Component({
   selector: 'app-item-entry',
   standalone: true,
-  imports: [TranslatePipe, DecimalPipe],
+  imports: [TranslatePipe, MoneyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="relative">
@@ -57,7 +57,7 @@ const PAUSE_MS = 250;
                   <span class="block truncate font-medium">{{ s.item.name }}</span>
                   <span class="font-mono text-xs text-gray-500">{{ s.item.code }}@if (s.item.className) { · {{ s.item.className }} }</span>
                 </span>
-                <span class="text-right font-mono">{{ s.saleAmount === null ? '-' : (s.saleAmount | number: '1.2-2') }}</span>
+                <span class="text-right font-mono">{{ s.saleAmount === null ? '-' : (s.saleAmount | money) }}</span>
                 <span class="text-right font-mono" [class.text-red-600]="s.stockQuantity !== null && s.stockQuantity <= 0">{{ s.stockQuantity === null ? '-' : s.stockQuantity }}</span>
               </button>
             </li>

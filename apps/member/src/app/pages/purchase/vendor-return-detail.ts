@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@org/auth';
@@ -9,6 +8,8 @@ import { VendorReturn } from '@org/shared-models';
 import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { PdfHandlers, downloadPdf, printPdf } from '../returns/pdf-delivery';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /**
  * One vendor return in the panel beside the list (purchase spec R2, R8, R11, R12): its number, date, vendor, the lines with where each
@@ -18,7 +19,7 @@ import { PdfHandlers, downloadPdf, printPdf } from '../returns/pdf-delivery';
 @Component({
   selector: 'app-vendor-return-detail',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, MoneyPipe, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
@@ -66,7 +67,7 @@ import { PdfHandlers, downloadPdf, printPdf } from '../returns/pdf-delivery';
               <tr>
                 <th class="px-3 py-2 font-semibold">{{ 'sales.columns.item' | translate }}</th>
                 <th class="px-3 py-2 font-semibold">{{ 'purchase.lines.source' | translate }}</th>
-                <th class="px-3 py-2 text-right font-semibold">{{ 'purchase.lines.rate' | translate }}</th>
+                <th class="px-3 py-2 text-right font-semibold">{{ 'purchase.lines.rate' | translate }} (₹)</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.qty' | translate }}</th>
                 <th class="px-3 py-2 text-right font-semibold">{{ 'sales.columns.amount' | translate }}</th>
               </tr>
@@ -76,9 +77,9 @@ import { PdfHandlers, downloadPdf, printPdf } from '../returns/pdf-delivery';
                 <tr>
                   <td class="px-3 py-2"><span class="font-medium text-primary-fg">{{ line.itemName }}</span> <span class="ml-1 font-mono text-gray-500">{{ line.itemCode }}</span></td>
                   <td class="px-3 py-2">{{ 'purchase.source.' + line.stockSource | translate }}</td>
-                  <td class="px-3 py-2 text-right font-mono">{{ line.rateAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ line.rateAmount | inr }}</td>
                   <td class="px-3 py-2 text-right">{{ line.quantity }}</td>
-                  <td class="px-3 py-2 text-right font-mono">{{ line.lineAmount | number: '1.2-2' }}</td>
+                  <td class="px-3 py-2 text-right font-mono">{{ line.lineAmount | inr }}</td>
                 </tr>
               }
             </tbody>
@@ -87,9 +88,9 @@ import { PdfHandlers, downloadPdf, printPdf } from '../returns/pdf-delivery';
 
         <aside class="ml-auto w-full max-w-xs rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800">
           <dl class="m-0 grid gap-1.5 text-sm">
-            <div class="flex justify-between"><dt class="text-gray-500">{{ 'sales.totals.subtotal' | translate }}</dt><dd class="m-0 font-mono">{{ r.subtotal | number: '1.2-2' }}</dd></div>
-            @if (r.roundOff !== 0) { <div class="flex justify-between"><dt class="text-gray-500">{{ 'sales.totals.roundOff' | translate }}</dt><dd class="m-0 font-mono">{{ r.roundOff | number: '1.2-2' }}</dd></div> }
-            <div class="flex justify-between border-t border-neutral-200 pt-1.5 text-base font-semibold dark:border-charcoal-700"><dt>{{ 'sales.totals.grandTotal' | translate }}</dt><dd class="m-0 font-mono">{{ r.grandTotal | number: '1.2-2' }}</dd></div>
+            <div class="flex justify-between"><dt class="text-gray-500">{{ 'sales.totals.subtotal' | translate }}</dt><dd class="m-0 font-mono">{{ r.subtotal | money }}</dd></div>
+            @if (r.roundOff !== 0) { <div class="flex justify-between"><dt class="text-gray-500">{{ 'sales.totals.roundOff' | translate }}</dt><dd class="m-0 font-mono">{{ r.roundOff | money }}</dd></div> }
+            <div class="flex justify-between border-t border-neutral-200 pt-1.5 text-base font-semibold dark:border-charcoal-700"><dt>{{ 'sales.totals.grandTotal' | translate }}</dt><dd class="m-0 font-mono">{{ r.grandTotal | money }}</dd></div>
           </dl>
         </aside>
 

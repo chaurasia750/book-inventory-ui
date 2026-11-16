@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,6 +11,8 @@ import { COUNTER_BILL_STATUSES, Counter, CounterBillStatus, CounterBillSummary, 
 import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
 import { CounterBillDetailComponent } from './counter-bill-detail';
+import { IndianCurrencyPipe } from './indian-currency.pipe';
+import { MoneyPipe } from './money.pipe';
 
 const PAGE_SIZE = 20;
 const CHOICES = 200;
@@ -25,7 +27,7 @@ const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gra
 @Component({
   selector: 'app-counter-bills',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, CounterBillDetailComponent],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, CounterBillDetailComponent, MoneyPipe, IndianCurrencyPipe],
   templateUrl: './counter-bills.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { messageForError } from '@org/interceptors';
 import { Counter, CounterBillSummary } from '@org/shared-models';
 import { counterStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, SkeletonLoaderComponent } from '@org/ui';
+import { IndianCurrencyPipe } from './indian-currency.pipe';
 
 const SHOWN = 20;
 
@@ -19,7 +20,7 @@ const SHOWN = 20;
 @Component({
   selector: 'app-school-counters-tab',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent],
+  imports: [DatePipe, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-4">
@@ -77,7 +78,7 @@ const SHOWN = 20;
                     <td class="px-3 py-2"><a [routerLink]="['/counters', 'bills', b.id]" class="font-mono font-medium text-brand-700 hover:underline">{{ b.number }}</a></td>
                     <td class="px-3 py-2">{{ b.studentName }} <span class="text-gray-500">{{ b.className }}</span></td>
                     <td class="whitespace-nowrap px-3 py-2">{{ b.billDate | date: 'dd MMM yy' }}</td>
-                    <td class="px-3 py-2 text-right font-mono" [class.line-through]="b.status === 'CANCELLED'">{{ b.grandTotal | number: '1.2-2' }}</td>
+                    <td class="px-3 py-2 text-right font-mono" [class.line-through]="b.status === 'CANCELLED'">{{ b.grandTotal | inr }}</td>
                   </tr>
                 } @empty { <tr><td colspan="4" class="py-6 text-center text-gray-400">{{ 'counter.bills.empty' | translate }}</td></tr> }
               }

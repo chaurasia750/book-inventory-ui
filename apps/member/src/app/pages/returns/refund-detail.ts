@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ReturnService } from '@org/api-services';
@@ -8,6 +7,7 @@ import { Refund } from '@org/shared-models';
 import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
+import { MoneyPipe } from '../counters/money.pipe';
 
 /**
  * One refund in the panel beside the refunds list (sales spec R64, R67, R68, R69): its number, date, school, amount, mode and
@@ -17,7 +17,7 @@ import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
 @Component({
   selector: 'app-refund-detail',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, MoneyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
@@ -41,7 +41,7 @@ import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
           <dl class="m-0 grid gap-1.5 text-sm sm:grid-cols-2">
             <div><dt class="text-xs text-gray-500">{{ 'returns.fields.school' | translate }}</dt><dd class="m-0">{{ r.schoolName }} <span class="font-mono text-xs">({{ r.schoolCode }})</span></dd></div>
             <div><dt class="text-xs text-gray-500">{{ 'refunds.detail.date' | translate }}</dt><dd class="m-0 font-mono">{{ r.refundDate }}</dd></div>
-            <div><dt class="text-xs text-gray-500">{{ 'refunds.fields.amount' | translate }}</dt><dd class="m-0 font-mono text-base font-semibold" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | number: '1.2-2' }}</dd></div>
+            <div><dt class="text-xs text-gray-500">{{ 'refunds.fields.amount' | translate }}</dt><dd class="m-0 font-mono text-base font-semibold" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | money }}</dd></div>
             <div><dt class="text-xs text-gray-500">{{ 'refunds.fields.mode' | translate }}</dt><dd class="m-0">{{ 'refunds.mode.' + r.mode | translate }}@if (r.reference) { <span class="font-mono text-xs"> · {{ r.reference }}</span> }</dd></div>
             @if (r.creditNoteNumber) { <div><dt class="text-xs text-gray-500">{{ 'refunds.fields.creditNote' | translate }}</dt><dd class="m-0 font-mono">{{ r.creditNoteNumber }}</dd></div> }
             @if (r.remark) { <div class="sm:col-span-2"><dt class="text-xs text-gray-500">{{ 'returns.fields.remark' | translate }}</dt><dd class="m-0">{{ r.remark }}</dd></div> }

@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -17,6 +16,8 @@ import {
 } from '@org/shared-models';
 import { ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent, SchoolSelectComponent } from '@org/ui';
 import { ItemEntryComponent } from '../sales/item-entry';
+import { MoneyPipe } from '../counters/money.pipe';
+import { MoneyPrefixComponent } from '../counters/money-prefix';
 
 const FIELD = 'h-10 w-full rounded-lg border border-gray-300 bg-white px-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20';
 const LABEL = 'mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500';
@@ -44,7 +45,7 @@ interface ReturnRow {
 @Component({
   selector: 'app-credit-note-add',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent, SchoolSelectComponent, ItemEntryComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, DatePickerComponent, SchoolSelectComponent, ItemEntryComponent, MoneyPipe, MoneyPrefixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-5">
@@ -64,7 +65,7 @@ interface ReturnRow {
               <label for="cn-invoice" class="${LABEL}">{{ 'returns.fields.invoice' | translate }}</label>
               <select id="cn-invoice" [formControl]="invoice" (change)="invoiceChosen()" class="${FIELD}" [disabled]="!school.value">
                 <option value="">{{ 'returns.fields.noInvoice' | translate }}</option>
-                @for (i of invoices(); track i.id) { <option [value]="i.id">{{ i.number }} · {{ i.invoiceDate }} · {{ i.grandTotal | number: '1.2-2' }}</option> }
+                @for (i of invoices(); track i.id) { <option [value]="i.id">{{ i.number }} · {{ i.invoiceDate }} · {{ i.grandTotal | money }}</option> }
               </select>
             </div>
             <div>
@@ -100,7 +101,7 @@ interface ReturnRow {
                           <td class="px-3 py-2 text-right">{{ row.sold }}</td>
                           <td class="px-3 py-2 text-right">{{ (row.sold ?? 0) - (row.returned ?? 0) }}</td>
                         } @else {
-                          <td class="px-3 py-2 text-right"><input type="number" min="0" step="0.01" [value]="row.rate" [placeholder]="'returns.lines.rateAuto' | translate" (input)="patch(row.key, { rate: $any($event.target).value })" class="h-9 w-24 rounded-lg border border-gray-300 px-2 text-right text-sm" /></td>
+                          <td class="px-3 py-2 text-right"><app-money-prefix [inline]="true"><input type="number" min="0" step="0.01" [value]="row.rate" [placeholder]="'returns.lines.rateAuto' | translate" (input)="patch(row.key, { rate: $any($event.target).value })" class="h-9 w-24 rounded-lg border border-gray-300 px-2 text-right text-sm" /></app-money-prefix></td>
                         }
                         <td class="px-3 py-2 text-right"><input type="number" min="0" step="1" [value]="row.quantity" [attr.aria-label]="'sales.columns.qty' | translate" (input)="patch(row.key, { quantity: $any($event.target).value })" class="h-9 w-20 rounded-lg border border-gray-300 px-2 text-right text-sm" /></td>
                         <td class="px-3 py-2">

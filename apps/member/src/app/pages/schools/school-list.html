@@ -108,7 +108,7 @@
                     <td class="px-4 py-3">
                       <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(school.status)">{{ 'school.status.' + school.status | translate }}</span>
                     </td>
-                    @if (canEdit) { <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="(balances()[school.id] ?? 0) < 0">{{ (balances()[school.id] ?? 0) | number: '1.2-2' }}</td> }
+                    @if (canEdit) { <td class="px-4 py-3 text-right font-mono" [class.text-red-600]="(balances()[school.id] ?? 0) < 0">{{ (balances()[school.id] ?? 0) | inr }}</td> }
                   </tr>
                 } @empty {
                   @if (!loadError()) {

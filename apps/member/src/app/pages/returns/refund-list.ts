@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +12,8 @@ import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SchoolSelectComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
 import { RefundAddComponent } from './refund-add';
 import { RefundDetailComponent } from './refund-detail';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
 
 const PAGE_SIZE = 20;
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
@@ -24,7 +26,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
 @Component({
   selector: 'app-refund-list',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SchoolSelectComponent, SkeletonLoaderComponent, RefundAddComponent, RefundDetailComponent],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SchoolSelectComponent, SkeletonLoaderComponent, RefundAddComponent, RefundDetailComponent, MoneyPipe, IndianCurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-4">
@@ -66,7 +68,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
                   <li [class.bg-gold-50]="r.id === selectedId()">
                     <button type="button" (click)="openView(r.id)" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-charcoal-700" [attr.aria-current]="r.id === selectedId() ? 'true' : null">
                       <span class="min-w-0 flex-1"><span class="block whitespace-nowrap font-mono text-xs font-medium text-primary-fg">{{ r.number }}</span><span class="block truncate text-xs text-gray-500">{{ r.schoolName }}</span></span>
-                      <span class="shrink-0 text-right"><span class="block font-mono text-sm" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | number: '1.2-2' }}</span><span class="block text-[11px] text-gray-500">{{ r.refundDate | date: 'dd MMM yy' }}</span></span>
+                      <span class="shrink-0 text-right"><span class="block font-mono text-sm" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | money }}</span><span class="block text-[11px] text-gray-500">{{ r.refundDate | date: 'dd MMM yy' }}</span></span>
                     </button>
                   </li>
                 } @empty { @if (!loadError()) { <li class="py-8 text-center text-sm text-gray-400">{{ 'refunds.empty' | translate }}</li> } }
@@ -82,7 +84,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
                     <th class="px-4 py-3 font-semibold">{{ 'returns.columns.date' | translate }}</th>
                     <th class="px-4 py-3 font-semibold">{{ 'refunds.fields.mode' | translate }}</th>
                     <th class="px-4 py-3 font-semibold">{{ 'returns.columns.status' | translate }}</th>
-                    <th class="px-4 py-3 text-right font-semibold">{{ 'refunds.fields.amount' | translate }}</th>
+                    <th class="px-4 py-3 text-right font-semibold">{{ 'refunds.fields.amount' | translate }} (₹)</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -96,7 +98,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
                         <td class="whitespace-nowrap px-4 py-3 text-gray-600">{{ r.refundDate | date: 'dd MMM yy' }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ 'refunds.mode.' + r.mode | translate }}</td>
                         <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(r.status)">{{ 'returns.status.' + r.status | translate }}</span></td>
-                        <td class="whitespace-nowrap px-4 py-3 text-right font-mono" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | number: '1.2-2' }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-right font-mono" [class.line-through]="r.status === 'CANCELLED'">{{ r.amount | inr }}</td>
                       </tr>
                     } @empty { @if (!loadError()) { <tr><td colspan="6" class="py-10 text-center text-sm text-gray-400">{{ 'refunds.empty' | translate }}</td></tr> } }
                   }

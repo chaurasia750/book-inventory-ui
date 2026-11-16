@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { SchoolService } from '@org/api-services';
 import { CustomerDetail, CustomerFields } from '@org/shared-models';
 import { ButtonComponent, SchoolSelectComponent } from '@org/ui';
+import { MoneyPrefixComponent } from '../counters/money-prefix';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 
@@ -17,7 +18,7 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
 @Component({
   selector: 'app-customer-form',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, SchoolSelectComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, SchoolSelectComponent, MoneyPrefixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
@@ -54,12 +55,12 @@ const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 tex
         </div>
         <div>
           <label for="cf-balance" class="mb-1 block text-sm font-semibold">{{ 'customer.fields.openingBalance' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          <input id="cf-balance" type="number" step="0.01" min="0" formControlName="openingBalanceAmount" class="${FIELD}" />
+          <app-money-prefix><input id="cf-balance" type="number" step="0.01" min="0" formControlName="openingBalanceAmount" class="${FIELD}" /></app-money-prefix>
           <p class="mt-1 text-xs text-gray-500">{{ 'customer.fields.openingBalanceHint' | translate }}</p>
         </div>
         <div>
           <label for="cf-limit" class="mb-1 block text-sm font-semibold">{{ 'customer.fields.creditLimit' | translate }}</label>
-          <input id="cf-limit" type="number" step="0.01" min="0.01" formControlName="creditLimitAmount" class="${FIELD}" />
+          <app-money-prefix><input id="cf-limit" type="number" step="0.01" min="0.01" formControlName="creditLimitAmount" class="${FIELD}" /></app-money-prefix>
           <p class="mt-1 text-xs text-gray-500">{{ 'customer.fields.creditLimitHint' | translate }}</p>
         </div>
       </div>

@@ -1,10 +1,12 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ReceiptDetail, SchoolDues } from '@org/shared-models';
 import { ButtonComponent } from '@org/ui';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
+import { MoneyPipe } from '../counters/money.pipe';
+import { MoneyPrefixComponent } from '../counters/money-prefix';
 
 const money = (value: number): number => Math.round(value * 100) / 100;
 
@@ -15,11 +17,11 @@ const money = (value: number): number => Math.round(value * 100) / 100;
 @Component({
   selector: 'app-adjust-advance-panel',
   standalone: true,
-  imports: [DecimalPipe, TranslatePipe, ButtonComponent],
+  imports: [TranslatePipe, ButtonComponent, MoneyPipe, IndianCurrencyPipe, MoneyPrefixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="space-y-2 rounded-lg border border-neutral-200 p-3 dark:border-charcoal-700" role="group" [attr.aria-label]="'payment.adjust.title' | translate">
-      <p class="m-0 text-sm font-semibold">{{ 'payment.adjust.title' | translate }}: <span class="font-mono">{{ receipt().advanceAmount | number: '1.2-2' }}</span></p>
+      <p class="m-0 text-sm font-semibold">{{ 'payment.adjust.title' | translate }}: <span class="font-mono">{{ receipt().advanceAmount | money }}</span></p>
       @if (loading()) {
         <p class="m-0 text-xs text-gray-500">{{ 'payment.receive.loading' | translate }}</p>
       } @else if (dues(); as d) {
@@ -38,12 +40,12 @@ const money = (value: number): number => Math.round(value * 100) / 100;
               @for (o of d.openInvoices; track o.invoiceId) {
                 <tr>
                   <td class="py-1 pr-3 font-mono">{{ o.number }}</td>
-                  <td class="py-1 pr-3 text-right font-mono">{{ o.due | number: '1.2-2' }}</td>
+                  <td class="py-1 pr-3 text-right font-mono">{{ o.due | inr }}</td>
                   <td class="py-1 text-right">
                     @if (manual()) {
-                      <input type="number" min="0" step="0.01" [value]="amounts()[o.invoiceId] ?? ''" (input)="setAmount(o.invoiceId, $any($event.target).value)" [attr.aria-label]="o.number"
-                        class="h-8 w-28 rounded border border-gray-300 px-2 text-right text-xs" />
-                    } @else { <span class="font-mono">{{ preview()[o.invoiceId] ?? 0 | number: '1.2-2' }}</span> }
+                      <app-money-prefix [inline]="true"><input type="number" min="0" step="0.01" [value]="amounts()[o.invoiceId] ?? ''" (input)="setAmount(o.invoiceId, $any($event.target).value)" [attr.aria-label]="o.number"
+                        class="h-8 w-28 rounded border border-gray-300 px-2 text-right text-xs" /></app-money-prefix>
+                    } @else { <span class="font-mono">{{ preview()[o.invoiceId] ?? 0 | inr }}</span> }
                   </td>
                 </tr>
               }

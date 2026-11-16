@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -8,6 +8,7 @@ import { messageForError } from '@org/interceptors';
 import { financialYearOptions } from '@org/shared-utils';
 import { LedgerStatement, LedgerStatementParams, LedgerStatementRow } from '@org/shared-models';
 import { ButtonComponent, DatePickerComponent, SkeletonLoaderComponent } from '@org/ui';
+import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 
 const FIELD = 'h-10 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 
@@ -22,7 +23,7 @@ type FilterKind = 'ALL' | 'YEAR' | 'SESSION' | 'DATES';
 @Component({
   selector: 'app-ledger-statement',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, DatePickerComponent],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, DatePickerComponent, IndianCurrencyPipe],
   templateUrl: './ledger-statement.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

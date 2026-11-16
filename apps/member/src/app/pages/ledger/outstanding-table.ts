@@ -1,10 +1,10 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LedgerService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { OutstandingPage } from '@org/shared-models';
 import { ButtonComponent, PaginationComponent, SkeletonLoaderComponent } from '@org/ui';
+import { MoneyPipe } from '../counters/money.pipe';
 
 const PAGE_SIZE = 20;
 
@@ -16,12 +16,12 @@ const PAGE_SIZE = 20;
 @Component({
   selector: 'app-outstanding-table',
   standalone: true,
-  imports: [DecimalPipe, TranslatePipe, ButtonComponent, PaginationComponent, SkeletonLoaderComponent],
+  imports: [TranslatePipe, ButtonComponent, PaginationComponent, SkeletonLoaderComponent, MoneyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (result(); as r) {
       <div class="flex justify-end border-b border-neutral-100 px-4 py-2 text-sm text-gray-600">
-        {{ 'ledger.total' | translate }}:&nbsp;<span class="font-mono font-semibold text-primary-fg">{{ r.totalBalance | number: '1.2-2' }}</span>
+        {{ 'ledger.total' | translate }}:&nbsp;<span class="font-mono font-semibold text-primary-fg">{{ r.totalBalance | money }}</span>
       </div>
     }
     @if (loadError()) {
@@ -45,7 +45,7 @@ const PAGE_SIZE = 20;
                 </span>
                 <span class="block font-mono text-xs text-gray-500">{{ row.code }}</span>
               </span>
-              <span class="font-mono text-sm font-semibold" [class.text-red-600]="row.balance < 0">{{ row.balance | number: '1.2-2' }}</span>
+              <span class="font-mono text-sm font-semibold" [class.text-red-600]="row.balance < 0">{{ row.balance | money }}</span>
             </button>
           </li>
         } @empty {
