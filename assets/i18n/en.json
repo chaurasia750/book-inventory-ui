@@ -891,6 +891,8 @@
       "orders": "Orders",
       "payments": "Payments",
       "invoices": "Invoices",
+      "counters": "Counters",
+      "returns": "Returns",
       "bookLists": "Book lists"
     },
     "paymentType": {

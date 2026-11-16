@@ -82,6 +82,14 @@
       <app-school-documents-tab kind="invoices" [schoolId]="s.id" />
     }
 
+    @if (tab() === 'counters') {
+      <app-school-counters-tab [schoolId]="s.id" />
+    }
+
+    @if (tab() === 'returns') {
+      <app-school-returns-tab [schoolId]="s.id" />
+    }
+
     @if (tab() === 'payments' && canEdit) {
       <app-school-payments-tab [schoolId]="s.id" />
     }

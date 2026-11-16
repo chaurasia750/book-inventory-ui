@@ -11,12 +11,14 @@ import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, S
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
 import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 import { SchoolDocumentsTabComponent } from '../sales/school-documents-tab';
+import { SchoolCountersTabComponent } from '../counters/school-counters-tab';
+import { SchoolReturnsTabComponent } from '../returns/school-returns-tab';
 import { SchoolPaymentsTabComponent } from '../payment/school-payments-tab';
 import { InvoiceLayoutSettingComponent } from '../sales/invoice-layout-setting';
 import { BookListsTabComponent } from '../planning/book-lists-tab';
 
 /** Planning section 6: the Book lists tab joins the profile tabs. */
-type ProfileTab = 'profile' | 'classes' | 'orders' | 'invoices' | 'payments' | 'bookLists' | 'ledger';
+type ProfileTab = 'profile' | 'classes' | 'orders' | 'invoices' | 'payments' | 'bookLists' | 'ledger' | 'counters' | 'returns';
 
 /** The segment of a tab in the address: the tab's name, with `bookLists` written `book-lists`. */
 const tabPath = (tab: ProfileTab): string => (tab === 'bookLists' ? 'book-lists' : tab);
@@ -43,6 +45,8 @@ const tabPath = (tab: ProfileTab): string => (tab === 'bookLists' ? 'book-lists'
     LedgerStatementComponent,
     PartyLedgerSummaryComponent,
     SchoolDocumentsTabComponent,
+    SchoolCountersTabComponent,
+    SchoolReturnsTabComponent,
     SchoolPaymentsTabComponent,
     InvoiceLayoutSettingComponent,
     BookListsTabComponent,
@@ -70,8 +74,8 @@ export class SchoolDetailComponent {
   /** The tabs this account sees: the ledger is the Owner's only (finance R13). */
   /** Sales section 6: the school's orders and invoices are tabs of its profile (Owner and Staff); the payments (payment R2) and the ledger are the Owner's. */
   readonly tabs: readonly ProfileTab[] = this.canEdit
-    ? ['profile', 'orders', 'invoices', 'payments', 'bookLists', 'ledger', 'classes']
-    : ['profile', 'orders', 'invoices', 'bookLists', 'classes'];
+    ? ['profile', 'orders', 'invoices', 'counters', 'returns', 'payments', 'bookLists', 'ledger', 'classes']
+    : ['profile', 'orders', 'invoices', 'counters', 'returns', 'bookLists', 'classes'];
 
   /** The tab shown: the one in the address when this account sees it, else the profile. */
   readonly tab = computed<ProfileTab>(() => this.tabs.find((t) => tabPath(t) === this.routeTab()) ?? 'profile');

@@ -12,7 +12,8 @@ import { IndianCurrencyPipe } from '../counters/indian-currency.pipe';
 const CARD = 'rounded-[10px] border border-neutral-200 bg-white p-4 dark:border-charcoal-700 dark:bg-charcoal-800';
 const TITLE = 'm-0 mb-3 text-sm font-semibold uppercase tracking-[0.05em] text-gray-500';
 const BIG = 'm-0 font-mono text-2xl font-semibold text-primary-fg';
-const ROW = 'flex items-center justify-between gap-3 py-1 text-sm';
+const TILE = 'min-w-0 rounded-lg bg-gray-50 p-3 dark:bg-charcoal-700';
+const ROW ='flex items-center justify-between gap-3 py-1 text-sm';
 const CHART_WIDTH = 240;
 const CHART_HEIGHT = 56;
 
@@ -90,9 +91,9 @@ const CHART_HEIGHT = 56;
           <section class="${CARD}" aria-labelledby="db-sales">
             <h2 id="db-sales" class="${TITLE}">{{ 'dashboard.sales.title' | translate }}</h2>
             @if (d.sales.data; as s) {
-              <div class="flex gap-6">
-                <div><p class="${BIG}">{{ s.today.total | inr }}</p><p class="m-0 text-xs text-gray-500">{{ 'dashboard.sales.today' | translate }}</p></div>
-                <div><p class="${BIG}">{{ s.session.total | inr }}</p><p class="m-0 text-xs text-gray-500">{{ 'dashboard.sales.session' | translate }}</p></div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="${TILE}"><p class="m-0 text-xs text-gray-500">{{ 'dashboard.sales.today' | translate }}</p><p class="${BIG}">{{ s.today.total | inr }}</p></div>
+                <div class="${TILE}"><p class="m-0 text-xs text-gray-500">{{ 'dashboard.sales.session' | translate }}</p><p class="${BIG}">{{ s.session.total | inr }}</p></div>
               </div>
               <p class="m-0 mt-2 text-xs text-gray-500">{{ 'dashboard.sales.invoices' | translate }} {{ s.session.invoicesTotal | inr }} · {{ 'dashboard.sales.counter' | translate }} {{ s.session.counterTotal | inr }}</p>
               @if (line(); as points) {
