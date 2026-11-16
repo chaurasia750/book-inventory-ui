@@ -5,7 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { ReceiptDetail } from '@org/shared-models';
-import { ButtonComponent, SidePanelComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent, SidePanelComponent } from '@org/ui';
 import { AdjustAdvancePanelComponent } from './adjust-advance-panel';
 import { CancelReceiptPanelComponent } from './cancel-receipt-panel';
 import { ReceiptProofsComponent } from './receipt-proofs';
@@ -23,7 +23,7 @@ function todayIso(): string {
 @Component({
   selector: 'app-receipt-detail-dialog',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, SidePanelComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent, ReceiptProofsComponent],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SidePanelComponent, AdjustAdvancePanelComponent, CancelReceiptPanelComponent, ReceiptProofsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-side-panel [isOpen]="receiptId() !== null" panelWidth="min(760px, 100vw)" [title]="'payment.detail.title' | translate" (closed)="closed.emit()">
@@ -81,7 +81,7 @@ function todayIso(): string {
               <div class="grid gap-2 sm:grid-cols-[10rem_1fr]">
                 <div>
                   <label for="cq-date" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'payment.cheque.date' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-                  <input id="cq-date" type="date" [formControl]="actionDate" class="h-10 w-full rounded-lg border border-gray-300 bg-white px-2 text-sm" />
+                  <app-date-picker inputId="cq-date" [formControl]="actionDate" />
                 </div>
                 @if (a.kind === 'bounce') {
                   <div>

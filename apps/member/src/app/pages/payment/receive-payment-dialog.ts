@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { catchError, concatMap, from, map, of, toArray } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '@org/api-services';
@@ -42,7 +42,7 @@ const money = (value: number): number => Math.round(value * 100) / 100;
 @Component({
   selector: 'app-receive-payment-dialog',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SidePanelComponent],
+  imports: [DecimalPipe, FormsModule, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, SidePanelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-side-panel [isOpen]="open()" panelWidth="min(760px, 100vw)" [title]="'payment.receive.title' | translate" (closed)="close()">
@@ -143,7 +143,7 @@ const money = (value: number): number => Math.round(value * 100) / 100;
                     </div>
                     <div>
                       <label [for]="'pm-cdate-' + i" [class]="label">{{ 'payment.receive.chequeDate' | translate }}</label>
-                      <input [id]="'pm-cdate-' + i" type="date" [value]="m.chequeDate" (input)="setMode(i, { chequeDate: $any($event.target).value })" [class]="field" />
+                      <app-date-picker [inputId]="'pm-cdate-' + i" [ngModel]="m.chequeDate" (valueChange)="setMode(i, { chequeDate: $event })" />
                     </div>
                     <div>
                       <label [for]="'pm-bank-' + i" [class]="label">{{ 'payment.receive.bankName' | translate }}</label>
