@@ -1,4 +1,4 @@
-import { AccountStatus, CompanyStatus, DeviceType, CustomerStatus, LoginResult, ItemStatus, SchoolStatus, VendorStatus } from '@org/shared-models';
+import { AccountStatus, CompanyStatus, CounterBillStatus, CounterStatus, DeviceType, CustomerStatus, LoginResult, ItemStatus, SchoolStatus, VendorStatus } from '@org/shared-models';
 
 // Avatar initials reuse the existing `initials` of ./string.util (exported from the same index) rather than a second
 // implementation of the same rule.
@@ -55,6 +55,16 @@ export function customerStatusBadgeClass(status: CustomerStatus): string {
 /** The colour an item status is shown in (item spec R8): the same two states and colours as a company. */
 export function itemStatusBadgeClass(status: ItemStatus): string {
   return companyStatusBadgeClass(status);
+}
+
+/** The colour a counter status is shown in (sales spec R39): green while active, grey once closed. */
+export function counterStatusBadgeClass(status: CounterStatus): string {
+  return status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600';
+}
+
+/** The colour a counter bill status is shown in (sales spec R47): green while live, grey once cancelled. */
+export function counterBillStatusBadgeClass(status: CounterBillStatus): string {
+  return status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600';
 }
 
 /** The colour a login attempt's result is shown in: green for a success, red for every refusal. */

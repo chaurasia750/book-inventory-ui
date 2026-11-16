@@ -69,6 +69,21 @@ export class MemberLayoutComponent {
   /** Customer spec R9, platform U14: the Owner and Staff both see the customers (Staff add but never edit); its ledger joins the group later. */
   private readonly customerNavItems: SidebarNavItem[] = [{ name: 'Customers', icon: MEMBERS_ICON, section: 'BUSINESS', path: '/customers' }];
 
+  /** Sales R48, R49, R50: the Owner and Staff both see the school counters (Staff read-only) and the day summary. */
+  private readonly counterNavItems: SidebarNavItem[] = [
+    {
+      name: 'Counters',
+      icon: SETTINGS_ICON,
+      section: 'BUSINESS',
+      subItems: [
+        // The billing screen (`/counters/:id/bill`) belongs to the counter list: it stays highlighted and titled there.
+        { name: 'Counter list', path: '/counters' },
+        { name: 'Bills', path: '/counters/bills' },
+        { name: 'Day summary', path: '/counters/day-summary' },
+      ],
+    },
+  ];
+
   /** Sales R19, platform U14: the Owner and Staff place and follow orders from one Orders menu (the school profile keeps its tabs). */
   private readonly ordersNavItems: SidebarNavItem[] = [
     {
@@ -101,6 +116,7 @@ export class MemberLayoutComponent {
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.customerNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.itemNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.ordersNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.counterNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];
 

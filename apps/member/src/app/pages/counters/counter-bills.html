@@ -1,0 +1,104 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-primary-fg">{{ 'counter.bills.title' | translate }}</h1>
+      <p class="mt-0.5 text-sm text-gray-500">{{ 'counter.bills.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <app-list-detail [hasDetail]="hasPanel()" [listLabel]="'counter.bills.title' | translate" [detailLabel]="'counter.bill.panelLabel' | translate">
+    <div list>
+      @if (studentId()) {
+        <div class="flex items-center justify-between gap-3 border-b border-neutral-200 bg-brand-50 px-4 py-2 text-sm dark:border-charcoal-700">
+          <span>{{ 'counter.bills.studentFilter' | translate }}</span>
+          <button type="button" class="font-semibold text-brand-700 hover:underline" (click)="clearStudent()">{{ 'counter.bills.clearStudent' | translate }}</button>
+        </div>
+      }
+
+      @if (!hasPanel()) {
+        <div class="flex flex-wrap items-center gap-3 border-b border-neutral-200 p-4 dark:border-charcoal-700">
+          <input type="search" [formControl]="search" [placeholder]="'counter.bills.search' | translate" [attr.aria-label]="'counter.bills.search' | translate"
+            class="h-10 min-w-[12rem] flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+          <select (change)="setCounter($any($event.target).value)" [attr.aria-label]="'counter.bills.counter' | translate" [class]="select">
+            <option value="">{{ 'counter.bills.allCounters' | translate }}</option>
+            @for (counter of countersList(); track counter.id) { <option [value]="counter.id">{{ counter.name }}</option> }
+          </select>
+          <select (change)="setSchool($any($event.target).value)" [attr.aria-label]="'counter.fields.school' | translate" [class]="select">
+            <option value="">{{ 'counter.filters.allSchools' | translate }}</option>
+            @for (school of schools(); track school.id) { <option [value]="school.id">{{ school.name }}</option> }
+          </select>
+          <input type="text" [value]="className()" (input)="className.set($any($event.target).value)" [placeholder]="'counter.bills.class' | translate"
+            [attr.aria-label]="'counter.bills.class' | translate"
+            class="h-10 w-28 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100" />
+          <select (change)="setStatus($any($event.target).value)" [attr.aria-label]="'counter.bill.status' | translate" [class]="select">
+            <option value="">{{ 'counter.bills.allStatuses' | translate }}</option>
+            @for (s of statuses; track s) { <option [value]="s">{{ 'counter.billStatus.' + s | translate }}</option> }
+          </select>
+          <input type="date" [formControl]="from" [attr.aria-label]="'counter.bills.from' | translate" [class]="select" />
+          <input type="date" [formControl]="to" [attr.aria-label]="'counter.bills.to' | translate" [class]="select" />
+        </div>
+      }
+
+      @if (loadError()) {
+        <div class="m-4 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600" role="alert">
+          <span>{{ loadError() }}</span>
+          <app-button variant="secondary" (clicked)="load()">{{ 'users.retry' | translate }}</app-button>
+        </div>
+      }
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50/80 text-xs uppercase tracking-wide text-gray-500">
+            <tr>
+              <th class="px-4 py-3 font-semibold">{{ 'counter.bill.number' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'counter.bill.date' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'counter.bill.student' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'counter.bills.counter' | translate }}</th>
+              <th class="px-4 py-3 text-right font-semibold">{{ 'sales.totals.grandTotal' | translate }}</th>
+              <th class="px-4 py-3 font-semibold">{{ 'counter.bill.status' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @if (loading() && !result()) {
+              @for (i of skeletonRows; track i) {
+                <tr>
+                  <td class="px-4 py-3"><app-skeleton-loader width="9rem" /></td>
+                  <td class="px-4 py-3"><app-skeleton-loader width="6rem" /></td>
+                  <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                  <td class="px-4 py-3"><app-skeleton-loader width="8rem" /></td>
+                  <td class="px-4 py-3"><app-skeleton-loader width="5rem" /></td>
+                  <td class="px-4 py-3"><app-skeleton-loader width="4rem" /></td>
+                </tr>
+              }
+            } @else {
+              @for (bill of result()?.items ?? []; track bill.id) {
+                <tr class="cursor-pointer transition-colors hover:bg-brand-50/60" [class.bg-gold-50]="bill.id === selectedId()" (click)="openView(bill.id)" (keydown.enter)="openView(bill.id)" tabindex="0">
+                  <td class="px-4 py-3 font-mono text-xs font-medium text-primary-fg">{{ bill.number }}</td>
+                  <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ bill.billDate }}</td>
+                  <td class="px-4 py-3 text-gray-700"><div>{{ bill.studentName }}</div><div class="text-xs text-gray-500">{{ bill.className }}</div></td>
+                  <td class="px-4 py-3 text-gray-600"><div>{{ bill.schoolName }}</div></td>
+                  <td class="px-4 py-3 text-right font-mono">{{ bill.grandTotal | number: '1.2-2' }}</td>
+                  <td class="px-4 py-3">
+                    <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClass(bill.status)">{{ 'counter.billStatus.' + bill.status | translate }}</span>
+                  </td>
+                </tr>
+              } @empty {
+                @if (!loadError()) {
+                  <tr><td [attr.colspan]="6" class="py-10 text-center text-sm text-gray-400">{{ 'counter.bills.empty' | translate }}</td></tr>
+                }
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination [page]="page()" [pageSize]="pageSize" [total]="result()?.totalCount ?? 0" (pageChange)="goToPage($event)" />
+    </div>
+
+    <div detail>
+      @if (selectedId(); as id) {
+        <app-counter-bill-detail [id]="id" (closed)="closePanel()" (changed)="load()" (studentBills)="showStudentBills($event)" />
+      }
+    </div>
+  </app-list-detail>
+</div>

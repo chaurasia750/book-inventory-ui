@@ -1707,6 +1707,150 @@
       "print": "Print"
     }
   },
+  "counter": {
+    "title": "Counters",
+    "subtitle": "The school counter sale points: one per school and session.",
+    "panelLabel": "Counter",
+    "close": "Close",
+    "empty": "No counters match.",
+    "openBilling": "Open billing",
+    "status": {
+      "ACTIVE": "Active",
+      "CLOSED": "Closed"
+    },
+    "columns": {
+      "name": "Name",
+      "school": "School",
+      "session": "Session",
+      "startDate": "Start",
+      "endDate": "End",
+      "status": "Status"
+    },
+    "filters": {
+      "search": "Search counter, school",
+      "session": "Session",
+      "allStatuses": "All statuses",
+      "allSchools": "All schools"
+    },
+    "fields": {
+      "name": "Name",
+      "school": "School",
+      "noSchool": "Choose a school",
+      "schoolLocked": "The school cannot change once the counter has a bill.",
+      "session": "Session",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "none": "None",
+      "endBeforeStart": "The end date cannot be before the start date."
+    },
+    "add": {
+      "button": "New counter",
+      "title": "New counter",
+      "submit": "Open counter"
+    },
+    "edit": {
+      "button": "Edit",
+      "title": "Edit counter",
+      "submit": "Save changes"
+    },
+    "close": {
+      "button": "Close counter",
+      "title": "Close this counter",
+      "confirm": "A closed counter takes no new bill; its bills stay readable and cancellable, and it can be opened again."
+    },
+    "open": {
+      "button": "Open counter",
+      "title": "Open this counter",
+      "confirm": "The counter takes new bills again."
+    },
+    "billStatus": {
+      "ACTIVE": "Active",
+      "CANCELLED": "Cancelled"
+    },
+    "student": {
+      "title": "Student",
+      "name": "Student name",
+      "nameHint": "Type the student's name",
+      "reusing": "Reusing {{name}} ({{className}})",
+      "change": "Change",
+      "class": "Class",
+      "noClass": "Choose a class",
+      "section": "Section",
+      "roll": "Roll no.",
+      "parentMobile": "Parent mobile"
+    },
+    "billing": {
+      "back": "Back",
+      "closedTitle": "This counter is closed",
+      "closedHint": "A closed counter takes no new bill; its bills stay readable and cancellable, and it can be opened again.",
+      "saved": "Bill saved",
+      "stockWarning": "Stock is at or below zero for:",
+      "openBill": "Open the bill",
+      "newBill": "New bill",
+      "addClassBookList": "Add the class book list",
+      "noBookList": "Class {{className}} has no book list for this session.",
+      "bookListAdded": "Added {{n}} book(s).",
+      "bookListSkipped": "Added {{n}} book(s); {{skipped}} had no price and were skipped.",
+      "remove": "Remove",
+      "noLines": "No lines yet: scan, search or pick an item above.",
+      "remark": "Remark",
+      "gstApplied": "GST applied",
+      "payments": "Payments",
+      "cash": "Cash",
+      "upi": "UPI",
+      "reference": "UPI reference",
+      "short": "Short by",
+      "excess": "Excess",
+      "paidInFull": "Paid in full.",
+      "save": "Save bill",
+      "pickCategory": "Pick items",
+      "add": "Add",
+      "noCategoryItems": "No active items in this category.",
+      "print": "Print",
+      "downloadPdf": "Download PDF"
+    },
+    "bills": {
+      "title": "Counter bills",
+      "subtitle": "Every counter bill of the company, newest first.",
+      "studentFilter": "Showing one student's bills.",
+      "clearStudent": "Show all",
+      "search": "Search number, student",
+      "counter": "Counter",
+      "allCounters": "All counters",
+      "class": "Class",
+      "allStatuses": "All statuses",
+      "from": "From",
+      "to": "To",
+      "empty": "No bills match."
+    },
+    "daySummary": {
+      "title": "Day summary",
+      "subtitle": "What the counters sold on one day. Cancelled bills are left out.",
+      "date": "Date",
+      "allCounters": "All counters",
+      "bills": "Bills",
+      "total": "Total",
+      "cash": "Cash",
+      "upi": "UPI",
+      "books": "Books",
+      "quantity": "Quantity",
+      "empty": "No bills on this day."
+    },
+    "bill": {
+      "panelLabel": "Bill",
+      "number": "Number",
+      "date": "Date",
+      "student": "Student",
+      "status": "Status",
+      "studentBills": "This student's bills",
+      "cancel": "Cancel bill",
+      "cancelTitle": "Cancel this bill",
+      "cancelHint": "The stock is reversed; the bill keeps its number and is left out of the day summary.",
+      "cancelled": "Cancelled",
+      "print": "Print",
+      "downloadPdf": "Download PDF"
+    }
+  },
   "planning": {
     "tab": "Book lists",
     "subtitle": "Which books each class uses in a session, and roughly how many students. Orders take whole class sets from here.",
