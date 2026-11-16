@@ -19,7 +19,8 @@ export const appRoutes: Route[] = [
       {
         path: '',
         pathMatch: 'full',
-        loadComponent: () => import('@org/layout').then((m) => m.WelcomeComponent),
+        // Report R1-R13: the Home page is the dashboard (the Welcome page stays for the other apps).
+        loadComponent: () => import('./pages/dashboard/dashboard-page').then((m) => m.DashboardPageComponent),
       },
       {
         path: 'audit',

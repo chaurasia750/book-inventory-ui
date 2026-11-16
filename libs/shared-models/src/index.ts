@@ -28,3 +28,4 @@ export * from './lib/planning.model';
 export * from './lib/payment.model';
 export * from './lib/return.model';
 export * from './lib/purchase.model';
+export * from './lib/dashboard.model';
