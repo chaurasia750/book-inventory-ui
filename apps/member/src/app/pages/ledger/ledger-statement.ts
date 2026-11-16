@@ -5,6 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { LedgerService, PaymentService, SalesService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
+import { financialYearOptions } from '@org/shared-utils';
 import { LedgerStatement, LedgerStatementParams, LedgerStatementRow } from '@org/shared-models';
 import { ButtonComponent, DatePickerComponent, SkeletonLoaderComponent } from '@org/ui';
 
@@ -39,6 +40,10 @@ export class LedgerStatementComponent {
   readonly field = FIELD;
 
   /** The filter choices; the session filter is the schools' only (R9). */
+  /** The financial years and the sessions are chosen from a list, like everywhere else, not typed. */
+  readonly years = financialYearOptions();
+  readonly sessionOptions = signal<string[]>([]);
+
   readonly kinds = computed<FilterKind[]>(() => (this.party() === 'schools' ? ['ALL', 'YEAR', 'SESSION', 'DATES'] : ['ALL', 'YEAR', 'DATES']));
 
   readonly filters = new FormGroup({
@@ -133,9 +138,27 @@ export class LedgerStatementComponent {
       this.party();
       untracked(() => {
         this.filters.reset({ kind: 'ALL', financialYear: '', session: '', from: '', to: '' });
+        this.loadSessionChoice();
         this.load();
       });
     });
+  }
+
+  /** The sessions of a school: the one of today, the one before and after it, and any other a statement line has. */
+  private loadSessionChoice(): void {
+    this.sessionOptions.set([]);
+    if (this.party() !== 'schools') {
+      return;
+    }
+
+    this.sales.sessionChoice(this.id(), new Date().toISOString().slice(0, 10)).subscribe({
+      next: (choice) => this.addSessions([choice.next, choice.session, choice.previous]),
+      error: () => undefined,
+    });
+  }
+
+  private addSessions(names: (string | null)[]): void {
+    this.sessionOptions.update((list) => [...new Set([...list, ...names.filter((n): n is string => !!n)])].sort().reverse());
   }
 
   kindKey(kind: FilterKind): string {
@@ -158,6 +181,7 @@ export class LedgerStatementComponent {
         this.loading.set(false);
         this.shownParams = params;
         this.statement.set(statement);
+        this.addSessions(statement.rows.map((r) => r.session));
       },
       error: (error: unknown) => {
         this.loading.set(false);

@@ -1463,6 +1463,7 @@
       "kind": "Show",
       "all": "All entries",
       "year": "Financial year",
+      "choose": "Choose",
       "session": "Session",
       "dates": "Date range",
       "from": "From",
@@ -1728,6 +1729,7 @@
     },
     "filters": {
       "search": "Search counter, school",
+      "allSessions": "All sessions",
       "session": "Session",
       "allStatuses": "All statuses",
       "allSchools": "All schools"

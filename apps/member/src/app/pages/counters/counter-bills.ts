@@ -9,12 +9,12 @@ import { CounterService, SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { COUNTER_BILL_STATUSES, Counter, CounterBillStatus, CounterBillSummary, PagedList, SchoolSummary } from '@org/shared-models';
 import { counterBillStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
+import { ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, injectPanelState } from '@org/ui';
 import { CounterBillDetailComponent } from './counter-bill-detail';
 
 const PAGE_SIZE = 20;
 const CHOICES = 200;
-const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
+const SELECT = 'h-10 w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
 
 /**
  * The company's counter bills (sales spec R47, R49): search by number and student name, filters by counter, school, class, status and
@@ -25,7 +25,7 @@ const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gra
 @Component({
   selector: 'app-counter-bills',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, CounterBillDetailComponent],
+  imports: [DatePipe, DecimalPipe, ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent, ListDetailComponent, PaginationComponent, SkeletonLoaderComponent, CounterBillDetailComponent],
   templateUrl: './counter-bills.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

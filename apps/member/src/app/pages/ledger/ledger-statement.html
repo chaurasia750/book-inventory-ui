@@ -8,15 +8,21 @@
     </div>
     @switch (filters.controls.kind.value) {
       @case ('YEAR') {
-        <div class="w-32">
+        <div class="w-36">
           <label for="ls-year" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'ledger.filter.year' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          <input id="ls-year" formControlName="financialYear" placeholder="2026-27" [class]="field" />
+          <select id="ls-year" formControlName="financialYear" [class]="field">
+            <option value="">{{ 'ledger.filter.choose' | translate }}</option>
+            @for (name of years; track name) { <option [value]="name">{{ name }}</option> }
+          </select>
         </div>
       }
       @case ('SESSION') {
-        <div class="w-32">
+        <div class="w-36">
           <label for="ls-session" class="mb-1 block text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{{ 'ledger.filter.session' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          <input id="ls-session" formControlName="session" placeholder="2026-27" [class]="field" />
+          <select id="ls-session" formControlName="session" [class]="field">
+            <option value="">{{ 'ledger.filter.choose' | translate }}</option>
+            @for (name of sessionOptions(); track name) { <option [value]="name">{{ name }}</option> }
+          </select>
         </div>
       }
       @case ('DATES') {

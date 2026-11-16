@@ -6,7 +6,7 @@
 
   <div class="flex flex-wrap items-center gap-3">
     <label for="cds-date" class="text-sm font-semibold">{{ 'counter.daySummary.date' | translate }}</label>
-    <input id="cds-date" type="date" [formControl]="date" [class]="select" />
+    <div class="w-44"><app-date-picker inputId="cds-date" [formControl]="date" /></div>
     <select (change)="setCounter($any($event.target).value)" [attr.aria-label]="'counter.bills.counter' | translate" [class]="select">
       <option value="">{{ 'counter.daySummary.allCounters' | translate }}</option>
       @for (counter of countersList(); track counter.id) { <option [value]="counter.id">{{ counter.name }}</option> }

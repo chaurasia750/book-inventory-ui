@@ -55,3 +55,12 @@ export function timeAgo(date: string | Date): string {
 
   return `${value} ${unit}${value === 1 ? '' : 's'} ago`;
 }
+
+/**
+ * The financial years (April-March, written `2026-27`) a screen offers in a drop-down instead of a free text box: next year, this
+ * one and the previous four, newest first.
+ */
+export function financialYearOptions(today: Date = new Date(), previous = 4): string[] {
+  const start = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+  return Array.from({ length: previous + 2 }, (_, i) => start + 1 - i).map((year) => `${year}-${String((year + 1) % 100).padStart(2, '0')}`);
+}

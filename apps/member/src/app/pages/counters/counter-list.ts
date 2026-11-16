@@ -17,6 +17,7 @@ import { CounterEditComponent } from './counter-edit';
 
 const PAGE_SIZE = 20;
 const SCHOOL_CHOICES = 200;
+const SESSION_SCAN = 200;
 const SELECT = 'h-10 max-w-full min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100';
 
 /**
@@ -61,7 +62,8 @@ export class CounterListComponent {
   readonly statuses = COUNTER_STATUSES;
 
   readonly search = new FormControl('', { nonNullable: true });
-  readonly session = new FormControl('', { nonNullable: true });
+  readonly sessionFilter = signal('');
+  readonly sessions = signal<string[]>([]);
   readonly status = signal<CounterStatus | ''>('');
   readonly schoolId = signal('');
   readonly schools = signal<SchoolSummary[]>([]);
@@ -77,19 +79,33 @@ export class CounterListComponent {
     this.search.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.applyFilters());
-    this.session.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.applyFilters());
     this.schoolService
       .list({ orderBy: 'Name ASC', pageIndex: 1, pageSize: SCHOOL_CHOICES })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: (page) => this.schools.set(page.items), error: () => this.schools.set([]) });
+    this.loadSessions();
     this.load();
   }
 
   applyFilters(): void {
     this.page.set(1);
     this.load();
+  }
+
+  setSession(value: string): void {
+    this.sessionFilter.set(value);
+    this.applyFilters();
+  }
+
+  /** The drop-down offers the sessions the company's counters have, newest first. */
+  private loadSessions(): void {
+    this.counters
+      .list({ orderBy: 'CreatedAt DESC', pageIndex: 1, pageSize: SESSION_SCAN })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (page) => this.sessions.set([...new Set(page.items.map((c) => c.session))].sort().reverse()),
+        error: () => this.sessions.set([]),
+      });
   }
 
   setStatus(value: string): void {
@@ -132,6 +148,7 @@ export class CounterListComponent {
   }
 
   openCreated(id: string): void {
+    this.loadSessions();
     this.load();
     this.openView(id);
   }
@@ -147,7 +164,7 @@ export class CounterListComponent {
     this.counters
       .list({
         search: this.search.value.trim() || undefined,
-        session: this.session.value.trim() || undefined,
+        session: this.sessionFilter() || undefined,
         status: this.status() || undefined,
         schoolId: this.schoolId() || undefined,
         orderBy: 'CreatedAt DESC',

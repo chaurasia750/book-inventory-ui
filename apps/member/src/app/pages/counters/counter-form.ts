@@ -5,7 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SalesService, SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { Counter, CounterFields, SchoolSummary } from '@org/shared-models';
-import { ButtonComponent } from '@org/ui';
+import { ButtonComponent, DatePickerComponent } from '@org/ui';
 
 const FIELD = 'h-10 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-100';
 const SCHOOL_CHOICES = 200;
@@ -23,7 +23,7 @@ function today(): string {
 @Component({
   selector: 'app-counter-form',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent],
+  imports: [ReactiveFormsModule, TranslatePipe, ButtonComponent, DatePickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
@@ -46,11 +46,11 @@ function today(): string {
         </div>
         <div>
           <label for="ctf-start" class="mb-1 block text-sm font-semibold">{{ 'counter.fields.startDate' | translate }}<span class="text-red-500" aria-hidden="true"> *</span></label>
-          <input id="ctf-start" type="date" formControlName="startDate" (change)="datesChanged()" class="${FIELD}" />
+          <app-date-picker inputId="ctf-start" formControlName="startDate" (valueChange)="datesChanged()" />
         </div>
         <div>
           <label for="ctf-end" class="mb-1 block text-sm font-semibold">{{ 'counter.fields.endDate' | translate }}</label>
-          <input id="ctf-end" type="date" formControlName="endDate" class="${FIELD}" />
+          <app-date-picker inputId="ctf-end" formControlName="endDate" />
           @if (endBeforeStart()) {
             <p class="mt-1 text-xs text-red-600" role="alert">{{ 'counter.fields.endBeforeStart' | translate }}</p>
           }
