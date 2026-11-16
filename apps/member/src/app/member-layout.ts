@@ -94,6 +94,9 @@ export class MemberLayoutComponent {
         // The order editor (`/school-orders/new`, `/school-orders/:id`) belongs to the order list: it stays highlighted and titled there.
         { name: 'Order list', path: '/orders', aliases: ['/school-orders'] },
         { name: 'Invoices', path: '/invoices' },
+        // Sales R53-R69: the school returns (credit notes) for the Owner and Staff; the refunds only for the Owner (R67).
+        { name: 'Returns', path: '/returns' },
+        ...(this.auth.hasAppRole('OWNER') ? [{ name: 'Refunds', path: '/refunds' }] : []),
       ],
     },
   ];

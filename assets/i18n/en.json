@@ -1015,6 +1015,7 @@
     "detail": {
       "title": "Payment receipt",
       "print": "Print",
+      "date": "Date",
       "downloadPdf": "Download PDF",
       "total": "Total",
       "advance": "Advance",
@@ -1942,6 +1943,107 @@
       "bank": "Bank account",
       "settings": "Invoice settings",
       "cutoffs": "Session cut-offs"
+    }
+  },
+  "returns": {
+    "title": "Returns",
+    "subtitle": "Books the schools give back: each return is a credit note.",
+    "panelLabel": "Credit note",
+    "new": "New return",
+    "search": "Search number, school",
+    "allSchools": "All schools",
+    "allStatuses": "All statuses",
+    "allReasons": "All reasons",
+    "empty": "No credit notes match.",
+    "columns": {
+      "number": "Number",
+      "date": "Date",
+      "status": "Status"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "CANCELLED": "Cancelled"
+    },
+    "reason": {
+      "SESSION_END": "Session end",
+      "DAMAGED": "Damaged",
+      "WRONG_BOOK": "Wrong book",
+      "OTHER": "Other"
+    },
+    "condition": {
+      "GOOD": "Good",
+      "DAMAGED": "Damaged"
+    },
+    "fields": {
+      "school": "School",
+      "invoice": "Invoice",
+      "noInvoice": "No invoice (choose the books)",
+      "date": "Date (today if empty)",
+      "reason": "Reason",
+      "remark": "Remark",
+      "gst": "Apply GST"
+    },
+    "lines": {
+      "noneInvoice": "This invoice has no lines.",
+      "noneItem": "Search a book above to add it to the return.",
+      "sold": "Sold",
+      "returnable": "Can return",
+      "rate": "Rate",
+      "rateAuto": "last rate",
+      "condition": "Condition",
+      "remove": "Remove the line"
+    },
+    "add": {
+      "title": "New return",
+      "submit": "Make credit note"
+    },
+    "detail": {
+      "cancel": "Cancel credit note",
+      "cancelTitle": "Cancel this credit note?",
+      "cancelHint": "The books leave the stock again and the school ledger credit is reversed. The number stays.",
+      "cancelled": "Cancelled",
+      "refunds": "Refunds",
+      "noRefunds": "No refund names this credit note.",
+      "overWarning": "More was returned than was sold on the invoice. The credit note is saved; check the quantities."
+    },
+    "invoiceBlock": {
+      "title": "Returns",
+      "none": "No credit note was made against this invoice.",
+      "returned": "Returned"
+    }
+  },
+  "refunds": {
+    "title": "Refunds",
+    "subtitle": "Money paid back to the schools. Each refund has a slip to hand over.",
+    "panelLabel": "Refund",
+    "new": "New refund",
+    "empty": "No refunds match.",
+    "mode": {
+      "CASH": "Cash",
+      "UPI": "UPI",
+      "BANK_TRANSFER": "Bank transfer"
+    },
+    "fields": {
+      "amount": "Amount",
+      "mode": "Paid by",
+      "upiRef": "UPI transaction id",
+      "bankRef": "Bank UTR number",
+      "date": "Date (today if empty)",
+      "creditNote": "Credit note it settles",
+      "noCreditNote": "None",
+      "credit": "The school can be refunded up to",
+      "noCredit": "The school has no credit to refund."
+    },
+    "add": {
+      "title": "New refund",
+      "submit": "Record refund"
+    },
+    "detail": {
+      "print": "Print",
+      "downloadPdf": "Download PDF",
+      "cancel": "Cancel refund",
+      "cancelTitle": "Cancel this refund?",
+      "cancelHint": "The ledger posting is reversed and the school is owed the money again. The number stays."
     }
   }
 }

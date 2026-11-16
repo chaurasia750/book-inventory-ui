@@ -17,3 +17,4 @@ export * from './lib/core-audit.service';
 export * from './lib/ledger.service';
 export * from './lib/sales.service';
 export * from './lib/planning.service';
+export * from './lib/return.service';
