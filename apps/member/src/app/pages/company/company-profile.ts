@@ -6,7 +6,7 @@ import { forkJoin } from 'rxjs';
 import { CompanyService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { CompanyInvoiceIdentity, CompanyProfile } from '@org/shared-models';
-import { ButtonComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
+import { ButtonComponent, SkeletonLoaderComponent, injectRouteParam, TabStripDirective } from '@org/ui';
 import { SessionCutOffsComponent } from '../sales/session-cut-offs';
 import { CompanyBankFormComponent } from './company-bank-form';
 import { CompanyDetailsFormComponent } from './company-details-form';
@@ -23,7 +23,7 @@ type CompanyTab = 'details' | 'images' | 'bank' | 'settings' | 'cutoffs';
 @Component({
   selector: 'app-company-profile',
   standalone: true,
-  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, CompanyDetailsFormComponent, CompanyImagesComponent, CompanyBankFormComponent, CompanyInvoiceSettingsComponent, SessionCutOffsComponent],
+  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, SkeletonLoaderComponent, CompanyDetailsFormComponent, CompanyImagesComponent, CompanyBankFormComponent, CompanyInvoiceSettingsComponent, SessionCutOffsComponent, TabStripDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3">
@@ -40,7 +40,7 @@ type CompanyTab = 'details' | 'images' | 'bank' | 'settings' | 'cutoffs';
         </section>
 
         <section class="overflow-hidden rounded-[10px] border border-neutral-200 bg-white dark:border-charcoal-700 dark:bg-charcoal-800">
-          <div class="flex gap-6 overflow-x-auto overflow-y-hidden border-b border-neutral-200 px-4 dark:border-charcoal-700" role="tablist">
+          <div appTabStrip class="flex gap-6 border-b border-neutral-200 px-4 dark:border-charcoal-700" role="tablist">
             @for (t of tabs; track t) {
               <a role="tab" [routerLink]="tabLink(t)" [attr.aria-selected]="tab() === t"
                 class="-mb-px shrink-0 whitespace-nowrap border-b-2 py-3 text-sm font-semibold transition-colors"
