@@ -36,6 +36,11 @@ export class ReturnService {
     return this.api.post<void>(`/credit-notes/${id}/cancel`, { reason });
   }
 
+  /** R71: the credit note as an A4 PDF. */
+  creditNotePdf(id: string): Observable<Blob> {
+    return this.api.getBlob(`/credit-notes/${id}/pdf`);
+  }
+
   /** R54, R61: the invoice's returnable lines and its credit notes. */
   invoiceReturns(invoiceId: string): Observable<InvoiceReturns> {
     return this.api.get<InvoiceReturns>(`/invoices/${invoiceId}/returnable`);

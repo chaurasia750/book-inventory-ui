@@ -1998,6 +1998,8 @@
       "submit": "Make credit note"
     },
     "detail": {
+      "print": "Print",
+      "downloadPdf": "Download PDF",
       "cancel": "Cancel credit note",
       "cancelTitle": "Cancel this credit note?",
       "cancelHint": "The books leave the stock again and the school ledger credit is reversed. The number stays.",
@@ -2044,6 +2046,107 @@
       "cancel": "Cancel refund",
       "cancelTitle": "Cancel this refund?",
       "cancelHint": "The ledger posting is reversed and the school is owed the money again. The number stays."
+    }
+  },
+  "purchase": {
+    "title": "Vendor returns",
+    "subtitle": "Books sent back to the vendors: each return is a Debit Note.",
+    "panelLabel": "Vendor return",
+    "new": "New vendor return",
+    "search": "Search number, vendor",
+    "allVendors": "All vendors",
+    "empty": "No vendor returns match.",
+    "fields": {
+      "vendor": "Vendor",
+      "chooseVendor": "Choose a vendor",
+      "date": "Date (today if empty)",
+      "remark": "Remark"
+    },
+    "source": {
+      "MAIN": "Main stock",
+      "DAMAGED": "Damaged stock"
+    },
+    "lines": {
+      "none": "Search a book above to add it to the return.",
+      "source": "From",
+      "rate": "Rate",
+      "rateAuto": "purchase price",
+      "remove": "Remove the line"
+    },
+    "add": {
+      "title": "New vendor return",
+      "submit": "Make vendor return"
+    },
+    "detail": {
+      "print": "Print",
+      "downloadPdf": "Download PDF",
+      "cancel": "Cancel vendor return",
+      "cancelTitle": "Cancel this vendor return?",
+      "cancelHint": "The books come back into the stock and the vendor ledger debit is reversed. The number stays.",
+      "lowStock": "The stock of an item is now zero or below. The vendor return is saved; check the stock."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "session": "Session",
+    "current": "current",
+    "partFailed": "This part could not be read. Try again.",
+    "buttons": {
+      "newOrder": "New order",
+      "payment": "Payment",
+      "counter": "Counter sale"
+    },
+    "payments": {
+      "title": "Payments received",
+      "received": "received in this session",
+      "receipts": "receipts",
+      "earlier": "Earlier sessions' payment that came in",
+      "schools": "school(s)",
+      "mode": {
+        "CASH": "Cash",
+        "UPI": "UPI",
+        "BANK_TRANSFER": "Bank transfer",
+        "CHEQUE": "Cheque (cleared)"
+      },
+      "stillDue": "still due on those invoices",
+      "pending": "Pending cheques"
+    },
+    "orders": {
+      "title": "Orders and invoices",
+      "DRAFT": "Draft orders",
+      "CONFIRMED": "Confirmed orders",
+      "CLOSED": "Closed orders",
+      "invoices": "Invoices made",
+      "cancelled": "invoices cancelled",
+      "stillToInvoice": "books still to invoice"
+    },
+    "sales": {
+      "title": "Sales",
+      "today": "Today",
+      "session": "This session",
+      "invoices": "Invoices",
+      "counter": "Counter",
+      "line": "Sale of the last days"
+    },
+    "returns": {
+      "title": "Returns and refunds",
+      "creditNotes": "Credit notes",
+      "refunds": "Refunds",
+      "vendorReturns": "Vendor returns"
+    },
+    "owed": {
+      "title": "What is owed",
+      "schoolsOwing": "Schools owe us",
+      "schoolsInAdvance": "Schools in advance",
+      "vendorsOwed": "We owe vendors"
+    },
+    "stock": {
+      "title": "Stock",
+      "low": "At or below zero",
+      "negative": "Below zero",
+      "damaged": "Damaged pieces",
+      "value": "Stock value",
+      "withoutPrice": "items without a purchase price"
     }
   }
 }

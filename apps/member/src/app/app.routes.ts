@@ -19,7 +19,8 @@ export const appRoutes: Route[] = [
       {
         path: '',
         pathMatch: 'full',
-        loadComponent: () => import('@org/layout').then((m) => m.WelcomeComponent),
+        // Report R1-R13: the Home page is the dashboard (the Welcome page stays for the other apps).
+        loadComponent: () => import('./pages/dashboard/dashboard-page').then((m) => m.DashboardPageComponent),
       },
       {
         path: 'audit',
@@ -172,6 +173,16 @@ export const appRoutes: Route[] = [
         path: 'refunds',
         canActivate: [appRoleGuard(['OWNER'])],
         loadComponent: () => import('./pages/returns/refund-list').then((m) => m.RefundListComponent),
+        children: [
+          { path: 'new', children: [] },
+          { path: ':id', children: [] },
+        ],
+      },
+      {
+        // Purchase R2-R12: the vendor returns with a return's panel and the form for a new one beside the list (platform U10).
+        path: 'vendor-returns',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/purchase/vendor-return-list').then((m) => m.VendorReturnListComponent),
         children: [
           { path: 'new', children: [] },
           { path: ':id', children: [] },
