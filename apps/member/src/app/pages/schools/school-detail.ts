@@ -7,7 +7,7 @@ import { SchoolService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { SchoolDetail } from '@org/shared-models';
 import { schoolStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
+import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, injectRouteParam, TabStripDirective } from '@org/ui';
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
 import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 import { SchoolDocumentsTabComponent } from '../sales/school-documents-tab';
@@ -33,7 +33,7 @@ const tabPath = (tab: ProfileTab): string => (tab === 'bookLists' ? 'book-lists'
 @Component({
   selector: 'app-school-detail',
   standalone: true,
-  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, LedgerStatementComponent, PartyLedgerSummaryComponent, SchoolDocumentsTabComponent, SchoolCountersTabComponent, SchoolReturnsTabComponent, SchoolPaymentsTabComponent, InvoiceLayoutSettingComponent, BookListsTabComponent, MoneyPipe],
+  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, LedgerStatementComponent, PartyLedgerSummaryComponent, SchoolDocumentsTabComponent, SchoolCountersTabComponent, SchoolReturnsTabComponent, SchoolPaymentsTabComponent, InvoiceLayoutSettingComponent, BookListsTabComponent, MoneyPipe, TabStripDirective],
   templateUrl: './school-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

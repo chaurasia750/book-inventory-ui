@@ -6,7 +6,7 @@ import { VendorService } from '@org/api-services';
 import { messageForError } from '@org/interceptors';
 import { VendorDetail } from '@org/shared-models';
 import { vendorStatusBadgeClass } from '@org/shared-utils';
-import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, injectRouteParam } from '@org/ui';
+import { ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, injectRouteParam, TabStripDirective } from '@org/ui';
 import { LedgerStatementComponent } from '../ledger/ledger-statement';
 import { PartyLedgerSummaryComponent } from '../ledger/party-ledger-summary';
 import { MoneyPipe } from '../counters/money.pipe';
@@ -19,7 +19,7 @@ import { MoneyPipe } from '../counters/money.pipe';
 @Component({
   selector: 'app-vendor-detail',
   standalone: true,
-  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, LedgerStatementComponent, PartyLedgerSummaryComponent, MoneyPipe],
+  imports: [NgClass, RouterLink, TranslatePipe, ButtonComponent, CardComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent, LedgerStatementComponent, PartyLedgerSummaryComponent, MoneyPipe, TabStripDirective],
   templateUrl: './vendor-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

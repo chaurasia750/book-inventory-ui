@@ -26,6 +26,7 @@ export * from './lib/change-password/change-password';
 export * from './lib/title-select/title-select';
 export * from './lib/global-loader/global-loader';
 export * from './lib/disable-on-request/disable-on-request';
+export * from './lib/tab-strip/tab-strip';
 export * from './lib/date-picker/date-picker';
 export * from './lib/status-badge/status-badge';
 export * from './lib/reject-modal/reject-modal';
