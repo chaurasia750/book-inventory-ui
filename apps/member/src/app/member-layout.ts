@@ -84,6 +84,16 @@ export class MemberLayoutComponent {
     },
   ];
 
+  /** Purchase R2-R12: the Owner and Staff both see the Purchases menu (the vendor returns; Staff cannot cancel inside it, R9). */
+  private readonly purchaseNavItems: SidebarNavItem[] = [
+    {
+      name: 'Purchases',
+      icon: SETTINGS_ICON,
+      section: 'BUSINESS',
+      subItems: [{ name: 'Vendor returns', path: '/vendor-returns' }],
+    },
+  ];
+
   /** Sales R19, platform U14: the Owner and Staff place and follow orders from one Orders menu (the school profile keeps its tabs). */
   private readonly ordersNavItems: SidebarNavItem[] = [
     {
@@ -120,6 +130,7 @@ export class MemberLayoutComponent {
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.itemNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.ordersNavItems : []),
     ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.counterNavItems : []),
+    ...(this.auth.hasAppRole('OWNER') || this.auth.hasAppRole('STAFF') ? this.purchaseNavItems : []),
     ...(this.auth.hasAppRole('OWNER') ? this.ownerNavItems : []),
   ];
 

@@ -18,3 +18,4 @@ export * from './lib/ledger.service';
 export * from './lib/sales.service';
 export * from './lib/planning.service';
 export * from './lib/return.service';
+export * from './lib/purchase.service';

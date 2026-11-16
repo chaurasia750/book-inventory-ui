@@ -7,6 +7,7 @@ import { messageForError } from '@org/interceptors';
 import { Refund } from '@org/shared-models';
 import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
+import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
 
 /**
  * One refund in the panel beside the refunds list (sales spec R64, R67, R68, R69): its number, date, school, amount, mode and
@@ -92,6 +93,8 @@ export class RefundDetailComponent {
 
   statusClass = counterBillStatusBadgeClass;
 
+  private readonly pdfHandlers: PdfHandlers = { busy: (v) => this.busy.set(v), failed: (e) => this.actionError.set(messageForError(e, this.translate)) };
+
   constructor() {
     effect(() => {
       this.id();
@@ -120,38 +123,16 @@ export class RefundDetailComponent {
     this.cancelOpen.set(true);
   }
 
-  /** R68: the slip opens in a new tab for the browser's print dialog; the tab is opened first so a pop-up blocker allows it. */
+  /** R68: the slip opens in a new tab for the browser's print dialog. */
   print(r: Refund): void {
-    const tab = window.open('', '_blank');
-    this.withPdf(r, (url) => { if (tab) tab.location.href = url; }, () => tab?.close());
+    this.actionError.set('');
+    printPdf(this.returns.refundSlip(r.id), this.pdfHandlers);
   }
 
   /** R68: the slip is saved as a file named after the refund number. */
   download(r: Refund): void {
-    this.withPdf(r, (url) => {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = r.number.split('/').join('-') + '.pdf';
-      link.click();
-    });
-  }
-
-  private withPdf(r: Refund, use: (objectUrl: string) => void, onError?: () => void): void {
-    this.busy.set(true);
     this.actionError.set('');
-    this.returns.refundSlip(r.id).subscribe({
-      next: (blob) => {
-        this.busy.set(false);
-        const url = URL.createObjectURL(blob);
-        use(url);
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      },
-      error: (e: unknown) => {
-        this.busy.set(false);
-        this.actionError.set(messageForError(e, this.translate));
-        onError?.();
-      },
-    });
+    downloadPdf(this.returns.refundSlip(r.id), r.number, this.pdfHandlers);
   }
 
   cancel(): void {

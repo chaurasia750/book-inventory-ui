@@ -178,6 +178,16 @@ export const appRoutes: Route[] = [
         ],
       },
       {
+        // Purchase R2-R12: the vendor returns with a return's panel and the form for a new one beside the list (platform U10).
+        path: 'vendor-returns',
+        canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
+        loadComponent: () => import('./pages/purchase/vendor-return-list').then((m) => m.VendorReturnListComponent),
+        children: [
+          { path: 'new', children: [] },
+          { path: ':id', children: [] },
+        ],
+      },
+      {
         path: 'schools',
         canActivate: [appRoleGuard(['OWNER', 'STAFF'])],
         loadComponent: () => import('./pages/schools/school-list').then((m) => m.SchoolListComponent),

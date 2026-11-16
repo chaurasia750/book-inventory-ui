@@ -9,6 +9,7 @@ import { CreditNote, Refund, SaleTotals } from '@org/shared-models';
 import { counterBillStatusBadgeClass } from '@org/shared-utils';
 import { ButtonComponent, CloseButtonComponent, ModalComponent, SkeletonLoaderComponent } from '@org/ui';
 import { SaleTotalsComponent } from '../sales/sale-totals';
+import { PdfHandlers, downloadPdf, printPdf } from './pdf-delivery';
 
 /**
  * One credit note in the panel beside the returns list (sales spec R57, R58, R61): its number, date, school, invoice, reason, the
@@ -51,9 +52,12 @@ import { SaleTotalsComponent } from '../sales/sale-totals';
           @if (overReturned()) {
             <p class="m-0 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800" role="status">{{ 'returns.detail.overWarning' | translate }}</p>
           }
-          @if (isOwner && n.status === 'ACTIVE') {
-            <div class="flex gap-2"><app-button size="sm" variant="secondary" (clicked)="openCancel()">{{ 'returns.detail.cancel' | translate }}</app-button></div>
-          }
+          <div class="flex flex-wrap gap-2">
+            <app-button size="sm" variant="secondary" [loading]="busy()" (clicked)="print(n)">{{ 'returns.detail.print' | translate }}</app-button>
+            <app-button size="sm" [loading]="busy()" (clicked)="download(n)">{{ 'returns.detail.downloadPdf' | translate }}</app-button>
+            @if (isOwner && n.status === 'ACTIVE') { <app-button size="sm" variant="secondary" (clicked)="openCancel()">{{ 'returns.detail.cancel' | translate }}</app-button> }
+          </div>
+          @if (actionError()) { <p class="m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600" role="alert">{{ actionError() }}</p> }
           @if (n.status === 'CANCELLED' && n.cancelReason) {
             <p class="m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600" role="status">{{ 'returns.detail.cancelled' | translate }}: {{ n.cancelReason }}@if (n.cancelledOn) { <span class="text-gray-500"> ({{ n.cancelledOn }})</span> }</p>
           }
@@ -125,6 +129,8 @@ export class CreditNoteDetailComponent {
   readonly refunds = signal<Refund[]>([]);
   readonly loading = signal(true);
   readonly loadError = signal('');
+  readonly busy = signal(false);
+  readonly actionError = signal('');
   readonly cancelOpen = signal(false);
   readonly cancelling = signal(false);
   readonly cancelError = signal('');
@@ -148,6 +154,8 @@ export class CreditNoteDetailComponent {
 
   statusClass = counterBillStatusBadgeClass;
 
+  private readonly pdfHandlers: PdfHandlers = { busy: (v) => this.busy.set(v), failed: (e) => this.actionError.set(messageForError(e, this.translate)) };
+
   constructor() {
     effect(() => {
       this.id();
@@ -170,6 +178,18 @@ export class CreditNoteDetailComponent {
         this.loadError.set(messageForError(e, this.translate));
       },
     });
+  }
+
+  /** R71: the credit note opens in a new tab for the browser's print dialog. */
+  print(n: CreditNote): void {
+    this.actionError.set('');
+    printPdf(this.returns.creditNotePdf(n.id), this.pdfHandlers);
+  }
+
+  /** R71: the credit note is saved as a file named after its number. */
+  download(n: CreditNote): void {
+    this.actionError.set('');
+    downloadPdf(this.returns.creditNotePdf(n.id), n.number, this.pdfHandlers);
   }
 
   openCancel(): void {
